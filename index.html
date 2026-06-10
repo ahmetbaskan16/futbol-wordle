@@ -484,6 +484,8 @@
     <div id="toast" class="toast"></div>
 
     <script>
+        const API_URL = '/api/leaderboard';
+
         const CLUBS = [
             'Fenerbahce', 'Fenerbahce', 'Fenerbahce', 'Fenerbahce', 'Fenerbahce',
             'Galatasaray', 'Besiktas', 'Trabzonspor', 'Eyupspor', 'Basaksehir',
@@ -606,7 +608,7 @@
             } else { currentRow++; currentLetterIndex = 0; }
         }
 
-        function updateStats(win) {
+        async function updateStats(win) {
             stats.played++;
             if (win) {
                 stats.wins++; 
@@ -617,11 +619,22 @@
                 stats.bestRuns.push({ guesses: currentRow + 1, time: timeTaken, club: rawTarget });
                 stats.bestRuns.sort((a, b) => a.guesses - b.guesses || a.time - b.time);
                 stats.bestRuns = stats.bestRuns.slice(0, 10);
+                
+                // Submit to global leaderboard
+                if (username) {
+                    try {
+                        await fetch(API_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name: username, score: stats.totalScore })
+                        });
+                    } catch (e) { console.error("Global score submit failed", e); }
+                }
             } else { stats.streak = 0; }
             saveStats();
         }
 
-        function toggleStats() {
+        async function toggleStats() {
             document.getElementById('stats-played').textContent = stats.played;
             document.getElementById('stats-score').textContent = stats.totalScore || 0;
             document.getElementById('stats-streak').textContent = stats.streak;
@@ -635,27 +648,23 @@
                 </div>
             `).join('') : '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Henüz galibiyet yok</p>';
 
-            const players = [
-                {name: "Baskan66", score: 84},
-                {name: "Doğu CD", score: 72},
-                {name: "Fenerli1907", score: 65},
-                {name: "pes_master", score: 58},
-                {name: "Efe_77", score: 49},
-                {name: "Arda_Guler_Fan", score: 42},
-                {name: "Gol_Makinesi", score: 38},
-                {name: "Kramponlu_Dev", score: 31},
-                {name: "Süper_Lig_Uzmanı", score: 25},
-                {name: "Tribun_Sesi", score: 19},
-                {name: username || "Oyuncu", score: stats.totalScore || 0, isUser: true}
-            ].sort((a, b) => b.score - a.score);
-
             const glb = document.getElementById('global-leaderboard');
-            glb.innerHTML = players.map((l, i) => `
-                <div class="leaderboard-item ${l.isUser ? 'highlight' : ''}">
-                    <span><span class="rank">${i+1}</span> ${l.name}</span>
-                    <span style="font-weight:800">${l.score}</span>
-                </div>
-            `).join('');
+            glb.innerHTML = '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Yükleniyor...</p>';
+            
+            try {
+                const res = await fetch(API_URL);
+                if (res.ok) {
+                    const players = await res.json();
+                    glb.innerHTML = players.map((l, i) => `
+                        <div class="leaderboard-item ${l.name === username ? 'highlight' : ''}">
+                            <span><span class="rank">${i+1}</span> ${l.name}</span>
+                            <span style="font-weight:800">${l.score}</span>
+                        </div>
+                    `).join('');
+                } else { throw new Error(); }
+            } catch (e) {
+                glb.innerHTML = '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Sıralama şu an kapalı</p>';
+            }
             
             statsOverlay.style.display = (statsOverlay.style.display === 'flex') ? 'none' : 'flex';
         }
