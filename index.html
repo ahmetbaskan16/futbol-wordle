@@ -614,9 +614,14 @@
                 const res = await fetch(`${API_URL}?_=${Date.now()}`);
                 if (res.ok) {
                     const text = await res.text();
-                    if (!text) return [];
-                    const data = JSON.parse(text);
-                    return Array.isArray(data) ? data : [];
+                    if (!text || text.trim() === "") return [];
+                    try {
+                        const data = JSON.parse(text);
+                        return Array.isArray(data) ? data : [];
+                    } catch (e) {
+                        console.error("JSON parse failed", e);
+                        return [];
+                    }
                 }
             } catch (e) { console.error("Leaderboard fetch failed", e); }
             return [];
@@ -642,7 +647,7 @@
                 for (let attempt = 0; attempt < 3; attempt++) {
                     try {
                         let leaderboard = await getGlobalLeaderboard();
-                        const existingIdx = leaderboard.findIndex(p => p.name.toLowerCase() === username.toLowerCase());
+                        const existingIdx = leaderboard.findIndex(p => p.name && p.name.toLowerCase() === username.toLowerCase());
                         
                         if (existingIdx > -1) {
                             leaderboard[existingIdx].score = Math.max(stats.totalScore, leaderboard[existingIdx].score);
@@ -676,7 +681,7 @@
             document.getElementById('stats-max').textContent = stats.maxStreak;
             
             const lb = document.getElementById('leaderboard');
-            lb.innerHTML = stats.bestRuns.length ? stats.bestRuns.map((r, i) => `
+            lb.innerHTML = (stats.bestRuns && stats.bestRuns.length) ? stats.bestRuns.map((r, i) => `
                 <div class="leaderboard-item">
                     <span><span class="rank">#${i+1}</span> ${r.club}</span>
                     <span style="opacity:0.6">${r.guesses} deneme</span>
@@ -690,11 +695,11 @@
                 glb.innerHTML = '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Yükleniyor...</p>';
                 try {
                     const players = await getGlobalLeaderboard();
-                    if (players && players.length > 0) {
+                    if (players && Array.isArray(players) && players.length > 0) {
                         glb.innerHTML = players.map((l, i) => `
-                            <div class="leaderboard-item ${l.name.toLowerCase() === (username || "").toLowerCase() ? 'highlight' : ''}">
-                                <span><span class="rank">${i+1}</span> ${l.name}</span>
-                                <span style="font-weight:800">${l.score}</span>
+                            <div class="leaderboard-item ${(l.name && username && l.name.toLowerCase() === username.toLowerCase()) ? 'highlight' : ''}">
+                                <span><span class="rank">${i+1}</span> ${l.name || 'Anonim'}</span>
+                                <span style="font-weight:800">${l.score || 0}</span>
                             </div>
                         `).join('');
                     } else {
