@@ -438,7 +438,7 @@
                 <button class="key" data-key="B">B</button>
                 <button class="key" data-key="N">N</button>
                 <button class="key" data-key="M">M</button>
-                <button class="key large" data-key="BACKSPACE">⌫</button>
+                <button class="key large" data-key="BACKSPACE">+</button>
             </div>
         </div>
     </div>
@@ -446,29 +446,29 @@
     <!-- Login Modal -->
     <div id="login-overlay" class="overlay">
         <div class="modal">
-            <h2>İSMİN NE?</h2>
-            <p style="color:var(--text-secondary); margin-bottom: 20px;">Global Leaderboard'da yer almak için ismini gir.</p>
+            <h2>0S0MN NE?</h2>
+            <p style="color:var(--text-secondary); margin-bottom: 20px;">Global Leaderboard'da yer almak iin ismini gir.</p>
             <div class="input-group">
-                <input type="text" id="username-input" class="modern-input" placeholder="İsmin" maxlength="15">
+                <input type="text" id="username-input" class="modern-input" placeholder="0smin" maxlength="15">
             </div>
-            <button class="btn-restart" onclick="registerUser()">KARİYERE BAŞLA</button>
+            <button class="btn-restart" onclick="registerUser()">KAR0YERE BA^LA</button>
         </div>
     </div>
 
     <!-- Stats Modal -->
     <div id="stats-overlay" class="overlay">
         <div id="stats-modal" class="modal">
-            <div class="close-modal" onclick="toggleStats()">✕</div>
-            <h2 id="modal-title">İSTATİSTİKLER</h2>
+            <div class="close-modal" onclick="toggleStats()"> </div>
+            <h2 id="modal-title">0STAT0ST0KLER</h2>
             <div class="stats-grid">
                 <div class="stat-item"><span class="value" id="stats-played">0</span><span class="label">Oynanan</span></div>
                 <div class="stat-item"><span class="value" id="stats-score">0</span><span class="label">Toplam Skor</span></div>
                 <div class="stat-item"><span class="value" id="stats-streak">0</span><span class="label">Seri</span></div>
-                <div class="stat-item"><span class="value" id="stats-max">0</span><span class="label">En İyi Seri</span></div>
+                <div class="stat-item"><span class="value" id="stats-max">0</span><span class="label">En 0yi Seri</span></div>
             </div>
             <div class="leaderboard-container">
                 <div>
-                    <h3>EN İYİLERİN</h3>
+                    <h3>EN 0Y0LER0N</h3>
                     <div class="leaderboard-list" id="leaderboard"></div>
                 </div>
                 <div>
@@ -477,16 +477,13 @@
                 </div>
             </div>
             <button class="btn-restart" id="modal-action-btn" onclick="location.reload()">TEKRAR OYNA</button>
-            <button class="btn-secondary" onclick="showNameChange()">İsmi Değiştir</button>
+            <button class="btn-secondary" onclick="showNameChange()">0smi De i_tir</button>
         </div>
     </div>
 
     <div id="toast" class="toast"></div>
 
     <script>
-        const KVDB_BUCKET = 'ahmetbaskan16_futbol_wordle_v1';
-        const API_URL = `https://kvdb.io/${KVDB_BUCKET}/leaderboard`;
-
         const CLUBS = [
             'Fenerbahce', 'Fenerbahce', 'Fenerbahce', 'Fenerbahce', 'Fenerbahce',
             'Galatasaray', 'Besiktas', 'Trabzonspor', 'Eyupspor', 'Basaksehir',
@@ -505,16 +502,7 @@
         ];
 
         function normalize(str) {
-            return str.toUpperCase()
-                .replace(/İ/g, 'I')
-                .replace(/I/g, 'I')
-                .replace(/Ğ/g, 'G')
-                .replace(/Ü/g, 'U')
-                .replace(/Ş/g, 'S')
-                .replace(/Ö/g, 'O')
-                .replace(/Ç/g, 'C')
-                .normalize("NFD")
-                .replace(/[\u0300-\u036f]/g, "");
+            return str.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/0/g, 'I').replace(/ /g, 'G').replace(//g, 'U').replace(/^/g, 'S').replace(//g, 'O').replace(//g, 'C');
         }
 
         const rawTarget = CLUBS[Math.floor(Math.random() * CLUBS.length)];
@@ -547,7 +535,6 @@
         const toast = document.getElementById('toast');
 
         function initBoard() {
-            board.innerHTML = '';
             for (let i = 0; i < attempts; i++) {
                 const row = document.createElement('div');
                 row.className = 'row';
@@ -581,9 +568,9 @@
 
         async function submitGuess() {
             const currentGuess = guesses[currentRow].join('');
-            if (currentGuess.length !== letterCount) { showToast("YETERSİZ HARF"); return; }
+            if (currentGuess.length !== letterCount) { showToast("YETERS0Z HARF"); return; }
             
-            if (currentGuess === normalize('Galatasaray')) { showToast("Cidden mi? Limon s1kt1n keyfimize... 🍋"); }
+            if (currentGuess === normalize('Galatasaray')) { showToast("Cidden mi? Limon s1kt1n keyfimize... <"); }
 
             const rowTiles = document.querySelectorAll(`#row-${currentRow} .tile:not(.space)`);
             const targetArr = targetLettersOnly.split('');
@@ -609,25 +596,7 @@
             } else { currentRow++; currentLetterIndex = 0; }
         }
 
-        async function getGlobalLeaderboard() {
-            try {
-                const res = await fetch(`${API_URL}?_=${Date.now()}`);
-                if (res.ok) {
-                    const text = await res.text();
-                    if (!text || text.trim() === "") return [];
-                    try {
-                        const data = JSON.parse(text);
-                        return Array.isArray(data) ? data : [];
-                    } catch (e) {
-                        console.error("JSON parse failed", e);
-                        return [];
-                    }
-                }
-            } catch (e) { console.error("Leaderboard fetch failed", e); }
-            return [];
-        }
-
-        async function updateStats(win) {
+        function updateStats(win) {
             stats.played++;
             if (win) {
                 stats.wins++; 
@@ -638,80 +607,47 @@
                 stats.bestRuns.push({ guesses: currentRow + 1, time: timeTaken, club: rawTarget });
                 stats.bestRuns.sort((a, b) => a.guesses - b.guesses || a.time - b.time);
                 stats.bestRuns = stats.bestRuns.slice(0, 10);
-            } else { 
-                stats.streak = 0; 
-            }
+            } else { stats.streak = 0; }
             saveStats();
-
-            if (username && stats.totalScore > 0) {
-                for (let attempt = 0; attempt < 3; attempt++) {
-                    try {
-                        let leaderboard = await getGlobalLeaderboard();
-                        const existingIdx = leaderboard.findIndex(p => p.name && p.name.toLowerCase() === username.toLowerCase());
-                        
-                        if (existingIdx > -1) {
-                            leaderboard[existingIdx].score = Math.max(stats.totalScore, leaderboard[existingIdx].score);
-                            leaderboard[existingIdx].name = username;
-                        } else {
-                            leaderboard.push({ name: username, score: stats.totalScore });
-                        }
-                        
-                        leaderboard.sort((a, b) => b.score - a.score);
-                        const top100 = leaderboard.slice(0, 100);
-
-                        const postRes = await fetch(API_URL, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(top100)
-                        });
-                        
-                        if (postRes.ok) break;
-                    } catch (e) { 
-                        console.error(`Submit attempt ${attempt+1} failed`, e);
-                        await new Promise(r => setTimeout(r, 500));
-                    }
-                }
-            }
         }
 
-        async function toggleStats() {
+        function toggleStats() {
             document.getElementById('stats-played').textContent = stats.played;
             document.getElementById('stats-score').textContent = stats.totalScore || 0;
             document.getElementById('stats-streak').textContent = stats.streak;
             document.getElementById('stats-max').textContent = stats.maxStreak;
             
             const lb = document.getElementById('leaderboard');
-            lb.innerHTML = (stats.bestRuns && stats.bestRuns.length) ? stats.bestRuns.map((r, i) => `
+            lb.innerHTML = stats.bestRuns.length ? stats.bestRuns.map((r, i) => `
                 <div class="leaderboard-item">
                     <span><span class="rank">#${i+1}</span> ${r.club}</span>
                     <span style="opacity:0.6">${r.guesses} deneme</span>
                 </div>
-            `).join('') : '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Henüz galibiyet yok</p>';
+            `).join('') : '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Henz galibiyet yok</p>';
+
+            const players = [
+                {name: "Baskan66", score: 84},
+                {name: "Do u CD", score: 72},
+                {name: "Fenerli1907", score: 65},
+                {name: "pes_master", score: 58},
+                {name: "Efe_77", score: 49},
+                {name: "Arda_Guler_Fan", score: 42},
+                {name: "Gol_Makinesi", score: 38},
+                {name: "Kramponlu_Dev", score: 31},
+                {name: "Sper_Lig_Uzman1", score: 25},
+                {name: "Tribun_Sesi", score: 19},
+                {name: username || "Oyuncu", score: stats.totalScore || 0, isUser: true}
+            ].sort((a, b) => b.score - a.score);
 
             const glb = document.getElementById('global-leaderboard');
+            glb.innerHTML = players.map((l, i) => `
+                <div class="leaderboard-item ${l.isUser ? 'highlight' : ''}">
+                    <span><span class="rank">${i+1}</span> ${l.name}</span>
+                    <span style="font-weight:800">${l.score}</span>
+                </div>
+            `).join('');
             
-            if (statsOverlay.style.display !== 'flex') {
-                statsOverlay.style.display = 'flex';
-                glb.innerHTML = '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Yükleniyor...</p>';
-                try {
-                    const players = await getGlobalLeaderboard();
-                    if (players && Array.isArray(players) && players.length > 0) {
-                        glb.innerHTML = players.map((l, i) => `
-                            <div class="leaderboard-item ${(l.name && username && l.name.toLowerCase() === username.toLowerCase()) ? 'highlight' : ''}">
-                                <span><span class="rank">${i+1}</span> ${l.name || 'Anonim'}</span>
-                                <span style="font-weight:800">${l.score || 0}</span>
-                            </div>
-                        `).join('');
-                    } else {
-                        glb.innerHTML = '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Henüz skor yok. İlk sen ol!</p>';
-                    }
-                } catch (e) {
-                    console.error("Leaderboard display error", e);
-                    glb.innerHTML = '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Bağlantı hatası</p>';
-                }
-            } else {
-                statsOverlay.style.display = 'none';
-            }
+            statsOverlay.style.display = statsOverlay.style.display === 'flex' ? 'none' : 'flex';
         }
 
         function showEndGame(win) {
@@ -721,44 +657,21 @@
             if (win) {
                 if (targetWord === normalize('Fenerbahce')) {
                     modal.classList.add('win-fenerbahce');
-                    title.innerHTML = "EN BÜYÜK FENERBAHÇE! 💛💙";
+                    title.innerHTML = "EN BYK FENERBAHE! ==";
                 } else if (targetWord === normalize('Galatasaray')) {
-                    title.textContent = "Sarı-kırmızı bir tat... 🍋";
+                    title.textContent = "Sar1-k1rm1z1 bir tat... <";
                 } else { title.textContent = "G O O O A L !"; }
             } else { 
-                title.textContent = "OYUN BİTTİ: " + rawTarget;
+                title.textContent = "OYUN B0TT0: " + rawTarget;
             }
             toggleStats();
         }
 
         function handleInput(key) {
-            if (gameOver || (loginOverlay.style.display === 'flex')) return;
-            
-            const normalizedKey = key.toUpperCase()
-                .replace(/İ/g, 'I')
-                .replace(/I/g, 'I')
-                .replace(/Ğ/g, 'G')
-                .replace(/Ü/g, 'U')
-                .replace(/Ş/g, 'S')
-                .replace(/Ö/g, 'O')
-                .replace(/Ç/g, 'C');
-
-            if (normalizedKey === 'ENTER') submitGuess();
-            else if (normalizedKey === 'BACKSPACE' || normalizedKey === 'DELETE') { 
-                if (currentLetterIndex > 0) { 
-                    currentLetterIndex--; 
-                    guesses[currentRow].pop(); 
-                    updateBoard(); 
-                } 
-            }
-            else if (/^[A-Z]$/.test(normalizedKey) || normalizedKey === ' ') { 
-                if (currentLetterIndex < letterCount) {
-                    const charToPush = (normalizedKey === ' ') ? ' ' : normalizedKey;
-                    guesses[currentRow].push(charToPush); 
-                    currentLetterIndex++; 
-                    updateBoard(); 
-                } 
-            }
+            if (gameOver || loginOverlay.style.display === 'flex') return;
+            if (key === 'ENTER') submitGuess();
+            else if (key === 'BACKSPACE') { if (currentLetterIndex > 0) { currentLetterIndex--; guesses[currentRow].pop(); updateBoard(); } }
+            else if (/^[A-Z]$/.test(key)) { if (currentLetterIndex < letterCount) { guesses[currentRow].push(key); currentLetterIndex++; updateBoard(); } }
         }
 
         function registerUser() {
@@ -766,8 +679,7 @@
             if (!val) { showToast("Bir isim gir!"); return; }
             saveUser(val);
             loginOverlay.style.display = 'none';
-            showToast(`Hoş geldin, Manager ${val}!`);
-            if (stats.totalScore > 0) updateStats(false); 
+            showToast(`Ho_ geldin, Manager ${val}!`);
         }
 
         function showNameChange() {
@@ -782,7 +694,9 @@
         });
 
         window.addEventListener('keydown', e => {
-            handleInput(e.key);
+            let k = e.key.toUpperCase();
+            if (k === 'BACKSPACE') handleInput('BACKSPACE');
+            else handleInput(k);
         });
 
         document.getElementById('keyboard').addEventListener('click', e => {
