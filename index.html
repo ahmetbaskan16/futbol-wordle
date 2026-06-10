@@ -438,7 +438,7 @@
                 <button class="key" data-key="B">B</button>
                 <button class="key" data-key="N">N</button>
                 <button class="key" data-key="M">M</button>
-                <button class="key large" data-key="BACKSPACE">+</button>
+                <button class="key large" data-key="BACKSPACE">⌫</button>
             </div>
         </div>
     </div>
@@ -446,7 +446,7 @@
     <!-- Login Modal -->
     <div id="login-overlay" class="overlay">
         <div class="modal">
-            <h2>İSİMN NE?</h2>
+            <h2>İSMİN NE?</h2>
             <p style="color:var(--text-secondary); margin-bottom: 20px;">Global Leaderboard'da yer almak için ismini gir.</p>
             <div class="input-group">
                 <input type="text" id="username-input" class="modern-input" placeholder="İsmin" maxlength="15">
@@ -458,7 +458,7 @@
     <!-- Stats Modal -->
     <div id="stats-overlay" class="overlay">
         <div id="stats-modal" class="modal">
-            <div class="close-modal" onclick="toggleStats()"> </div>
+            <div class="close-modal" onclick="toggleStats()">✕</div>
             <h2 id="modal-title">İSTATİSTİKLER</h2>
             <div class="stats-grid">
                 <div class="stat-item"><span class="value" id="stats-played">0</span><span class="label">Oynanan</span></div>
@@ -484,7 +484,8 @@
     <div id="toast" class="toast"></div>
 
     <script>
-        const API_URL = '/api/leaderboard';
+        const KVDB_BUCKET = 'ahmetbaskan16_futbol_wordle_v1';
+        const API_URL = `https://kvdb.io/${KVDB_BUCKET}/leaderboard`;
 
         const CLUBS = [
             'Fenerbahce', 'Fenerbahce', 'Fenerbahce', 'Fenerbahce', 'Fenerbahce',
@@ -582,7 +583,7 @@
             const currentGuess = guesses[currentRow].join('');
             if (currentGuess.length !== letterCount) { showToast("YETERSİZ HARF"); return; }
             
-            if (currentGuess === normalize('Galatasaray')) { showToast("Cidden mi? Limon s1kt1n keyfimize... <"); }
+            if (currentGuess === normalize('Galatasaray')) { showToast("Cidden mi? Limon s1kt1n keyfimize... 🍋"); }
 
             const rowTiles = document.querySelectorAll(`#row-${currentRow} .tile:not(.space)`);
             const targetArr = targetLettersOnly.split('');
@@ -608,6 +609,17 @@
             } else { currentRow++; currentLetterIndex = 0; }
         }
 
+        async function getGlobalLeaderboard() {
+            try {
+                const res = await fetch(API_URL);
+                if (res.ok) {
+                    const data = await res.json();
+                    return Array.isArray(data) ? data : [];
+                }
+            } catch (e) { console.error("Leaderboard fetch failed", e); }
+            return [];
+        }
+
         async function updateStats(win) {
             stats.played++;
             if (win) {
@@ -620,13 +632,26 @@
                 stats.bestRuns.sort((a, b) => a.guesses - b.guesses || a.time - b.time);
                 stats.bestRuns = stats.bestRuns.slice(0, 10);
                 
-                // Submit to global leaderboard
+                // Submit to global leaderboard via KVDB
                 if (username) {
                     try {
+                        const leaderboard = await getGlobalLeaderboard();
+                        const existingIdx = leaderboard.findIndex(p => p.name === username);
+                        if (existingIdx > -1) {
+                            if (stats.totalScore > leaderboard[existingIdx].score) {
+                                leaderboard[existingIdx].score = stats.totalScore;
+                            }
+                        } else {
+                            leaderboard.push({ name: username, score: stats.totalScore });
+                        }
+                        
+                        // Sort and slice
+                        leaderboard.sort((a, b) => b.score - a.score);
+                        const top100 = leaderboard.slice(0, 100);
+
                         await fetch(API_URL, {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ name: username, score: stats.totalScore })
+                            body: JSON.stringify(top100)
                         });
                     } catch (e) { console.error("Global score submit failed", e); }
                 }
@@ -651,22 +676,26 @@
             const glb = document.getElementById('global-leaderboard');
             glb.innerHTML = '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Yükleniyor...</p>';
             
-            try {
-                const res = await fetch(API_URL);
-                if (res.ok) {
-                    const players = await res.json();
-                    glb.innerHTML = players.map((l, i) => `
-                        <div class="leaderboard-item ${l.name === username ? 'highlight' : ''}">
-                            <span><span class="rank">${i+1}</span> ${l.name}</span>
-                            <span style="font-weight:800">${l.score}</span>
-                        </div>
-                    `).join('');
-                } else { throw new Error(); }
-            } catch (e) {
-                glb.innerHTML = '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Sıralama şu an kapalı</p>';
+            if (statsOverlay.style.display !== 'flex') {
+                statsOverlay.style.display = 'flex';
+                try {
+                    const players = await getGlobalLeaderboard();
+                    if (players.length > 0) {
+                        glb.innerHTML = players.map((l, i) => `
+                            <div class="leaderboard-item ${l.name === username ? 'highlight' : ''}">
+                                <span><span class="rank">${i+1}</span> ${l.name}</span>
+                                <span style="font-weight:800">${l.score}</span>
+                            </div>
+                        `).join('');
+                    } else {
+                        glb.innerHTML = '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">İlk efsane sen ol!</p>';
+                    }
+                } catch (e) {
+                    glb.innerHTML = '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Sıralama şu an kapalı</p>';
+                }
+            } else {
+                statsOverlay.style.display = 'none';
             }
-            
-            statsOverlay.style.display = (statsOverlay.style.display === 'flex') ? 'none' : 'flex';
         }
 
         function showEndGame(win) {
