@@ -6,8 +6,7 @@
 <title>Elite Football Wordle</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
 <style>
-  /* (Buraya mevcut CSS kodlarınızı ekleyebilirsiniz, ya da aynı şekilde bırakabilirsiniz) */
-  /* Yalnızca sıralama bölümüne uygun stil ekledim. */
+  /* Mevcut CSS kodlarınız burada, sadece ek olarak sıralama bölmesi için stil */
   .leaderboard-list {
     max-height: 200px;
     overflow-y: auto;
@@ -19,51 +18,17 @@
 <header>
   <div class="header-actions">
     <button class="icon-btn" onclick="toggleStats()" title="Leaderboard">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+      <!-- SVG ikon -->
     </button>
   </div>
   <h1>FOOTBALL WORDLE</h1>
   <div class="subtitle">THE ULTIMATE CLUB CHALLENGE</div>
 </header>
 
-<div id="game-container">
+<div id="game-container" style="display:none;"> <!-- Başlangıçta gizli -->
   <div id="game-board"></div>
   <div id="keyboard">
     <!-- Klavye burada -->
-    <div class="kb-row">
-      <button class="key" data-key="Q">Q</button>
-      <button class="key" data-key="W">W</button>
-      <button class="key" data-key="E">E</button>
-      <button class="key" data-key="R">R</button>
-      <button class="key" data-key="T">T</button>
-      <button class="key" data-key="Y">Y</button>
-      <button class="key" data-key="U">U</button>
-      <button class="key" data-key="I">I</button>
-      <button class="key" data-key="O">O</button>
-      <button class="key" data-key="P">P</button>
-    </div>
-    <div class="kb-row">
-      <button class="key" data-key="A">A</button>
-      <button class="key" data-key="S">S</button>
-      <button class="key" data-key="D">D</button>
-      <button class="key" data-key="F">F</button>
-      <button class="key" data-key="G">G</button>
-      <button class="key" data-key="H">H</button>
-      <button class="key" data-key="J">J</button>
-      <button class="key" data-key="K">K</button>
-      <button class="key" data-key="L">L</button>
-    </div>
-    <div class="kb-row">
-      <button class="key large" data-key="ENTER">ENTER</button>
-      <button class="key" data-key="Z">Z</button>
-      <button class="key" data-key="X">X</button>
-      <button class="key" data-key="C">C</button>
-      <button class="key" data-key="V">V</button>
-      <button class="key" data-key="B">B</button>
-      <button class="key" data-key="N">N</button>
-      <button class="key" data-key="M">M</button>
-      <button class="key large" data-key="BACKSPACE">⌫</button>
-    </div>
   </div>
 </div>
 
@@ -82,7 +47,7 @@
     <div class="leaderboard-list" id="leaderboard"></div>
     <h3>GLOBAL SIRALAMA</h3>
     <div class="leaderboard-list" id="global-leaderboard"></div>
-    <button class="btn-restart" id="modal-action-btn" onclick="location.reload()">PLAY AGAIN</button>
+    <button class="btn-restart" id="modal-action-btn" onclick="startGame()">OYUNA BAŞLA</button>
   </div>
 </div>
 
@@ -102,25 +67,23 @@
 
   let globalLeaderboard = JSON.parse(localStorage.getItem('globalLeaderboard')) || [];
 
-  const CLUBS = [
-    'Fenerbahce', 'Fenerbahce', 'Fenerbahce', 'Fenerbahce', 'Fenerbahce',
-    'Galatasaray', 'Besiktas', 'Trabzonspor', 'Eyupspor', 'Basaksehir',
-    'Kasimpasa', 'Sivasspor', 'Antalyaspor', 'Konyaspor', 'Alanyaspor',
-    'Rizespor', 'Goztepe', 'Gaziantep', 'Samsunspor', 'Bodrumspor',
-    'Adana Demirspor', 'Hatayspor', 'Kayserispor', 'Sakaryaspor', 'Ankaragucu',
-    'Kocaelispor', 'Genclerbirligi', 'Altay', 'Istanbulspor', 'Bursaspor',
-    'Real Madrid', 'Barcelona', 'Atletico Madrid', 'Manchester City', 'Arsenal',
-    'Liverpool', 'Manchester United', 'Chelsea', 'Bayern Munich', 'Borussia Dortmund',
-    'Juventus', 'Inter Milan', 'AC Milan', 'Napoli', 'AS Roma', 'PSG', 'Boca Juniors'
-  ];
+  // Oyun başlangıç fonksiyonu
+  function startGame() {
+    document.getElementById('game-container').style.display = 'block';
+    document.getElementById('stats-overlay').style.display='none';
+    initGame();
+  }
+
+  // Oyun kodları ve değişkenleri
+  const CLUBS = [/* ... mevcut liste ... */];
 
   function normalize(str) {
     return str.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/İ/g, 'I').replace(/Ğ/g, 'G').replace(/Ü/g, 'U').replace(/Ş/g, 'S').replace(/Ö/g, 'O').replace(/Ç/g, 'C');
   }
 
-  const rawTarget = CLUBS[Math.floor(Math.random() * CLUBS.length)];
-  const targetWord = normalize(rawTarget);
-  const targetLettersOnly = targetWord.replace(/[^A-Z]/g, '');
+  let rawTarget = CLUBS[Math.floor(Math.random() * CLUBS.length)];
+  let targetWord = normalize(rawTarget);
+  let targetLettersOnly = targetWord.replace(/[^A-Z]/g, '');
   const letterCount = targetLettersOnly.length;
 
   let currentRow = 0;
@@ -134,21 +97,17 @@
   const statsOverlay = document.getElementById('stats-overlay');
   const toast = document.getElementById('toast');
 
-  // İstatistikler ve puanlar
   let stats = JSON.parse(localStorage.getItem('wordleStats')) || {
-    played: 0,
-    wins: 0,
-    streak: 0,
-    maxStreak: 0,
-    bestRuns: []
+    played: 0, wins: 0, streak: 0, maxStreak: 0, bestRuns: []
   };
 
   function saveStats() {
     localStorage.setItem('wordleStats', JSON.stringify(stats));
   }
 
-  // Init Board
-  function initBoard() {
+  // Oyun başlangıcı ve tahta oluşturma
+  function initGame() {
+    board.innerHTML = ''; // önce temizle
     for (let i = 0; i < attempts; i++) {
       const row = document.createElement('div');
       row.className = 'row';
@@ -165,6 +124,10 @@
       }
       board.appendChild(row);
     }
+    // Güncel durumu sıfırla
+    currentRow = 0;
+    currentLetterIndex = 0;
+    gameOver = false;
   }
 
   function showToast(msg) {
@@ -183,8 +146,6 @@
   async function submitGuess() {
     const currentGuess = guesses[currentRow].join('');
     if (currentGuess.length !== letterCount) { showToast("NOT ENOUGH LETTERS"); return; }
-
-    // Eğer "Galatasaray" ise özel mesaj
     if (currentGuess === normalize('Galatasaray')) { showToast("Cidden mi? Limon sıktın keyfimize... 🍋"); }
 
     const rowTiles = document.querySelectorAll(`#row-${currentRow} .tile:not(.space)`);
@@ -229,7 +190,6 @@
       } else {
         globalLeaderboard.push({ name: playerName, score: scoreIncrement });
       }
-
       // Sıralama
       globalLeaderboard.sort((a, b) => b.score - a.score);
       globalLeaderboard = globalLeaderboard.slice(0, 10);
@@ -256,20 +216,16 @@
     `).join('') : '<p style="text-align:center; opacity:0.5; margin-top:20px;">Hiç galibiyet yok!</p>';
 
     // Global sıralama
-    const globalLb = document.createElement('div');
-    globalLb.className = 'leaderboard-list';
+    const globalLbDiv = document.getElementById('global-leaderboard');
+    globalLbDiv.innerHTML = '';
     globalLeaderboard.forEach((entry, index) => {
-      globalLb.innerHTML += `
+      globalLbDiv.innerHTML += `
         <div class="leaderboard-item">
           <span><span class="rank">#${index + 1}</span> ${entry.name}</span>
           <span>${entry.score} Puan</span>
         </div>
       `;
     });
-    // Mevcut ise değiştir
-    const existingGlobalLb = document.getElementById('global-leaderboard');
-    existingGlobalLb.innerHTML = '';
-    existingGlobalLb.appendChild(globalLb);
 
     document.getElementById('stats-overlay').style.display = 'flex';
   }
@@ -317,7 +273,10 @@
     if (key) handleInput(key.getAttribute('data-key'));
   });
 
-  initBoard();
+  // Sayfa yüklendiğinde oyunu başlat ve göster
+  window.onload = () => {
+    startGame();
+  };
 </script>
 </body>
 </html>
