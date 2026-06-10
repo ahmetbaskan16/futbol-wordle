@@ -487,6 +487,14 @@
         const KVDB_BUCKET = 'ahmetbaskan16_futbol_wordle_v1';
         const API_URL = `https://kvdb.io/${KVDB_BUCKET}/leaderboard`;
 
+        const INITIAL_RIVALS = [
+            { name: "Baskan66", score: 87 },
+            { name: "Doğu CD", score: 74 },
+            { name: "Fenerli1907", score: 68 },
+            { name: "pes_master", score: 55 },
+            { name: "Efe_77", score: 42 }
+        ];
+
         const CLUBS = [
             'Fenerbahce', 'Fenerbahce', 'Fenerbahce', 'Fenerbahce', 'Fenerbahce',
             'Galatasaray', 'Besiktas', 'Trabzonspor', 'Eyupspor', 'Basaksehir',
@@ -611,16 +619,17 @@
 
         async function getGlobalLeaderboard() {
             try {
-                // Fetch with cache busting to prevent stale responses
                 const res = await fetch(`${API_URL}?_=${Date.now()}`);
                 if (res.ok) {
                     const text = await res.text();
-                    if (!text) return [];
+                    if (!text) return [...INITIAL_RIVALS];
                     const data = JSON.parse(text);
-                    return Array.isArray(data) ? data : [];
+                    let lb = Array.isArray(data) ? data : [];
+                    if (lb.length === 0) return [...INITIAL_RIVALS];
+                    return lb;
                 }
             } catch (e) { console.error("Leaderboard fetch failed", e); }
-            return [];
+            return [...INITIAL_RIVALS];
         }
 
         async function updateStats(win) {
@@ -639,11 +648,10 @@
             }
             saveStats();
 
-            // Submit to global leaderboard via KVDB
             if (username && stats.totalScore > 0) {
                 for (let attempt = 0; attempt < 3; attempt++) {
                     try {
-                        const leaderboard = await getGlobalLeaderboard();
+                        let leaderboard = await getGlobalLeaderboard();
                         const existingIdx = leaderboard.findIndex(p => p.name.toLowerCase() === username.toLowerCase());
                         
                         if (existingIdx > -1) {
