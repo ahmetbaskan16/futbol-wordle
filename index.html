@@ -485,8 +485,7 @@
 
     <script>
         const KVDB_BUCKET = 'ahmetbaskan16_futbol_wordle_v1';
-        // Using a more stable key for the leaderboard
-        const API_URL = `https://kvdb.io/${KVDB_BUCKET}/global_scores`;
+        const API_URL = `https://kvdb.io/${KVDB_BUCKET}/leaderboard`;
 
         const CLUBS = [
             'Fenerbahce', 'Fenerbahce', 'Fenerbahce', 'Fenerbahce', 'Fenerbahce',
@@ -612,9 +611,12 @@
 
         async function getGlobalLeaderboard() {
             try {
-                const res = await fetch(API_URL);
+                // Fetch with cache busting to prevent stale responses
+                const res = await fetch(`${API_URL}?_=${Date.now()}`);
                 if (res.ok) {
-                    const data = await res.json();
+                    const text = await res.text();
+                    if (!text) return [];
+                    const data = JSON.parse(text);
                     return Array.isArray(data) ? data : [];
                 }
             } catch (e) { console.error("Leaderboard fetch failed", e); }
@@ -632,41 +634,41 @@
                 stats.bestRuns.push({ guesses: currentRow + 1, time: timeTaken, club: rawTarget });
                 stats.bestRuns.sort((a, b) => a.guesses - b.guesses || a.time - b.time);
                 stats.bestRuns = stats.bestRuns.slice(0, 10);
-                
-                // Submit to global leaderboard via KVDB
-                if (username) {
-                    // Try up to 3 times in case of concurrent write conflicts
-                    for (let attempt = 0; attempt < 3; attempt++) {
-                        try {
-                            const leaderboard = await getGlobalLeaderboard();
-                            const existingIdx = leaderboard.findIndex(p => p.name.toLowerCase() === username.toLowerCase());
-                            
-                            if (existingIdx > -1) {
-                                // Update score if higher, or just sync it
-                                leaderboard[existingIdx].score = Math.max(stats.totalScore, leaderboard[existingIdx].score);
-                                leaderboard[existingIdx].name = username; // Update casing if needed
-                            } else {
-                                leaderboard.push({ name: username, score: stats.totalScore });
-                            }
-                            
-                            leaderboard.sort((a, b) => b.score - a.score);
-                            const top100 = leaderboard.slice(0, 100);
+            } else { 
+                stats.streak = 0; 
+            }
+            saveStats();
 
-                            const postRes = await fetch(API_URL, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify(top100)
-                            });
-                            
-                            if (postRes.ok) break; // Success
-                        } catch (e) { 
-                            console.error(`Global score submit attempt ${attempt+1} failed`, e);
-                            await new Promise(r => setTimeout(r, 500)); // Wait before retry
+            // Submit to global leaderboard via KVDB
+            if (username && stats.totalScore > 0) {
+                for (let attempt = 0; attempt < 3; attempt++) {
+                    try {
+                        const leaderboard = await getGlobalLeaderboard();
+                        const existingIdx = leaderboard.findIndex(p => p.name.toLowerCase() === username.toLowerCase());
+                        
+                        if (existingIdx > -1) {
+                            leaderboard[existingIdx].score = Math.max(stats.totalScore, leaderboard[existingIdx].score);
+                            leaderboard[existingIdx].name = username;
+                        } else {
+                            leaderboard.push({ name: username, score: stats.totalScore });
                         }
+                        
+                        leaderboard.sort((a, b) => b.score - a.score);
+                        const top100 = leaderboard.slice(0, 100);
+
+                        const postRes = await fetch(API_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(top100)
+                        });
+                        
+                        if (postRes.ok) break;
+                    } catch (e) { 
+                        console.error(`Submit attempt ${attempt+1} failed`, e);
+                        await new Promise(r => setTimeout(r, 500));
                     }
                 }
-            } else { stats.streak = 0; }
-            saveStats();
+            }
         }
 
         async function toggleStats() {
@@ -701,6 +703,7 @@
                         glb.innerHTML = '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Henüz skor yok. İlk sen ol!</p>';
                     }
                 } catch (e) {
+                    console.error("Leaderboard display error", e);
                     glb.innerHTML = '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Bağlantı hatası</p>';
                 }
             } else {
@@ -761,7 +764,6 @@
             saveUser(val);
             loginOverlay.style.display = 'none';
             showToast(`Hoş geldin, Manager ${val}!`);
-            // Sync current score to leaderboard on name change
             if (stats.totalScore > 0) updateStats(false); 
         }
 
