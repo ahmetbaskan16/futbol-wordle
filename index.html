@@ -485,7 +485,8 @@
 
     <script>
         const KVDB_BUCKET = 'ahmetbaskan16_futbol_wordle_v1';
-        const API_URL = `https://kvdb.io/${KVDB_BUCKET}/leaderboard`;
+        // Using a more stable key for the leaderboard
+        const API_URL = `https://kvdb.io/${KVDB_BUCKET}/global_scores`;
 
         const CLUBS = [
             'Fenerbahce', 'Fenerbahce', 'Fenerbahce', 'Fenerbahce', 'Fenerbahce',
@@ -634,26 +635,35 @@
                 
                 // Submit to global leaderboard via KVDB
                 if (username) {
-                    try {
-                        const leaderboard = await getGlobalLeaderboard();
-                        const existingIdx = leaderboard.findIndex(p => p.name === username);
-                        if (existingIdx > -1) {
-                            if (stats.totalScore > leaderboard[existingIdx].score) {
-                                leaderboard[existingIdx].score = stats.totalScore;
+                    // Try up to 3 times in case of concurrent write conflicts
+                    for (let attempt = 0; attempt < 3; attempt++) {
+                        try {
+                            const leaderboard = await getGlobalLeaderboard();
+                            const existingIdx = leaderboard.findIndex(p => p.name.toLowerCase() === username.toLowerCase());
+                            
+                            if (existingIdx > -1) {
+                                // Update score if higher, or just sync it
+                                leaderboard[existingIdx].score = Math.max(stats.totalScore, leaderboard[existingIdx].score);
+                                leaderboard[existingIdx].name = username; // Update casing if needed
+                            } else {
+                                leaderboard.push({ name: username, score: stats.totalScore });
                             }
-                        } else {
-                            leaderboard.push({ name: username, score: stats.totalScore });
-                        }
-                        
-                        // Sort and slice
-                        leaderboard.sort((a, b) => b.score - a.score);
-                        const top100 = leaderboard.slice(0, 100);
+                            
+                            leaderboard.sort((a, b) => b.score - a.score);
+                            const top100 = leaderboard.slice(0, 100);
 
-                        await fetch(API_URL, {
-                            method: 'POST',
-                            body: JSON.stringify(top100)
-                        });
-                    } catch (e) { console.error("Global score submit failed", e); }
+                            const postRes = await fetch(API_URL, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(top100)
+                            });
+                            
+                            if (postRes.ok) break; // Success
+                        } catch (e) { 
+                            console.error(`Global score submit attempt ${attempt+1} failed`, e);
+                            await new Promise(r => setTimeout(r, 500)); // Wait before retry
+                        }
+                    }
                 }
             } else { stats.streak = 0; }
             saveStats();
@@ -674,24 +684,24 @@
             `).join('') : '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Henüz galibiyet yok</p>';
 
             const glb = document.getElementById('global-leaderboard');
-            glb.innerHTML = '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Yükleniyor...</p>';
             
             if (statsOverlay.style.display !== 'flex') {
                 statsOverlay.style.display = 'flex';
+                glb.innerHTML = '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Yükleniyor...</p>';
                 try {
                     const players = await getGlobalLeaderboard();
-                    if (players.length > 0) {
+                    if (players && players.length > 0) {
                         glb.innerHTML = players.map((l, i) => `
-                            <div class="leaderboard-item ${l.name === username ? 'highlight' : ''}">
+                            <div class="leaderboard-item ${l.name.toLowerCase() === (username || "").toLowerCase() ? 'highlight' : ''}">
                                 <span><span class="rank">${i+1}</span> ${l.name}</span>
                                 <span style="font-weight:800">${l.score}</span>
                             </div>
                         `).join('');
                     } else {
-                        glb.innerHTML = '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">İlk efsane sen ol!</p>';
+                        glb.innerHTML = '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Henüz skor yok. İlk sen ol!</p>';
                     }
                 } catch (e) {
-                    glb.innerHTML = '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Sıralama şu an kapalı</p>';
+                    glb.innerHTML = '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Bağlantı hatası</p>';
                 }
             } else {
                 statsOverlay.style.display = 'none';
@@ -751,6 +761,8 @@
             saveUser(val);
             loginOverlay.style.display = 'none';
             showToast(`Hoş geldin, Manager ${val}!`);
+            // Sync current score to leaderboard on name change
+            if (stats.totalScore > 0) updateStats(false); 
         }
 
         function showNameChange() {
