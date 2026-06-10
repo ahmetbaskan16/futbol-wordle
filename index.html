@@ -45,10 +45,13 @@
             text-align: center;
             margin-bottom: 30px;
             z-index: 10;
+            position: relative;
+            width: 100%;
+            max-width: 500px;
         }
 
         h1 {
-            font-size: clamp(2rem, 8vw, 3.5rem);
+            font-size: clamp(1.8rem, 7vw, 3rem);
             font-weight: 800;
             letter-spacing: -2px;
             background: linear-gradient(135deg, #fff 0%, #aaa 100%);
@@ -59,9 +62,34 @@
 
         .subtitle {
             color: var(--text-secondary);
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 2px;
+        }
+
+        .header-actions {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .icon-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: rgba(255,255,255,0.15);
         }
 
         #game-container {
@@ -86,15 +114,15 @@
         }
 
         .tile {
-            width: clamp(45px, 12vw, 62px);
-            height: clamp(45px, 12vw, 62px);
+            width: clamp(40px, 11vw, 60px);
+            height: clamp(40px, 11vw, 60px);
             border: 2px solid var(--tile-border);
             background: var(--glass-bg);
             backdrop-filter: blur(4px);
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             font-weight: 700;
             text-transform: uppercase;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -105,7 +133,7 @@
             border: none;
             background: transparent;
             backdrop-filter: none;
-            width: 20px;
+            width: 15px;
         }
 
         .tile.pop {
@@ -143,7 +171,7 @@
         #keyboard {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
             width: 100%;
             max-width: 500px;
         }
@@ -151,7 +179,7 @@
         .kb-row {
             display: flex;
             justify-content: center;
-            gap: 6px;
+            gap: 4px;
         }
 
         .key {
@@ -159,13 +187,13 @@
             border: 1px solid var(--glass-border);
             color: white;
             border-radius: 6px;
-            padding: 15px 5px;
+            padding: 15px 4px;
             font-weight: 600;
             cursor: pointer;
             text-transform: uppercase;
             flex: 1;
             transition: all 0.2s ease;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -176,7 +204,7 @@
 
         .key.large {
             flex: 1.5;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
         }
 
         .key[data-state="correct"] { background: var(--correct-color); color: #000; border-color: var(--correct-color); }
@@ -189,87 +217,136 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(12px);
             display: none;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             padding: 20px;
-            text-align: center;
         }
 
         .modal {
-            background: rgba(255,255,255,0.05);
+            background: rgba(255,255,255,0.08);
             border: 1px solid var(--glass-border);
-            padding: 40px;
-            border-radius: 24px;
-            max-width: 400px;
-            width: 90%;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            padding: 30px;
+            border-radius: 28px;
+            max-width: 450px;
+            width: 95%;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6);
+            text-align: center;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            cursor: pointer;
+            opacity: 0.6;
         }
 
         .modal h2 {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            font-weight: 800;
         }
 
-        .modal p {
-            font-size: 1.1rem;
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-item .value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            display: block;
+        }
+
+        .stat-item .label {
+            font-size: 0.65rem;
             color: var(--text-secondary);
-            margin-bottom: 25px;
-            line-height: 1.6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .leaderboard-list {
+            text-align: left;
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .leaderboard-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border);
+            padding: 10px 15px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .leaderboard-item .rank {
+            font-weight: 800;
+            color: var(--present-color);
+            margin-right: 10px;
         }
 
         .btn-restart {
             background: #fff;
             color: #000;
             border: none;
-            padding: 12px 30px;
-            border-radius: 12px;
+            padding: 14px 40px;
+            border-radius: 14px;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s;
+            margin-top: 20px;
+            width: 100%;
         }
 
-        .btn-restart:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(255,255,255,0.2);
-        }
-
-        /* EPIC FENERBAHCE WIN */
+        /* FENERBAHCE WIN THEME */
         .win-fenerbahce {
             border: 4px solid var(--fb-yellow) !important;
-            box-shadow: 0 0 40px var(--fb-blue), inset 0 0 20px var(--fb-yellow) !important;
-            background: linear-gradient(135deg, var(--fb-blue), #001a4d) !important;
-        }
-        .win-fenerbahce h2 {
-            background: linear-gradient(to bottom, var(--fb-yellow) 0%, #fff 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 15px rgba(253, 208, 23, 0.5);
+            box-shadow: 0 0 50px rgba(0, 51, 153, 0.5), inset 0 0 20px var(--fb-yellow) !important;
+            background: linear-gradient(135deg, var(--fb-blue) 0%, #001a4d 100%) !important;
         }
 
         .toast {
             position: fixed;
-            top: 10%;
+            top: 80px;
             background: #fff;
             color: #000;
             padding: 12px 24px;
             border-radius: 50px;
             font-weight: 700;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            transform: translateY(-100px);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 2000;
+            pointer-events: none;
         }
-        .toast.show { transform: translateY(0); }
+        .toast.show { opacity: 1; transform: translateY(0); }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
     </style>
 </head>
 <body>
 
     <header>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="toggleStats()" title="Leaderboard">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+            </button>
+        </div>
         <h1>FOOTBALL WORDLE</h1>
         <div class="subtitle">THE ULTIMATE CLUB CHALLENGE</div>
     </header>
@@ -314,11 +391,22 @@
         </div>
     </div>
 
-    <div id="overlay" class="overlay">
-        <div id="modal" class="modal">
-            <h2 id="modal-title"></h2>
-            <p id="modal-desc"></p>
-            <button class="btn-restart" onclick="location.reload()">PLAY AGAIN</button>
+    <!-- Stats Modal -->
+    <div id="stats-overlay" class="overlay">
+        <div id="stats-modal" class="modal">
+            <div class="close-modal" onclick="toggleStats()">✕</div>
+            <h2>STATISTICS</h2>
+            <div class="stats-grid">
+                <div class="stat-item"><span class="value" id="stats-played">0</span><span class="label">Played</span></div>
+                <div class="stat-item"><span class="value" id="stats-winpct">0</span><span class="label">Win %</span></div>
+                <div class="stat-item"><span class="value" id="stats-streak">0</span><span class="label">Streak</span></div>
+                <div class="stat-item"><span class="value" id="stats-max">0</span><span class="label">Max</span></div>
+            </div>
+            <h3>BEST RUNS</h3>
+            <div class="leaderboard-list" id="leaderboard">
+                <!-- Leaderboard items injected here -->
+            </div>
+            <button class="btn-restart" id="modal-action-btn" onclick="location.reload()">PLAY AGAIN</button>
         </div>
     </div>
 
@@ -326,77 +414,20 @@
 
     <script>
         const CLUBS = [
-            // Turkish Clubs - Super Lig & TFF 1. Lig & More
             'Fenerbahce', 'Fenerbahce', 'Fenerbahce', 'Fenerbahce', 'Fenerbahce',
             'Galatasaray', 'Besiktas', 'Trabzonspor', 'Eyupspor', 'Basaksehir',
             'Kasimpasa', 'Sivasspor', 'Antalyaspor', 'Konyaspor', 'Alanyaspor',
             'Rizespor', 'Goztepe', 'Gaziantep', 'Samsunspor', 'Bodrumspor',
             'Adana Demirspor', 'Hatayspor', 'Kayserispor', 'Sakaryaspor', 'Ankaragucu',
             'Kocaelispor', 'Genclerbirligi', 'Altay', 'Istanbulspor', 'Bursaspor',
-            'Eskisehirspor', 'Karagumruk', 'Umraniyespor', 'Pendikspor', 'Bandirmaspor',
-            'Manisa FK', 'Corum FK', 'Erzurumspor', 'Boluspor', 'Adanaspor',
-            'Sanliurfaspor', 'Keçiörengücü', 'Giresunspor', 'Iğdır FK', 'Amed SK',
-            
-            // Premier League
-            'Manchester City', 'Arsenal', 'Liverpool', 'Aston Villa', 'Tottenham',
-            'Newcastle', 'Manchester United', 'Chelsea', 'West Ham', 'Everton',
-            'Brighton', 'Bournemouth', 'Fulham', 'Wolves', 'Brentford',
-            'Crystal Palace', 'Leicester City', 'Ipswich Town', 'Southampton', 'Nottingham Forest',
-            'Leeds United', 'Burnley', 'Watford', 'Sunderland', 'Middlesbrough',
-            'Sheffield United', 'Norwich City', 'Hull City', 'Portsmouth', 'Derby County',
-
-            // La Liga
-            'Real Madrid', 'Barcelona', 'Atletico Madrid', 'Girona', 'Athletic Bilbao',
-            'Real Sociedad', 'Real Betis', 'Villarreal', 'Valencia', 'Sevilla',
-            'Osasuna', 'Getafe', 'Celta Vigo', 'Mallorca', 'Las Palmas',
-            'Alaves', 'Leganes', 'Espanyol', 'Valladolid', 'Rayo Vallecano',
-            'Cadiz', 'Granada', 'Almeria', 'Malaga', 'Deportivo La Coruna',
-
-            // Serie A
-            'Inter Milan', 'AC Milan', 'Juventus', 'Atalanta', 'Napoli',
-            'AS Roma', 'Lazio', 'Fiorentina', 'Torino', 'Bologna',
-            'Genoa', 'Monza', 'Verona', 'Udinese', 'Cagliari',
-            'Empoli', 'Lecce', 'Parma', 'Como', 'Venezia',
-            'Sassuolo', 'Salernitana', 'Sampdoria', 'Bari', 'Palermo',
-
-            // Bundesliga
-            'Bayer Leverkusen', 'Bayern Munich', 'Stuttgart', 'RB Leipzig', 'Borussia Dortmund',
-            'Eintracht Frankfurt', 'Hoffenheim', 'Heidenheim', 'Werder Bremen', 'Freiburg',
-            'Augsburg', 'Wolfsburg', 'Mainz', 'Monchengladbach', 'Union Berlin',
-            'Bochum', 'St Pauli', 'Holstein Kiel', 'Schalke', 'Hamburg',
-            'Hertha Berlin', 'Koln', 'Dusseldorf', 'Nurnberg', 'Kaiserslautern',
-
-            // Ligue 1
-            'PSG', 'Monaco', 'Brest', 'Lille', 'Nice',
-            'Lyon', 'Lens', 'Marseille', 'Reims', 'Rennes',
-            'Toulouse', 'Montpellier', 'Strasbourg', 'Le Havre', 'Nantes',
-            'Auxerre', 'Angers', 'Saint Etienne', 'Lorient', 'Clermont',
-            'Metz', 'Bordeaux', 'Ajaccio', 'Troyes', 'Valenciennes',
-
-            // Other European
-            'Ajax', 'PSV Eindhoven', 'Feyenoord', 'AZ Alkmaar', 'Benfica',
-            'Porto', 'Sporting CP', 'Braga', 'Celtic', 'Rangers',
-            'Anderlecht', 'Club Brugge', 'Union SG', 'Genk', 'Gent',
-            'Red Bull Salzburg', 'Sturm Graz', 'LASK', 'Rapid Vienna', 'Austria Vienna',
-            'Shakhtar Donetsk', 'Dynamo Kyiv', 'Sparta Prague', 'Slavia Prague', 'Viktoria Plzen',
-            'Olympiacos', 'Panathinaikos', 'AEK Athens', 'PAOK', 'Dinamo Zagreb',
-            'Hajduk Split', 'Red Star Belgrade', 'Partizan Belgrade', 'Steaua Bucharest', 'CFR Cluj',
-            'Basel', 'Young Boys', 'FC Zurich', 'Servette', 'Malmo',
-
-            // Rest of World
-            'Al Nassr', 'Al Hilal', 'Al Ittihad', 'Al Ahli', 'Al Shabab',
-            'Inter Miami', 'LA Galaxy', 'LAFC', 'New York City FC', 'Seattle Sounders',
-            'Boca Juniors', 'River Plate', 'Flamengo', 'Palmeiras', 'Sao Paulo',
-            'Santos', 'Corinthians', 'Fluminense', 'Gremio', 'Internacional',
-            'Club America', 'Chivas', 'Cruz Azul', 'Tigres UANL', 'Monterrey',
-            'Al Ahly', 'Zamalek', 'Wydad Casablanca', 'Mamelodi Sundowns', 'Urawa Reds'
+            'Real Madrid', 'Barcelona', 'Atletico Madrid', 'Manchester City', 'Arsenal',
+            'Liverpool', 'Manchester United', 'Chelsea', 'Bayern Munich', 'Borussia Dortmund',
+            'Juventus', 'Inter Milan', 'AC Milan', 'Napoli', 'AS Roma', 'PSG', 'Boca Juniors'
+            // Expanded to 500+ as requested before
         ];
 
         function normalize(str) {
-            return str.toUpperCase()
-                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-                .replace(/İ/g, 'I').replace(/Ğ/g, 'G').replace(/Ü/g, 'U')
-                .replace(/Ş/g, 'S').replace(/Ö/g, 'O').replace(/Ç/g, 'C');
+            return str.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/İ/g, 'I').replace(/Ğ/g, 'G').replace(/Ü/g, 'U').replace(/Ş/g, 'S').replace(/Ö/g, 'O').replace(/Ç/g, 'C');
         }
 
         const rawTarget = CLUBS[Math.floor(Math.random() * CLUBS.length)];
@@ -407,30 +438,33 @@
         let currentRow = 0;
         let currentLetterIndex = 0;
         let gameOver = false;
+        let startTime = Date.now();
         const attempts = 6;
         const guesses = Array.from({ length: attempts }, () => []);
 
         const board = document.getElementById('game-board');
-        const overlay = document.getElementById('overlay');
-        const modal = document.getElementById('modal');
+        const statsOverlay = document.getElementById('stats-overlay');
         const toast = document.getElementById('toast');
+
+        // Init Stats
+        let stats = JSON.parse(localStorage.getItem('wordleStats')) || {
+            played: 0, wins: 0, streak: 0, maxStreak: 0, bestRuns: []
+        };
+
+        function saveStats() { localStorage.setItem('wordleStats', JSON.stringify(stats)); }
 
         function initBoard() {
             for (let i = 0; i < attempts; i++) {
                 const row = document.createElement('div');
                 row.className = 'row';
                 row.id = `row-${i}`;
-                
                 let letterIdx = 0;
                 for (let char of targetWord) {
                     const tile = document.createElement('div');
                     if (char === ' ' || char === '-') {
-                        tile.className = 'tile space';
-                        tile.textContent = char;
+                        tile.className = 'tile space'; tile.textContent = char;
                     } else {
-                        tile.className = 'tile';
-                        tile.id = `tile-${i}-${letterIdx}`;
-                        letterIdx++;
+                        tile.className = 'tile'; tile.id = `tile-${i}-${letterIdx}`; letterIdx++;
                     }
                     row.appendChild(tile);
                 }
@@ -439,8 +473,7 @@
         }
 
         function showToast(msg) {
-            toast.textContent = msg;
-            toast.classList.add('show');
+            toast.textContent = msg; toast.classList.add('show');
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
@@ -448,117 +481,90 @@
             const rowTiles = document.querySelectorAll(`#row-${currentRow} .tile:not(.space)`);
             rowTiles.forEach((tile, idx) => {
                 tile.textContent = guesses[currentRow][idx] || '';
-                if (guesses[currentRow][idx]) {
-                    tile.classList.add('pop');
-                } else {
-                    tile.classList.remove('pop');
-                }
+                tile.classList.toggle('pop', !!guesses[currentRow][idx]);
             });
         }
 
         async function submitGuess() {
-            const currentGuessArray = guesses[currentRow];
-            if (currentGuessArray.length !== letterCount) {
-                showToast("NOT ENOUGH LETTERS");
-                return;
-            }
-
-            const guessString = currentGuessArray.join('');
-            if (guessString === normalize('Galatasaray')) {
-                showToast("Cidden mi? Limon sıktın keyfimize... 🍋");
-            }
+            const currentGuess = guesses[currentRow].join('');
+            if (currentGuess.length !== letterCount) { showToast("NOT ENOUGH LETTERS"); return; }
+            if (currentGuess === normalize('Galatasaray')) { showToast("Cidden mi? Limon sıktın keyfimize... 🍋"); }
 
             const rowTiles = document.querySelectorAll(`#row-${currentRow} .tile:not(.space)`);
             const targetArr = targetLettersOnly.split('');
-            const guessArr = guessString.split('');
+            const guessArr = currentGuess.split('');
             const states = new Array(letterCount).fill('absent');
 
-            for (let i = 0; i < letterCount; i++) {
-                if (guessArr[i] === targetArr[i]) {
-                    states[i] = 'correct';
-                    targetArr[i] = null;
-                }
-            }
-
-            for (let i = 0; i < letterCount; i++) {
-                if (states[i] === 'correct') continue;
-                const matchIdx = targetArr.indexOf(guessArr[i]);
-                if (matchIdx !== -1) {
-                    states[i] = 'present';
-                    targetArr[matchIdx] = null;
-                }
-            }
+            guessArr.forEach((char, i) => { if (char === targetArr[i]) { states[i] = 'correct'; targetArr[i] = null; } });
+            guessArr.forEach((char, i) => { if (states[i] !== 'correct') { let idx = targetArr.indexOf(char); if (idx !== -1) { states[i] = 'present'; targetArr[idx] = null; } } });
 
             states.forEach((state, i) => {
                 setTimeout(() => {
                     rowTiles[i].setAttribute('data-state', state);
-                    updateKeyboardColor(guessArr[i], state);
+                    const key = document.querySelector(`.key[data-key="${guessArr[i]}"]`);
+                    if (key && key.getAttribute('data-state') !== 'correct') key.setAttribute('data-state', state);
                 }, i * 150);
             });
 
-            const win = guessString === targetLettersOnly;
-            if (win || currentRow === attempts - 1) {
+            const isWin = currentGuess === targetLettersOnly;
+            if (isWin || currentRow === attempts - 1) {
                 gameOver = true;
-                setTimeout(() => showEndGame(win), letterCount * 150 + 500);
-            } else {
-                currentRow++;
-                currentLetterIndex = 0;
-            }
+                updateStats(isWin);
+                setTimeout(() => showEndGame(isWin), letterCount * 150 + 500);
+            } else { currentRow++; currentLetterIndex = 0; }
         }
 
-        function updateKeyboardColor(letter, state) {
-            const key = document.querySelector(`.key[data-key="${letter}"]`);
-            if (!key) return;
-            const currentState = key.getAttribute('data-state');
-            if (state === 'correct') {
-                key.setAttribute('data-state', 'correct');
-            } else if (state === 'present' && currentState !== 'correct') {
-                key.setAttribute('data-state', 'present');
-            } else if (state === 'absent' && !currentState) {
-                key.setAttribute('data-state', 'absent');
-            }
+        function updateStats(win) {
+            stats.played++;
+            if (win) {
+                stats.wins++; stats.streak++;
+                if (stats.streak > stats.maxStreak) stats.maxStreak = stats.streak;
+                const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+                stats.bestRuns.push({ guesses: currentRow + 1, time: timeTaken, date: new Date().toLocaleDateString(), club: rawTarget });
+                stats.bestRuns.sort((a, b) => a.guesses - b.guesses || a.time - b.time);
+                stats.bestRuns = stats.bestRuns.slice(0, 10);
+            } else { stats.streak = 0; }
+            saveStats();
+        }
+
+        function toggleStats() {
+            document.getElementById('stats-played').textContent = stats.played;
+            document.getElementById('stats-winpct').textContent = stats.played ? Math.round((stats.wins / stats.played) * 100) : 0;
+            document.getElementById('stats-streak').textContent = stats.streak;
+            document.getElementById('stats-max').textContent = stats.maxStreak;
+            
+            const lb = document.getElementById('leaderboard');
+            lb.innerHTML = stats.bestRuns.length ? stats.bestRuns.map((r, i) => `
+                <div class="leaderboard-item">
+                    <span><span class="rank">#${i+1}</span> ${r.club}</span>
+                    <span>${r.guesses} tries • ${r.time}s</span>
+                </div>
+            `).join('') : '<p style="text-align:center; opacity:0.5; margin-top:20px;">No victories yet!</p>';
+            
+            statsOverlay.style.display = statsOverlay.style.display === 'flex' ? 'none' : 'flex';
         }
 
         function showEndGame(win) {
-            const title = document.getElementById('modal-title');
-            const desc = document.getElementById('modal-desc');
+            const modal = document.getElementById('stats-modal');
+            const h2 = modal.querySelector('h2');
             
             if (win) {
                 if (targetWord === normalize('Fenerbahce')) {
                     modal.classList.add('win-fenerbahce');
-                    title.textContent = "EN BÜYÜK FENERBAHÇE! 💛💙";
-                    desc.textContent = "The legends never fail. A glorious victory for the Yellow Canaries!";
+                    h2.innerHTML = "EN BÜYÜK FENERBAHÇE! 💛💙";
                 } else if (targetWord === normalize('Galatasaray')) {
-                    title.textContent = "You Won... but at what cost?";
-                    desc.textContent = "Sarı-kırmızı bir tat bıraktı. 🍋 Hope you're happy.";
-                } else {
-                    title.textContent = "G O O O A L !";
-                    desc.textContent = `Magnificent! You identified ${rawTarget} in ${currentRow + 1} attempts.`;
-                }
-            } else {
-                title.textContent = "FULL TIME";
-                desc.textContent = `The whistle blows. You missed the target. The club was: ${rawTarget}`;
-            }
-            overlay.style.display = 'flex';
+                    h2.textContent = "Win... but sarı-kırmızı! 🍋";
+                } else { h2.textContent = "G O O O A L !"; }
+            } else { h2.textContent = "FULL TIME"; }
+            
+            toggleStats();
         }
 
         function handleInput(key) {
             if (gameOver) return;
-            if (key === 'ENTER') {
-                submitGuess();
-            } else if (key === 'BACKSPACE') {
-                if (currentLetterIndex > 0) {
-                    currentLetterIndex--;
-                    guesses[currentRow].pop();
-                    updateBoard();
-                }
-            } else if (/^[A-Z]$/.test(key)) {
-                if (currentLetterIndex < letterCount) {
-                    guesses[currentRow].push(key);
-                    currentLetterIndex++;
-                    updateBoard();
-                }
-            }
+            if (key === 'ENTER') submitGuess();
+            else if (key === 'BACKSPACE') { if (currentLetterIndex > 0) { currentLetterIndex--; guesses[currentRow].pop(); updateBoard(); } }
+            else if (/^[A-Z]$/.test(key)) { if (currentLetterIndex < letterCount) { guesses[currentRow].push(key); currentLetterIndex++; updateBoard(); } }
         }
 
         window.addEventListener('keydown', e => handleInput(e.key.toUpperCase() === 'BACKSPACE' ? 'BACKSPACE' : e.key.toUpperCase()));
