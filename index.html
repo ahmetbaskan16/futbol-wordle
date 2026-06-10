@@ -458,7 +458,7 @@
     <!-- Stats Modal -->
     <div id="stats-overlay" class="overlay">
         <div id="stats-modal" class="modal">
-            <div class="close-modal" onclick="toggleStats()"></div>
+            <div class="close-modal" onclick="toggleStats()"> </div>
             <h2 id="modal-title">İSTATİSTİKLER</h2>
             <div class="stats-grid">
                 <div class="stat-item"><span class="value" id="stats-played">0</span><span class="label">Oynanan</span></div>
@@ -502,7 +502,16 @@
         ];
 
         function normalize(str) {
-            return str.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/0/g, 'I').replace(//g, 'G').replace(//g, 'U').replace(/^/g, 'S').replace(//g, 'O').replace(//g, 'C');
+            return str.toUpperCase()
+                .replace(/İ/g, 'I')
+                .replace(/I/g, 'I')
+                .replace(/Ğ/g, 'G')
+                .replace(/Ü/g, 'U')
+                .replace(/Ş/g, 'S')
+                .replace(/Ö/g, 'O')
+                .replace(/Ç/g, 'C')
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
         }
 
         const rawTarget = CLUBS[Math.floor(Math.random() * CLUBS.length)];
@@ -535,6 +544,7 @@
         const toast = document.getElementById('toast');
 
         function initBoard() {
+            board.innerHTML = '';
             for (let i = 0; i < attempts; i++) {
                 const row = document.createElement('div');
                 row.className = 'row';
@@ -647,7 +657,7 @@
                 </div>
             `).join('');
             
-            statsOverlay.style.display = statsOverlay.style.display === 'flex' ? 'none' : 'flex';
+            statsOverlay.style.display = (statsOverlay.style.display === 'flex') ? 'none' : 'flex';
         }
 
         function showEndGame(win) {
@@ -668,10 +678,33 @@
         }
 
         function handleInput(key) {
-            if (gameOver || loginOverlay.style.display === 'flex') return;
-            if (key === 'ENTER') submitGuess();
-            else if (key === 'BACKSPACE') { if (currentLetterIndex > 0) { currentLetterIndex--; guesses[currentRow].pop(); updateBoard(); } }
-            else if (/^[A-Z]$/.test(key)) { if (currentLetterIndex < letterCount) { guesses[currentRow].push(key); currentLetterIndex++; updateBoard(); } }
+            if (gameOver || (loginOverlay.style.display === 'flex')) return;
+            
+            const normalizedKey = key.toUpperCase()
+                .replace(/İ/g, 'I')
+                .replace(/I/g, 'I')
+                .replace(/Ğ/g, 'G')
+                .replace(/Ü/g, 'U')
+                .replace(/Ş/g, 'S')
+                .replace(/Ö/g, 'O')
+                .replace(/Ç/g, 'C');
+
+            if (normalizedKey === 'ENTER') submitGuess();
+            else if (normalizedKey === 'BACKSPACE' || normalizedKey === 'DELETE') { 
+                if (currentLetterIndex > 0) { 
+                    currentLetterIndex--; 
+                    guesses[currentRow].pop(); 
+                    updateBoard(); 
+                } 
+            }
+            else if (/^[A-Z]$/.test(normalizedKey) || normalizedKey === ' ') { 
+                if (currentLetterIndex < letterCount) {
+                    const charToPush = (normalizedKey === ' ') ? ' ' : normalizedKey;
+                    guesses[currentRow].push(charToPush); 
+                    currentLetterIndex++; 
+                    updateBoard(); 
+                } 
+            }
         }
 
         function registerUser() {
@@ -694,9 +727,7 @@
         });
 
         window.addEventListener('keydown', e => {
-            let k = e.key.toUpperCase();
-            if (k === 'BACKSPACE') handleInput('BACKSPACE');
-            else handleInput(k);
+            handleInput(e.key);
         });
 
         document.getElementById('keyboard').addEventListener('click', e => {
