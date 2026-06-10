@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Football Wordle</title>
+    <style>
+        :root {
+            --bg-color: #121213;
+            --text-color: #ffffff;
+            --correct-color: #6aaa64;
+            --present-color: #c9b458;
+            --absent-color: #3a3a3c;
+            --border-color: #3a3a3c;
+            --fb-blue: #002d72;
+            --fb-yellow: #f2d100;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 10px;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+            background: linear-gradient(to bottom, var(--fb-blue) 50%, var(--fb-yellow) 50%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.1);
+        }
+
+        #game-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            overflow-y: auto;
+        }
+
+        #game-board {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 20px;
+            width: fit-content;
+        }
+
+        .row {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .tile {
+            width: clamp(30px, 8vw, 50px);
+            height: clamp(30px, 8vw, 50px);
+            border: 2px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(1rem, 4vw, 1.5rem);
+            font-weight: bold;
+            text-transform: uppercase;
+            user-select: none;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .tile.space {
+            border: none;
+            width: clamp(10px, 3vw, 20px);
+        }
+
+        .tile[data-state="correct"] {
+            background-color: var(--correct-color);
+            border-color: var(--correct-color);
+        }
+
+        .tile[data-state="present"] {
+            background-color: var(--present-color);
+            border-color: var(--present-color);
+        }
+
+        .tile[data-state="absent"] {
+            background-color: var(--absent-color);
+            border-color: var(--absent-color);
+        }
+
+        #keyboard {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            max-width: 600px;
+            padding-bottom: 20px;
+        }
+
+        .kb-row {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .key {
+            background-color: #818384;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 4px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            flex: 1;
+            -webkit-tap-highlight-color: transparent;
+            font-size: clamp(0.7rem, 3vw, 1rem);
+        }
+
+        .key.large {
+            flex: 1.8;
+        }
+
+        .message {
+            position: fixed;
+            top: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: white;
+            color: black;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            text-align: center;
+            max-width: 80%;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>FOOTBALL WORDLE</h1>
+        <p id="hint" style="font-size: 0.9rem; opacity: 0.8; margin: 5px 0;">Guess the club name!</p>
+    </header>
+
+    <div id="game-container">
+        <div id="game-board"></div>
+    </div>
+
+    <div id="keyboard">
+        <div class="kb-row">
+            <button class="key" data-key="Q">Q</button>
+            <button class="key" data-key="W">W</button>
+            <button class="key" data-key="E">E</button>
+            <button class="key" data-key="R">R</button>
+            <button class="key" data-key="T">T</button>
+            <button class="key" data-key="Y">Y</button>
+            <button class="key" data-key="U">U</button>
+            <button class="key" data-key="I">I</button>
+            <button class="key" data-key="O">O</button>
+            <button class="key" data-key="P">P</button>
+        </div>
+        <div class="kb-row">
+            <button class="key" data-key="A">A</button>
+            <button class="key" data-key="S">S</button>
+            <button class="key" data-key="D">D</button>
+            <button class="key" data-key="F">F</button>
+            <button class="key" data-key="G">G</button>
+            <button class="key" data-key="H">H</button>
+            <button class="key" data-key="J">J</button>
+            <button class="key" data-key="K">K</button>
+            <button class="key" data-key="L">L</button>
+        </div>
+        <div class="kb-row">
+            <button class="key large" data-key="ENTER">ENTER</button>
+            <button class="key" data-key="Z">Z</button>
+            <button class="key" data-key="X">X</button>
+            <button class="key" data-key="C">C</button>
+            <button class="key" data-key="V">V</button>
+            <button class="key" data-key="B">B</button>
+            <button class="key" data-key="N">N</button>
+            <button class="key" data-key="M">M</button>
+            <button class="key large" data-key="BACKSPACE">⌫</button>
+        </div>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <script>
+        const CLUBS = [
+            'Fenerbahçe', 'Fenerbahçe', 'Fenerbahçe', 'Fenerbahçe', // The GOAT
+            'Galatasaray', 'Beşiktaş', 'Trabzonspor', 'Sivasspor', 'Başakşehir',
+            'Real Madrid', 'Barcelona', 'Atletico Madrid',
+            'Manchester City', 'Liverpool', 'Arsenal', 'Chelsea', 'Manchester United', 'Tottenham',
+            'Bayern Münih', 'Borussia Dortmund', 'Bayer Leverkusen',
+            'Juventus', 'Inter Milan', 'AC Milan', 'Napoli', 'AS Roma',
+            'Paris Saint-Germain', 'Ajax', 'Porto', 'Benfica', 'Sporting CP'
+        ];
+
+        // Normalize string for comparison: remove accents/special chars and uppercase
+        function normalize(str) {
+            return str.toUpperCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove accents
+                .replace(/İ/g, 'I')
+                .replace(/Ğ/g, 'G')
+                .replace(/Ü/g, 'U')
+                .replace(/Ş/g, 'S')
+                .replace(/Ö/g, 'O')
+                .replace(/Ç/g, 'C');
+        }
+
+        const rawTarget = CLUBS[Math.floor(Math.random() * CLUBS.length)];
+        const targetWord = normalize(rawTarget);
+        const targetLettersOnly = targetWord.replace(/[^A-Z]/g, '');
+        const letterCount = targetLettersOnly.length;
+
+        let currentRow = 0;
+        let currentLetterIndex = 0;
+        let gameOver = false;
+        const attempts = 6;
+        
+        const guesses = Array.from({ length: attempts }, () => []);
+
+        const board = document.getElementById('game-board');
+        const messageEl = document.getElementById('message');
+
+        function initBoard() {
+            for (let i = 0; i < attempts; i++) {
+                const row = document.createElement('div');
+                row.className = 'row';
+                row.id = `row-${i}`;
+                
+                let letterIdx = 0;
+                for (let char of targetWord) {
+                    const tile = document.createElement('div');
+                    if (char === ' ' || char === '-') {
+                        tile.className = 'tile space';
+                        tile.textContent = char;
+                    } else {
+                        tile.className = 'tile';
+                        tile.id = `tile-${i}-${letterIdx}`;
+                        letterIdx++;
+                    }
+                    row.appendChild(tile);
+                }
+                board.appendChild(row);
+            }
+        }
+
+        function showMessage(msg, duration = 3000) {
+            messageEl.innerHTML = msg;
+            messageEl.style.display = 'block';
+            if (duration) {
+                setTimeout(() => {
+                    messageEl.style.display = 'none';
+                }, duration);
+            }
+        }
+
+        function updateBoard() {
+            const rowTiles = document.querySelectorAll(`#row-${currentRow} .tile:not(.space)`);
+            rowTiles.forEach((tile, idx) => {
+                tile.textContent = guesses[currentRow][idx] || '';
+            });
+        }
+
+        async function submitGuess() {
+            const currentGuessArray = guesses[currentRow];
+            if (currentGuessArray.length !== letterCount) {
+                showMessage("Eksik harf!");
+                return;
+            }
+
+            const guessString = currentGuessArray.join('');
+            
+            // Galatasaray Roast
+            if (guessString === normalize('Galatasaray')) {
+                showMessage("Cidden mi? Limon sıktın keyfimize... 🍋");
+            }
+
+            const rowTiles = document.querySelectorAll(`#row-${currentRow} .tile:not(.space)`);
+            const targetArr = targetLettersOnly.split('');
+            const guessArr = guessString.split('');
+            const states = new Array(letterCount).fill('absent');
+
+            // Pass 1: Correct
+            for (let i = 0; i < letterCount; i++) {
+                if (guessArr[i] === targetArr[i]) {
+                    states[i] = 'correct';
+                    targetArr[i] = null;
+                }
+            }
+
+            // Pass 2: Present
+            for (let i = 0; i < letterCount; i++) {
+                if (states[i] === 'correct') continue;
+                const matchIdx = targetArr.indexOf(guessArr[i]);
+                if (matchIdx !== -1) {
+                    states[i] = 'present';
+                    targetArr[matchIdx] = null;
+                }
+            }
+
+            // UI Update
+            states.forEach((state, i) => {
+                setTimeout(() => {
+                    rowTiles[i].setAttribute('data-state', state);
+                    updateKeyboardColor(guessArr[i], state);
+                }, i * 100);
+            });
+
+            if (guessString === targetLettersOnly) {
+                gameOver = true;
+                setTimeout(() => {
+                    if (targetWord === normalize('Fenerbahçe')) {
+                        showMessage("EN BÜYÜK FENERBAHÇE! 💛💙<br>Şampiyonluk geldi!", 0);
+                    } else if (targetWord === normalize('Galatasaray')) {
+                        showMessage("Kazandın ama... sarı-kırmızı bir tat bıraktı. 🍋", 0);
+                    } else {
+                        showMessage(`GOOOOOL!!!<br>${rawTarget} doğru cevap!`, 0);
+                    }
+                }, letterCount * 100);
+                return;
+            }
+
+            if (currentRow === attempts - 1) {
+                gameOver = true;
+                setTimeout(() => {
+                    showMessage(`KAYBETTİN!<br>Doğru cevap: ${rawTarget}`, 0);
+                }, letterCount * 100);
+                return;
+            }
+
+            currentRow++;
+            currentLetterIndex = 0;
+        }
+
+        function updateKeyboardColor(letter, state) {
+            const key = document.querySelector(`.key[data-key="${letter}"]`);
+            if (!key) return;
+            const currentState = key.getAttribute('data-state');
+            if (state === 'correct') {
+                key.setAttribute('data-state', 'correct');
+                key.style.backgroundColor = 'var(--correct-color)';
+            } else if (state === 'present' && currentState !== 'correct') {
+                key.setAttribute('data-state', 'present');
+                key.style.backgroundColor = 'var(--present-color)';
+            } else if (state === 'absent' && !currentState) {
+                key.setAttribute('data-state', 'absent');
+                key.style.backgroundColor = 'var(--absent-color)';
+            }
+        }
+
+        function handleInput(key) {
+            if (gameOver) return;
+
+            if (key === 'ENTER') {
+                submitGuess();
+            } else if (key === 'BACKSPACE') {
+                if (currentLetterIndex > 0) {
+                    currentLetterIndex--;
+                    guesses[currentRow].pop();
+                    updateBoard();
+                }
+            } else if (/^[A-Z]$/.test(key)) {
+                if (currentLetterIndex < letterCount) {
+                    guesses[currentRow].push(key);
+                    currentLetterIndex++;
+                    updateBoard();
+                }
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            const key = e.key.toUpperCase();
+            if (key === 'ENTER' || key === 'BACKSPACE' || /^[A-Z]$/.test(key)) {
+                handleInput(key);
+            }
+        });
+
+        document.getElementById('keyboard').addEventListener('click', (e) => {
+            const target = e.target.closest('.key');
+            if (target) {
+                handleInput(target.getAttribute('data-key'));
+            }
+        });
+
+        initBoard();
+    </script>
+</body>
+</html>
