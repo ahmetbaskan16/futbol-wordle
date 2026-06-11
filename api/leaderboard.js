@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv';
+import { kv } from '@vercelkv';
 
 export default async function handler(req, res) {
   // Set CORS headers
@@ -17,7 +17,6 @@ export default async function handler(req, res) {
 
   try {
     if (req.method === 'GET') {
-      // Get top 100 players
       const rawScores = await kv.zrange('leaderboard', 0, 99, { rev: true, withScores: true });
       const leaderboard = [];
       for (let i = 0; i < rawScores.length; i += 2) {
@@ -31,14 +30,16 @@ export default async function handler(req, res) {
       if (!name || score === undefined) {
         return res.status(400).json({ error: 'Missing name or score' });
       }
-
-      // Add to leaderboard. ZADD will update if user already exists
-      // We use 'NX' if we only want to add if they don't exist, but 'GT' (only if new score is greater) is better for leaderboards.
-      // Vercel KV / Upstash support GT.
       await kv.zadd('leaderboard', { score: score, member: name.substring(0, 20) });
-      
       return res.status(200).json({ success: true });
     }
+
+    if (req.method === 'DELETE') {
+      // Secret key or specific header to prevent accidental wipes could be added here
+      await kv.del('leaderboard');
+      return res.status(200).json({ success: true, message: 'Leaderboard wiped' });
+    }
+
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Internal Server Error' });
