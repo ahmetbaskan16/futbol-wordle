@@ -520,6 +520,8 @@
     <div id="toast" class="toast"></div>
 
     <script>
+        const API_URL = '/api/leaderboard';
+
         const CLUBS = [
             // Super Lig
             'Fenerbahce', 'Galatasaray', 'Besiktas', 'Trabzonspor', 'Basaksehir',
@@ -616,8 +618,7 @@
         const attempts = 6;
         let guesses = Array.from({ length: attempts }, () => []);
 
-        const statsKey = currentGameMode === 'club' ? 'wordleStats' : 'playerWordleStats';
-        let stats = JSON.parse(localStorage.getItem(statsKey)) || {
+        let stats = JSON.parse(localStorage.getItem('wordleStats')) || {
             played: 0, wins: 0, streak: 0, maxStreak: 0, bestRuns: [], totalScore: 0
         };
         let username = localStorage.getItem('futbol_wordle_username');
@@ -627,7 +628,7 @@
         const loginOverlay = document.getElementById('login-overlay');
         const toast = document.getElementById('toast');
 
-        function saveStats() { localStorage.setItem(statsKey, JSON.stringify(stats)); }
+        function saveStats() { localStorage.setItem('wordleStats', JSON.stringify(stats)); }
         function saveUser(name) { 
             username = name;
             localStorage.setItem('futbol_wordle_username', name); 
@@ -640,7 +641,6 @@
         }
 
         function initBoard() {
-            // Update UI based on mode
             document.getElementById('mode-club').classList.toggle('active', currentGameMode === 'club');
             document.getElementById('mode-player').classList.toggle('active', currentGameMode === 'player');
             document.getElementById('game-subtitle').textContent = currentGameMode === 'club' ? 'THE ULTIMATE CLUB CHALLENGE' : 'GUESS THE STAR PLAYER';
@@ -718,8 +718,46 @@
                 stats.bestRuns.push({ guesses: currentRow + 1, time: timeTaken, club: rawTarget });
                 stats.bestRuns.sort((a, b) => a.guesses - b.guesses || a.time - b.time);
                 stats.bestRuns = stats.bestRuns.slice(0, 10);
+                
+                if (username) {
+                    syncScore();
+                }
             } else { stats.streak = 0; }
             saveStats();
+        }
+
+        async function syncScore() {
+            if (!username) return;
+            try {
+                await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: username, score: stats.totalScore })
+                });
+            } catch (e) { console.error("Sync failed", e); }
+        }
+
+        async function loadGlobalLeaderboard() {
+            try {
+                const res = await fetch(API_URL);
+                const data = await res.json();
+                const glb = document.getElementById('global-leaderboard');
+                
+                if (!data || data.length === 0) {
+                    glb.innerHTML = '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Sıralama boş</p>';
+                    return;
+                }
+
+                glb.innerHTML = data.map((l, i) => `
+                    <div class="leaderboard-item ${l.name === username ? 'highlight' : ''}">
+                        <span><span class="rank">${i+1}</span> ${l.name}</span>
+                        <span style="font-weight:800">${l.score}</span>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error("Load failed", e);
+                document.getElementById('global-leaderboard').innerHTML = '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Sıralama yüklenemedi</p>';
+            }
         }
 
         window.toggleStats = function() {
@@ -740,28 +778,7 @@
                     </div>
                 `).join('') : '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Henüz galibiyet yok</p>';
 
-                const players = [
-                    {name: "Baskan66", score: 84},
-                    {name: "Doğu CD", score: 72},
-                    {name: "Fenerli1907", score: 65},
-                    {name: "pes_master", score: 58},
-                    {name: "Efe_77", score: 49},
-                    {name: "Arda_Guler_Fan", score: 42},
-                    {name: "Gol_Makinesi", score: 38},
-                    {name: "Kramponlu_Dev", score: 31},
-                    {name: "Süper_Lig_Uzmanı", score: 25},
-                    {name: "Tribün_Sesi", score: 19},
-                    {name: username || "Oyuncu", score: stats.totalScore || 0, isUser: true}
-                ].sort((a, b) => b.score - a.score);
-
-                const glb = document.getElementById('global-leaderboard');
-                glb.innerHTML = players.map((l, i) => `
-                    <div class="leaderboard-item ${l.isUser ? 'highlight' : ''}">
-                        <span><span class="rank">${i+1}</span> ${l.name}</span>
-                        <span style="font-weight:800">${l.score}</span>
-                    </div>
-                `).join('');
-                
+                loadGlobalLeaderboard();
                 overlay.style.display = 'flex';
             }
         };
@@ -796,6 +813,7 @@
             saveUser(val);
             loginOverlay.style.display = 'none';
             showToast(`Hoş geldin, Manager ${val}!`);
+            if (stats.totalScore > 0) syncScore();
         }
 
         function showNameChange() {
