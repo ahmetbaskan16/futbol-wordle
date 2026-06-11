@@ -203,7 +203,7 @@
         const loginOverlay = document.getElementById('login-overlay');
         const usernameInput = document.getElementById('username-input');
 
-        function normalize(str) { return str.toUpperCase().replace(/[İIĞÜŞÖÇ]/g, m => ({'İ':'I','I':'I','Ğ':'G','Ü':'U','Ş':'S','Ö':'O','Ç':'C'}[m])).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z]/g, ''); }
+        function normalize(str) { return str.toUpperCase().replace(/[İIĞÜŞÖÇ]/g, m => ({'İ':'I','I':'I','Ğ':'G','Ü':'U','Ş':'S','Ö':'O','Ç':'C'}[m])).normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Z]/g, ''); }
 
         function switchMode(mode) {
             localStorage.setItem('futbol_wordle_mode', mode);
