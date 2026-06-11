@@ -74,7 +74,7 @@
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
         .stat-item .value { font-size: 1.5rem; font-weight: 800; display: block; }
         .stat-item .label { font-size: 0.6rem; color: var(--text-secondary); text-transform: uppercase; }
-        .leaderboard-container { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left; }
+        .leaderboard-container { display: grid; grid-template-columns: 1fr; gap: 15px; text-align: left; }
         .leaderboard-list { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 16px; max-height: 180px; overflow-y: auto; }
         .leaderboard-item { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 8px 12px; border-radius: 10px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
         .leaderboard-item.highlight { border-color: var(--correct-color); background: rgba(74, 222, 128, 0.1); }
@@ -90,7 +90,7 @@
 
     <header>
         <div class="header-actions">
-            <button class="icon-btn" onclick="toggleStats()" title="Leaderboard">
+            <button class="icon-btn" onclick="toggleStats()" title="İstatistikler">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
             </button>
         </div>
@@ -137,7 +137,7 @@
     <div id="login-overlay" class="overlay">
         <div class="modal">
             <h2>İSMİN NE?</h2>
-            <p style="color:var(--text-secondary); margin-bottom: 20px;">Global Leaderboard'da yer almak için ismini gir.</p>
+            <p style="color:var(--text-secondary); margin-bottom: 20px;">İstatistilerini kaydetmek için ismini gir.</p>
             <input type="text" id="username-input" class="modern-input" placeholder="İsmin" maxlength="15">
             <button class="btn-restart" onclick="registerUser()">BAŞLA</button>
         </div>
@@ -154,8 +154,8 @@
                 <div class="stat-item"><span class="value" id="stats-max">0</span><span class="label">Rekor</span></div>
             </div>
             <div class="leaderboard-container">
-                <div><h3>EN İYİLERİN</h3><div class="leaderboard-list" id="leaderboard"></div></div>
-                <div><h3>GLOBAL</h3><div class="leaderboard-list" id="global-leaderboard"></div></div>
+                <div id="personal-leaderboard-section"><h3>EN İYİLERİN</h3><div class="leaderboard-list" id="leaderboard"></div></div>
+                <div id="global-leaderboard-section" style="display:none"><h3>GLOBAL</h3><div class="leaderboard-list" id="global-leaderboard"></div></div>
             </div>
             <button class="btn-restart" onclick="location.reload()">TEKRAR OYNA</button>
             <button class="btn-secondary" onclick="showNameChange()">İsmi Değiştir</button>
@@ -276,7 +276,6 @@
             } else {
                 btn.classList.add('wrong');
                 showToast("YANLIŞ! DOĞRU: " + quizCurrent.name);
-                // Highlight the correct one
                 document.querySelectorAll('.option-btn').forEach(b => {
                     if (b.textContent === quizCurrent.name) b.classList.add('correct');
                 });
@@ -331,15 +330,39 @@
         // Global Helpers
         function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2500); }
         function saveStats() { localStorage.setItem('wordleStats', JSON.stringify(stats)); }
-        async function syncScore() { if(username) fetch(API_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name:username, score:stats.totalScore, uuid:userUuid})}).catch(()=>{}); }
+        
+        async function syncScore() { 
+            if(!username) return;
+            try {
+                await fetch(API_URL, {
+                    method:'POST', 
+                    headers:{'Content-Type':'application/json'}, 
+                    body:JSON.stringify({name:username, score:stats.totalScore, uuid:userUuid})
+                });
+            } catch (e) {
+                // Silently fail if KV/API is unavailable
+            }
+        }
         
         async function loadGlobalLeaderboard() {
             const glb = document.getElementById('global-leaderboard');
+            const glbSection = document.getElementById('global-leaderboard-section');
             try {
                 const res = await fetch(API_URL);
+                if (!res.ok) throw new Error();
                 const data = await res.json();
-                glb.innerHTML = data.map((l, i) => `<div class="leaderboard-item ${l.uuid === userUuid ? 'highlight' : ''}"><span><span class="rank">${i+1}</span> ${l.name}</span><span style="font-weight:800">${l.score}</span></div>`).join('');
-            } catch (e) { glb.innerHTML = '<p style="font-size:0.7rem; opacity:0.5">Yüklenemedi. KV bağlı mı?</p>'; }
+                if (data && data.length > 0) {
+                    glb.innerHTML = data.map((l, i) => `<div class="leaderboard-item ${l.uuid === userUuid ? 'highlight' : ''}"><span><span class="rank">${i+1}</span> ${l.name}</span><span style="font-weight:800">${l.score}</span></div>`).join('');
+                    // glbSection.style.display = 'block'; // Keeping it hidden as requested
+                }
+            } catch (e) { 
+                glbSection.style.display = 'none';
+            }
+        }
+
+        function loadPersonalLeaderboard() {
+            const plb = document.getElementById('leaderboard');
+            plb.innerHTML = `<div class="leaderboard-item highlight"><span><span class="rank">#</span> ${username || 'Siz'}</span><span style="font-weight:800">${stats.totalScore}</span></div>`;
         }
 
         window.toggleStats = function() {
@@ -350,6 +373,7 @@
                 document.getElementById('stats-score').textContent = stats.totalScore;
                 document.getElementById('stats-streak').textContent = stats.streak;
                 document.getElementById('stats-max').textContent = stats.maxStreak;
+                loadPersonalLeaderboard();
                 loadGlobalLeaderboard();
                 s.style.display = 'flex';
             }
