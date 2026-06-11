@@ -521,34 +521,71 @@
 
     <script>
         const CLUBS = [
-            'Fenerbahce', 'Fenerbahce', 'Fenerbahce', 'Fenerbahce', 'Fenerbahce',
-            'Galatasaray', 'Besiktas', 'Trabzonspor', 'Eyupspor', 'Basaksehir',
-            'Kasimpasa', 'Sivasspor', 'Antalyaspor', 'Konyaspor', 'Alanyaspor',
-            'Rizespor', 'Goztepe', 'Gaziantep', 'Samsunspor', 'Bodrumspor',
-            'Adana Demirspor', 'Hatayspor', 'Kayserispor', 'Sakaryaspor', 'Ankaragucu',
-            'Kocaelispor', 'Genclerbirligi', 'Altay', 'Istanbulspor', 'Bursaspor',
-            'Real Madrid', 'Barcelona', 'Atletico Madrid', 'Manchester City', 'Arsenal',
-            'Liverpool', 'Manchester United', 'Chelsea', 'Bayern Munich', 'Borussia Dortmund',
-            'Juventus', 'Inter Milan', 'AC Milan', 'Napoli', 'AS Roma', 'PSG', 'Boca Juniors',
-            'River Plate', 'Flamengo', 'Palmeiras', 'Al Nassr', 'Al Hilal', 'Inter Miami',
-            'Ajax', 'PSV', 'Benfica', 'Porto', 'Sporting CP', 'Celtic', 'Rangers',
-            'Monaco', 'Lyon', 'Marseille', 'Lille', 'Nice', 'Leipzig', 'Leverkusen',
-            'Tottenham', 'Newcastle', 'Aston Villa', 'Everton', 'West Ham', 'Sevilla',
-            'Valencia', 'Villarreal', 'Real Sociedad', 'Bilbao', 'Lazio', 'Atalanta'
+            // Super Lig
+            'Fenerbahce', 'Galatasaray', 'Besiktas', 'Trabzonspor', 'Basaksehir',
+            'Kasimpasa', 'Sivasspor', 'Alanyaspor', 'Antalyaspor', 'Rizespor',
+            'Eyupspor', 'Goztepe', 'Gaziantep', 'Samsunspor', 'Bodrumspor',
+            'Konyaspor', 'Adana Demirspor', 'Hatayspor', 'Kayserispor',
+            // TFF 1. Lig
+            'Ankaragucu', 'Istanbulspor', 'Pendikspor', 'Kocaelispor', 'Sakaryaspor',
+            'Ahlatci Corum FK', 'Bandirmaspor', 'Boluspor', 'Genclerbirligi', 'Erzurumspor',
+            'Umraniyespor', 'Manisa FK', 'Ankaraspor', 'Igdir FK', 'Sanliurfaspor',
+            'Adanaspor', 'Karagumruk', 'Yeni Malatyaspor', 'Amed SK',
+            // Premier League
+            'Manchester City', 'Arsenal', 'Liverpool', 'Aston Villa', 'Tottenham',
+            'Chelsea', 'Newcastle', 'Manchester United', 'West Ham', 'Brighton',
+            'Everton', 'Leicester City', 'Wolves', 'Fulham', 'Crystal Palace',
+            'Brentford', 'Bournemouth', 'Nottingham Forest', 'Southampton', 'Ipswich Town',
+            // La Liga
+            'Real Madrid', 'Barcelona', 'Girona', 'Atletico Madrid', 'Athletic Bilbao',
+            'Real Sociedad', 'Real Betis', 'Villarreal', 'Valencia', 'Sevilla',
+            'Espanyol', 'Osasuna', 'Getafe', 'Celta Vigo', 'Mallorca', 'Las Palmas',
+            // Serie A
+            'Inter Milan', 'AC Milan', 'Juventus', 'Atalanta', 'Bologna', 'AS Roma',
+            'Lazio', 'Fiorentina', 'Napoli', 'Torino', 'Monza', 'Genoa', 'Udinese', 'Cagliari',
+            // Bundesliga
+            'Bayer Leverkusen', 'Bayern Munich', 'Stuttgart', 'RB Leipzig', 'Borussia Dortmund',
+            'Frankfurt', 'Hoffenheim', 'Heidenheim', 'Werder Bremen', 'Freiburg', 'Augsburg',
+            'Wolfsburg', 'Monchengladbach', 'Mainz 05', 'Union Berlin', 'St Pauli',
+            // Ligue 1
+            'PSG', 'Monaco', 'Lille', 'Brest', 'Nice', 'Lyon', 'Lens', 'Marseille',
+            'Reims', 'Rennes', 'Toulouse', 'Montpellier', 'Strasbourg', 'Saint-Etienne',
+            // Other European
+            'Ajax', 'PSV Eindhoven', 'Feyenoord', 'Benfica', 'Porto', 'Sporting CP',
+            'Celtic', 'Rangers', 'Brugge', 'Anderlecht', 'Salzburg'
         ];
 
         const PLAYERS = [
-            'Arda Guler', 'Ferdi Kadioglu', 'Mauro Icardi', 'Cristiano Ronaldo', 'Lionel Messi',
-            'Kylian Mbappe', 'Erling Haaland', 'Jude Bellingham', 'Kevin De Bruyne', 'Mohamed Salah',
-            'Vinicius Junior', 'Harry Kane', 'Robert Lewandowski', 'Luka Modric', 'Antoine Griezmann',
-            'Bukayo Saka', 'Phil Foden', 'Rodri', 'Bruno Fernandes', 'Victor Osimhen',
-            'Enner Valencia', 'Dusan Tadic', 'Edin Dzeko', 'Sebastian Szymanski', 'Kerem Akturkoglu',
-            'Baris Alper Yilmaz', 'Fred', 'Ismail Yuksek', 'Caglar Soyuncu', 'Mert Gunok',
-            'Neymar', 'Karim Benzema', 'Luis Suarez', 'Zlatan Ibrahimovic', 'Paul Pogba',
-            'Virgil van Dijk', 'Alisson Becker', 'Thibaut Courtois', 'Jan Oblak', 'Ederson',
-            'Kyle Walker', 'Alphonso Davies', 'Achraf Hakimi', 'Theo Hernandez', 'Ruben Dias',
-            'Ronald Araujo', 'William Saliba', 'Declan Rice', 'Martin Odegaard', 'Jamal Musiala',
-            'Florian Wirtz', 'Lamine Yamal', 'Pedri', 'Gavi', 'Rafael Leao'
+            // Stars & Legends
+            'Cristiano Ronaldo', 'Lionel Messi', 'Kylian Mbappe', 'Erling Haaland', 'Jude Bellingham',
+            'Vinicius Junior', 'Harry Kane', 'Kevin De Bruyne', 'Mohamed Salah', 'Rodri',
+            'Robert Lewandowski', 'Antoine Griezmann', 'Luka Modric', 'Karim Benzema', 'Neymar',
+            // Turkish Stars
+            'Arda Guler', 'Ferdi Kadioglu', 'Kerem Akturkoglu', 'Baris Alper Yilmaz', 'Semih Kilicsoy',
+            'Ismail Yuksek', 'Caglar Soyuncu', 'Mert Gunok', 'Hakan Calhanoglu', 'Kenan Yildiz',
+            'Can Uzun', 'Bertug Yildirim', 'Okay Yokuslu', 'Orkun Kokcu', 'Zeki Celik',
+            'Merih Demiral', 'Altay Bayindir', 'Ugurcan Cakir', 'Irfan Can Kahveci', 'Cengiz Under',
+            // Super Lig Key Players
+            'Mauro Icardi', 'Dusan Tadic', 'Edin Dzeko', 'Sebastian Szymanski', 'Fred',
+            'Victor Osimhen', 'Allan Saint-Maximin', 'Rafa Silva', 'Ciro Immobile', 'Gedson Fernandes',
+            'Lucas Torreira', 'Davinson Sanchez', 'Michy Batshuayi', 'En-Nesyri', 'Sofyan Amrabat',
+            // Premier League
+            'Phil Foden', 'Bukayo Saka', 'Declan Rice', 'Martin Odegaard', 'Cole Palmer',
+            'Virgil van Dijk', 'Alisson Becker', 'Bruno Fernandes', 'Marcus Rashford', 'Son Heung-min',
+            'Alexander-Arnold', 'Ollie Watkins', 'Alexis Mac Allister', 'Dominic Solanke', 'William Saliba',
+            // La Liga
+            'Lamine Yamal', 'Pedri', 'Gavi', 'Federico Valverde', 'Rodrygo Goes',
+            'Aurilien Tchouameni', 'Eduardo Camavinga', 'Eder Militao', 'Ronald Araujo', 'Nico Williams',
+            'Dani Olmo', 'Julian Alvarez', 'Conor Gallagher', 'Alexander Sorloth',
+            // Bundesliga
+            'Florian Wirtz', 'Jamal Musiala', 'Xavi Simons', 'Granit Xhaka', 'Victor Boniface',
+            'Serge Gnabry', 'Leroy Sane', 'Joshua Kimmich', 'Alphonso Davies', 'Alejandro Grimaldo',
+            // Serie A
+            'Rafael Leao', 'Lautaro Martinez', 'Marcus Thuram', 'Nicolo Barella', 'Theo Hernandez',
+            'Dusan Vlahovic', 'Paulo Dybala', 'Khvicha Kvaratskhelia', 'Christian Pulisic', 'Douglas Luiz',
+            // Ligue 1
+            'Bradley Barcola', 'Ousmane Dembele', 'Warren Zaire-Emery', 'Jonathan David', 'Achraf Hakimi',
+            'Vitinha', 'Mason Greenwood'
         ];
 
         function normalize(str) {
@@ -616,7 +653,7 @@
                 let letterIdx = 0;
                 for (let char of targetWord) {
                     const tile = document.createElement('div');
-                    if (char === ' ' || char === '-') {
+                    if (char === ' ' || char === '-' || char === '.') {
                         tile.className = 'tile space'; tile.textContent = char;
                     } else {
                         tile.className = 'tile'; tile.id = `tile-${i}-${letterIdx}`; letterIdx++;
