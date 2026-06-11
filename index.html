@@ -21,6 +21,7 @@
             --gs-red: #a90432;
             --gs-yellow: #fdb912;
             --glow-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
+            --accent-color: #3b82f6;
         }
 
         * {
@@ -43,7 +44,7 @@
 
         header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             z-index: 10;
             position: relative;
             width: 100%;
@@ -92,6 +93,37 @@
 
         .icon-btn:hover {
             background: rgba(255,255,255,0.15);
+        }
+
+        /* Mode Switcher */
+        .mode-switcher {
+            display: flex;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .mode-btn.active {
+            background: var(--accent-color);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
         #game-container {
@@ -399,8 +431,13 @@
             </button>
         </div>
         <h1>FOOTBALL WORDLE</h1>
-        <div class="subtitle">THE ULTIMATE CLUB CHALLENGE</div>
+        <div class="subtitle" id="game-subtitle">THE ULTIMATE CLUB CHALLENGE</div>
     </header>
+
+    <div class="mode-switcher">
+        <button class="mode-btn active" id="mode-club" onclick="switchMode('club')">CLUB</button>
+        <button class="mode-btn" id="mode-player" onclick="switchMode('player')">PLAYER</button>
+    </div>
 
     <div id="game-container">
         <div id="game-board"></div>
@@ -500,6 +537,20 @@
             'Valencia', 'Villarreal', 'Real Sociedad', 'Bilbao', 'Lazio', 'Atalanta'
         ];
 
+        const PLAYERS = [
+            'Arda Guler', 'Ferdi Kadioglu', 'Mauro Icardi', 'Cristiano Ronaldo', 'Lionel Messi',
+            'Kylian Mbappe', 'Erling Haaland', 'Jude Bellingham', 'Kevin De Bruyne', 'Mohamed Salah',
+            'Vinicius Junior', 'Harry Kane', 'Robert Lewandowski', 'Luka Modric', 'Antoine Griezmann',
+            'Bukayo Saka', 'Phil Foden', 'Rodri', 'Bruno Fernandes', 'Victor Osimhen',
+            'Enner Valencia', 'Dusan Tadic', 'Edin Dzeko', 'Sebastian Szymanski', 'Kerem Akturkoglu',
+            'Baris Alper Yilmaz', 'Fred', 'Ismail Yuksek', 'Caglar Soyuncu', 'Mert Gunok',
+            'Neymar', 'Karim Benzema', 'Luis Suarez', 'Zlatan Ibrahimovic', 'Paul Pogba',
+            'Virgil van Dijk', 'Alisson Becker', 'Thibaut Courtois', 'Jan Oblak', 'Ederson',
+            'Kyle Walker', 'Alphonso Davies', 'Achraf Hakimi', 'Theo Hernandez', 'Ruben Dias',
+            'Ronald Araujo', 'William Saliba', 'Declan Rice', 'Martin Odegaard', 'Jamal Musiala',
+            'Florian Wirtz', 'Lamine Yamal', 'Pedri', 'Gavi', 'Rafael Leao'
+        ];
+
         function normalize(str) {
             return str.toUpperCase()
                 .replace(/İ/g, 'I')
@@ -513,35 +564,51 @@
                 .replace(/[\u0300-\u036f]/g, "");
         }
 
-        const rawTarget = CLUBS[Math.floor(Math.random() * CLUBS.length)];
-        const targetWord = normalize(rawTarget);
-        const targetLettersOnly = targetWord.replace(/[^A-Z]/g, '');
-        const letterCount = targetLettersOnly.length;
+        let currentGameMode = localStorage.getItem('futbol_wordle_mode') || 'club';
+        let wordList = currentGameMode === 'club' ? CLUBS : PLAYERS;
+        
+        let rawTarget = wordList[Math.floor(Math.random() * wordList.length)];
+        let targetWord = normalize(rawTarget);
+        let targetLettersOnly = targetWord.replace(/[^A-Z]/g, '');
+        let letterCount = targetLettersOnly.length;
 
         let currentRow = 0;
         let currentLetterIndex = 0;
         let gameOver = false;
         let startTime = Date.now();
         const attempts = 6;
-        const guesses = Array.from({ length: attempts }, () => []);
+        let guesses = Array.from({ length: attempts }, () => []);
 
-        let stats = JSON.parse(localStorage.getItem('wordleStats')) || {
+        const statsKey = currentGameMode === 'club' ? 'wordleStats' : 'playerWordleStats';
+        let stats = JSON.parse(localStorage.getItem(statsKey)) || {
             played: 0, wins: 0, streak: 0, maxStreak: 0, bestRuns: [], totalScore: 0
         };
         let username = localStorage.getItem('futbol_wordle_username');
-
-        function saveStats() { localStorage.setItem('wordleStats', JSON.stringify(stats)); }
-        function saveUser(name) { 
-            username = name;
-            localStorage.setItem('futbol_wordle_username', name); 
-        }
 
         const board = document.getElementById('game-board');
         const statsOverlay = document.getElementById('stats-overlay');
         const loginOverlay = document.getElementById('login-overlay');
         const toast = document.getElementById('toast');
 
+        function saveStats() { localStorage.setItem(statsKey, JSON.stringify(stats)); }
+        function saveUser(name) { 
+            username = name;
+            localStorage.setItem('futbol_wordle_username', name); 
+        }
+
+        function switchMode(mode) {
+            if (currentGameMode === mode) return;
+            localStorage.setItem('futbol_wordle_mode', mode);
+            location.reload();
+        }
+
         function initBoard() {
+            // Update UI based on mode
+            document.getElementById('mode-club').classList.toggle('active', currentGameMode === 'club');
+            document.getElementById('mode-player').classList.toggle('active', currentGameMode === 'player');
+            document.getElementById('game-subtitle').textContent = currentGameMode === 'club' ? 'THE ULTIMATE CLUB CHALLENGE' : 'GUESS THE STAR PLAYER';
+
+            board.innerHTML = '';
             for (let i = 0; i < attempts; i++) {
                 const row = document.createElement('div');
                 row.className = 'row';
@@ -577,7 +644,7 @@
             const currentGuess = guesses[currentRow].join('');
             if (currentGuess.length !== letterCount) { showToast("YETERSİZ HARF"); return; }
             
-            if (currentGuess === normalize('Galatasaray')) { showToast("Cidden mi? Limon siktin keyfimize... 🍋"); }
+            if (currentGameMode === 'club' && currentGuess === normalize('Galatasaray')) { showToast("Cidden mi? Limon siktin keyfimize... 🍋"); }
 
             const rowTiles = document.querySelectorAll(`#row-${currentRow} .tile:not(.space)`);
             const targetArr = targetLettersOnly.split('');
@@ -618,7 +685,6 @@
             saveStats();
         }
 
-        // Revised toggle function to ensure it always opens correctly
         window.toggleStats = function() {
             const overlay = document.getElementById('stats-overlay');
             if (overlay.style.display === 'flex') {
