@@ -60,7 +60,8 @@ export default async function handler(req, res) {
 
   } catch (error) {
     console.error('KV Error:', error);
-    return res.status(500).json({ error: 'Database Connection Error. Check Vercel KV setup.' });
+    // Updated error message to trigger redeploy and verify KV connectivity
+    return res.status(500).json({ error: 'Database Connection Error. Check Vercel KV configuration.' });
   }
 
   return res.status(405).json({ error: 'Method not allowed' });
