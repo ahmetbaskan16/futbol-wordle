@@ -24,7 +24,7 @@
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg-gradient); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; padding: 20px; }
+        body { background: var(--bg-gradient); color: var(--text-primary); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; padding: 20px; }
         header { text-align: center; margin-bottom: 20px; z-index: 10; position: relative; width: 100%; max-width: 500px; }
         h1 { font-size: clamp(1.8rem, 7vw, 3rem); font-weight: 800; letter-spacing: -2px; background: linear-gradient(135deg, #fff 0%, #aaa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; }
         .subtitle { color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; }
@@ -196,7 +196,7 @@
         let userUuid = localStorage.getItem('futbol_wordle_uuid') || (()=>{const u=crypto.randomUUID();localStorage.setItem('futbol_wordle_uuid',u);return u;})();
         
         let targetWord = '', rawTarget = '', currentRow = 0, currentLetterIndex = 0, gameOver = false, guesses = [];
-        let quizCurrent = null, quizLocked = false;
+        let quizCurrent = null, quizLocked = false, quizTimer = null;
 
         // UI Refs
         const board = document.getElementById('game-board');
@@ -234,7 +234,7 @@
         function initBoard() {
             board.innerHTML = '';
             for (let i = 0; i < 6; i++) {
-                const row = document.createElement('div'); row.className = 'row';
+                const row = document.createElement('div'); row.className = 'row'; row.id = 'row-' + i;
                 for (let j = 0; j < targetWord.length; j++) {
                     const tile = document.createElement('div'); tile.className = 'tile'; tile.id = `tile-${i}-${j}`;
                     row.appendChild(tile);
@@ -245,6 +245,7 @@
 
         // Quiz Logic
         function loadQuiz() {
+            if (quizTimer) clearTimeout(quizTimer);
             quizLocked = false;
             quizCurrent = QUIZ_DATA[Math.floor(Math.random() * QUIZ_DATA.length)];
             const logo = document.getElementById('quiz-logo');
@@ -275,12 +276,16 @@
             } else {
                 btn.classList.add('wrong');
                 showToast("YANLIŞ! DOĞRU: " + quizCurrent.name);
+                // Highlight the correct one
+                document.querySelectorAll('.option-btn').forEach(b => {
+                    if (b.textContent === quizCurrent.name) b.classList.add('correct');
+                });
             }
             
             stats.played++;
             saveStats();
             syncScore();
-            setTimeout(loadQuiz, 2000);
+            quizTimer = setTimeout(loadQuiz, 2000);
         }
 
         // Wordle Logic
