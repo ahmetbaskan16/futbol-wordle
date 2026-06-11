@@ -104,7 +104,7 @@
             border-radius: 12px;
             margin-bottom: 25px;
             width: 100%;
-            max-width: 300px;
+            max-width: 400px;
         }
 
         .mode-btn {
@@ -112,10 +112,10 @@
             background: transparent;
             border: none;
             color: var(--text-secondary);
-            padding: 10px;
+            padding: 10px 4px;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
             cursor: pointer;
             transition: all 0.3s;
         }
@@ -437,6 +437,7 @@
     <div class="mode-switcher">
         <button class="mode-btn active" id="mode-club" onclick="switchMode('club')">CLUB</button>
         <button class="mode-btn" id="mode-player" onclick="switchMode('player')">PLAYER</button>
+        <button class="mode-btn" id="mode-manager" onclick="switchMode('manager')">TEKNİK DİREKTÖR</button>
     </div>
 
     <div id="game-container">
@@ -590,6 +591,15 @@
             'Vitinha', 'Mason Greenwood'
         ];
 
+        const MANAGERS = [
+            'Fatih Terim', 'Jose Mourinho', 'Pep Guardiola', 'Jurgen Klopp', 'Carlo Ancelotti',
+            'Okan Buruk', 'Sergen Yalcin', 'Ismail Kartal', 'Jorge Jesus', 'Senol Gunes',
+            'Xabi Alonso', 'Mikel Arteta', 'Zinedine Zidane', 'Diego Simeone', 'Erik ten Hag',
+            'Unai Emery', 'Luis Enrique', 'Julian Nagelsmann', 'Thomas Tuchel', 'Arne Slot',
+            'Vincenzo Montella', 'Mustafa Denizli', 'Ertugrul Saglam', 'Ayikut Kocaman', 'Hikmet Karaman',
+            'Antonio Conte', 'Hansi Flick', 'Luciano Spalletti', 'Mauricio Pochettino', 'Simone Inzaghi'
+        ];
+
         function normalize(str) {
             return str.toUpperCase()
                 .replace(/İ/g, 'I')
@@ -604,7 +614,9 @@
         }
 
         let currentGameMode = localStorage.getItem('futbol_wordle_mode') || 'club';
-        let wordList = currentGameMode === 'club' ? CLUBS : PLAYERS;
+        let wordList = CLUBS;
+        if (currentGameMode === 'player') wordList = PLAYERS;
+        if (currentGameMode === 'manager') wordList = MANAGERS;
         
         let rawTarget = wordList[Math.floor(Math.random() * wordList.length)];
         let targetWord = normalize(rawTarget);
@@ -622,11 +634,18 @@
             played: 0, wins: 0, streak: 0, maxStreak: 0, bestRuns: [], totalScore: 0
         };
         let username = localStorage.getItem('futbol_wordle_username');
+        let userUuid = localStorage.getItem('futbol_wordle_uuid');
+        
+        if (!userUuid) {
+            userUuid = crypto.randomUUID();
+            localStorage.setItem('futbol_wordle_uuid', userUuid);
+        }
 
         const board = document.getElementById('game-board');
         const statsOverlay = document.getElementById('stats-overlay');
         const loginOverlay = document.getElementById('login-overlay');
         const toast = document.getElementById('toast');
+        const usernameInput = document.getElementById('username-input');
 
         function saveStats() { localStorage.setItem('wordleStats', JSON.stringify(stats)); }
         function saveUser(name) { 
@@ -643,7 +662,12 @@
         function initBoard() {
             document.getElementById('mode-club').classList.toggle('active', currentGameMode === 'club');
             document.getElementById('mode-player').classList.toggle('active', currentGameMode === 'player');
-            document.getElementById('game-subtitle').textContent = currentGameMode === 'club' ? 'THE ULTIMATE CLUB CHALLENGE' : 'GUESS THE STAR PLAYER';
+            document.getElementById('mode-manager').classList.toggle('active', currentGameMode === 'manager');
+            
+            let subtitleText = 'THE ULTIMATE CLUB CHALLENGE';
+            if (currentGameMode === 'player') subtitleText = 'GUESS THE STAR PLAYER';
+            if (currentGameMode === 'manager') subtitleText = 'TACTICAL MASTERMINDS';
+            document.getElementById('game-subtitle').textContent = subtitleText;
 
             board.innerHTML = '';
             for (let i = 0; i < attempts; i++) {
@@ -727,12 +751,12 @@
         }
 
         async function syncScore() {
-            if (!username) return;
+            if (!username || !userUuid) return;
             try {
                 await fetch(API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: username, score: stats.totalScore })
+                    body: JSON.stringify({ name: username, score: stats.totalScore, uuid: userUuid })
                 });
             } catch (e) { console.error("Sync failed", e); }
         }
@@ -749,7 +773,7 @@
                 }
 
                 glb.innerHTML = data.map((l, i) => `
-                    <div class="leaderboard-item ${l.name === username ? 'highlight' : ''}">
+                    <div class="leaderboard-item ${l.uuid === userUuid ? 'highlight' : ''}">
                         <span><span class="rank">${i+1}</span> ${l.name}</span>
                         <span style="font-weight:800">${l.score}</span>
                     </div>
@@ -801,14 +825,14 @@
         }
 
         function handleInput(key) {
-            if (gameOver || loginOverlay.style.display === 'flex') return;
+            if (gameOver || loginOverlay.style.display === 'flex' || document.activeElement === usernameInput) return;
             if (key === 'ENTER') submitGuess();
             else if (key === 'BACKSPACE') { if (currentLetterIndex > 0) { currentLetterIndex--; guesses[currentRow].pop(); updateBoard(); } }
             else if (/^[A-Z]$/.test(key)) { if (currentLetterIndex < letterCount) { guesses[currentRow].push(key); currentLetterIndex++; updateBoard(); } }
         }
 
         function registerUser() {
-            const val = document.getElementById('username-input').value.trim();
+            const val = usernameInput.value.trim();
             if (!val) { showToast("Bir isim gir!"); return; }
             saveUser(val);
             loginOverlay.style.display = 'none';
@@ -819,15 +843,23 @@
         function showNameChange() {
             statsOverlay.style.display = 'none';
             loginOverlay.style.display = 'flex';
-            document.getElementById('username-input').value = username || '';
+            usernameInput.value = username || '';
+            setTimeout(() => usernameInput.focus(), 100);
         }
 
         window.addEventListener('load', () => {
-            if (!username) { loginOverlay.style.display = 'flex'; }
+            if (!username) { 
+                loginOverlay.style.display = 'flex'; 
+                setTimeout(() => usernameInput.focus(), 100);
+            }
             initBoard();
         });
 
         window.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && loginOverlay.style.display === 'flex' && document.activeElement === usernameInput) {
+                registerUser();
+                return;
+            }
             let k = e.key.toUpperCase();
             if (k === 'BACKSPACE') handleInput('BACKSPACE');
             else handleInput(k);
