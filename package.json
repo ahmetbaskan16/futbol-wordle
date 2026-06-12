@@ -1,7 +1,7 @@
 {
   "name": "futbol-wordle",
-  "version": "1.0.0",
-  "description": "Elite Football Wordle Game",
+  "version": "2.0.0",
+  "description": "Elite Football Wordle - Modular",
   "main": "index.html",
   "dependencies": {
     "@vercel/kv": "^1.0.1"

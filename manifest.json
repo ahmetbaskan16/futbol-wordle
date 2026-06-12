@@ -1,0 +1,14 @@
+{
+  "name": "Football Hub",
+  "short_name": "FH",
+  "description": "Futbol Wordle, Quiz, Daily ve Blitz modları",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f0f1a",
+  "theme_color": "#0f0f1a",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%231a1a2e'/><text x='50%25' y='55%25' font-size='90' font-family='Inter,sans-serif' font-weight='800' fill='white' text-anchor='middle' dominant-baseline='middle'>⚽</text></svg>", "sizes": "192x192", "type": "image/svg+xml" },
+    { "src": "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%231a1a2e'/><text x='50%25' y='55%25' font-size='280' font-family='Inter,sans-serif' font-weight='800' fill='white' text-anchor='middle' dominant-baseline='middle'>⚽</text></svg>", "sizes": "512x512", "type": "image/svg+xml" }
+  ]
+}
