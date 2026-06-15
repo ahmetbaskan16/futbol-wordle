@@ -478,29 +478,21 @@ let startTime = Date.now();
 const attempts = 6;
 let guesses = Array.from({length: attempts}, () => []);
 
+// TEMİZLENMİŞ DEĞİŞKENLER VE ID OLUŞTURMA
 const statsKey = currentGameMode === 'club' ? 'wordleStats' : 'playerWordleStats';
 let stats = JSON.parse(localStorage.getItem(statsKey)) || {played:0, wins:0, streak:0, maxStreak:0, bestRuns:[], totalScore:0};
 let username = localStorage.getItem('futbol_wordle_username');
-let stats = JSON.parse(localStorage.getItem(statsKey)) || {played:0, wins:0, streak:0, maxStreak:0, bestRuns:[], totalScore:0};
-let username = localStorage.getItem('futbol_wordle_username');
 
-// --- BURAYA EKLİYORUZ ---
-// Benzersiz bir kullanıcı ID'si oluştur (ilk girişte çalışır)
 let userUUID = localStorage.getItem('futbol_wordle_uuid');
 if (!userUUID) {
     userUUID = crypto.randomUUID();
     localStorage.setItem('futbol_wordle_uuid', userUUID);
 }
-// ------------------------
 
 function saveStats() { localStorage.setItem(statsKey, JSON.stringify(stats)); }
-function saveStats() { localStorage.setItem(statsKey, JSON.stringify(stats)); }
-function saveUser(name) { username = name; localStorage.setItem('futbol_wordle_username', name); }
-    function saveStats() { localStorage.setItem(statsKey, JSON.stringify(stats)); }
 function saveUser(name) { username = name; localStorage.setItem('futbol_wordle_username', name); }
 
-// --- BURAYA EKLİYORUZ ---
-// Skoru Backend'e Gönder
+// BACKEND FONKSİYONLARI
 async function submitScoreToDB(newScore) {
     if (!username) return;
     try {
@@ -514,7 +506,6 @@ async function submitScoreToDB(newScore) {
     }
 }
 
-// Liderlik Tablosunu Backend'den Çek
 async function fetchGlobalLeaderboard() {
     try {
         const res = await fetch('/api/leaderboard');
@@ -529,10 +520,11 @@ async function fetchGlobalLeaderboard() {
         ).join('');
     } catch (error) {
         console.error('Leaderboard çekilemedi:', error);
+        document.getElementById('global-leaderboard').innerHTML = '<p style="text-align:center;opacity:.5;font-size:.8rem;">Bağlantı hatası</p>';
     }
 }
-// ------------------------
 
+// OYUN MEKANİKLERİ
 function switchMode(mode) {
     if (currentGameMode === mode) return;
     localStorage.setItem('futbol_wordle_mode', mode);
@@ -587,6 +579,13 @@ function submitGuess() {
         return;
     }
 
+    // EKİP İÇİN SÜRPRİZ KONTROL (Puan/deneme hakkı gitmez, sadece uyarı verir)
+    const lowerGuess = guess.toLowerCase();
+    if (['mali', 'berat', 'amo', 'özo', 'batuhan'].includes(lowerGuess)) {
+        showToast("Efsaneler listesinde o henüz yok! 😅");
+        return; 
+    }
+
     if (currentGameMode === 'club' && guess === normalize('Galatasaray')) {
         showToast("Cidden mi? Limon sıktın keyfimize... 🍋");
     }
@@ -604,7 +603,6 @@ function submitGuess() {
         }
     });
 
-    // Tile + klavye renklendirmesi aynı anda ama sırayla (cascade)
     const KB_PRIORITY = { correct: 3, present: 2, absent: 1 };
     states.forEach((state, i) => {
         setTimeout(() => {
@@ -639,13 +637,15 @@ function updateStats(win) {
         stats.bestRuns.push({ guesses: currentRow + 1, time, club: rawTarget });
         stats.bestRuns.sort((a,b) => a.guesses - b.guesses || a.time - b.time);
         stats.bestRuns = stats.bestRuns.slice(0, 10);
-        submitScoreToDB(stats.totalScore); // Her kazandığında skoru gönder
-        // ------------------------
-    } else { stats.streak = 0; }
+        
+        submitScoreToDB(stats.totalScore); // Gerçek skoru gönder
+    } else { 
+        stats.streak = 0; 
+    }
     saveStats();
 }
-  
 
+// İSTATİSTİK EKRANI VE GERÇEK LİDERLİK TABLOSU
 window.toggleStats = function() {
     const overlay = document.getElementById('stats-overlay');
     if (overlay.style.display === 'flex') { overlay.style.display = 'none'; return; }
@@ -660,17 +660,9 @@ window.toggleStats = function() {
         ? stats.bestRuns.map((r,i) => `<div class="leaderboard-item"><span><span class="rank">#${i+1}</span>${r.club}</span><span style="opacity:.6">${r.guesses} deneme</span></div>`).join('')
         : '<p style="text-align:center;opacity:.3;font-size:.7rem;">Henüz galibiyet yok</p>';
 
-    const players = [
-        {name:"Baskan66",score:84},{name:"Doğu CD",score:72},{name:"Fenerli1907",score:65},
-        {name:"pes_master",score:58},{name:"Efe_77",score:49},{name:"Arda_Guler_Fan",score:42},
-        {name:"Gol_Makinesi",score:38},{name:"Kramponlu_Dev",score:31},
-        {name:"Superlig_Uzmani",score:25},{name:"Tribun_Sesi",score:19},
-        {name:username||"Oyuncu",score:stats.totalScore||0,isUser:true}
-    ].sort((a,b) => b.score - a.score);
-
-    document.getElementById('global-leaderboard').innerHTML = players.map((l,i) =>
-        `<div class="leaderboard-item ${l.isUser?'highlight':''}"><span><span class="rank">${i+1}</span>${l.name}</span><span style="font-weight:800">${l.score}</span></div>`
-    ).join('');
+    // Sahte oyuncular silindi, veritabanından çekiliyor
+    document.getElementById('global-leaderboard').innerHTML = '<p style="text-align:center;opacity:.5;font-size:.8rem;">Yükleniyor...</p>';
+    fetchGlobalLeaderboard();
 
     overlay.style.display = 'flex';
 };
