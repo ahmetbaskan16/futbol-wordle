@@ -248,9 +248,7 @@
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
-        <!-- ROZETLERİN STİLİ -->
-<style>
-/* ... diğer stillerin altına ekle ... */
+        /* ROZETLERİN STİLİ */
 
 .achievements-grid {
     display: grid;
@@ -378,7 +376,6 @@
     margin: 0 4px;
 }
 </style>
-    </style>
 </head>
 <body>
 
@@ -469,7 +466,20 @@
             <!-- JS ile doldurulur -->
         </div>
 
-        <!-- ARKADAŞ SEKMESİ -->
+        
+        <!-- EN İYİ OYUNLAR + GENEL SIRALAMASI -->
+        <div class="leaderboard-container">
+            <div>
+                <h3 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);">📊 En İyi Oyunlar</h3>
+                <div class="leaderboard-list" id="leaderboard"></div>
+            </div>
+            <div>
+                <h3 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);">🏆 Genel Sıralama</h3>
+                <div class="leaderboard-list" id="global-leaderboard"></div>
+            </div>
+        </div>
+
+<!-- ARKADAŞ SEKMESİ -->
         <div class="friends-section">
             <div class="friends-header">
                 <h3 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">👫 Arkadaşlar</h3>
@@ -1218,14 +1228,10 @@ function showNameChange() {
     document.getElementById('username-input').value = username || '';
 }
 
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
     if (!username) document.getElementById('login-overlay').style.display = 'flex';
-    loadUserData();  // 🆕 YENİ - BU SATIRI EKLE
+    await loadUserData();
     initBoard();
-});
-
-window.addEventListener('keydown', e => {
-    // klavye kodları...
 });
 
 window.addEventListener('keydown', e => {
