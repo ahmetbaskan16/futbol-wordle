@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Football Wordle & Quiz</title>
+    <title>Elite Football Wordle</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -20,144 +20,499 @@
             --fb-yellow: #fdd017;
             --gs-red: #a90432;
             --gs-yellow: #fdb912;
+            --glow-shadow: 0 0 20px rgba(74, 222, 128, 0.3);
             --accent-color: #3b82f6;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body { background: var(--bg-gradient); color: var(--text-primary); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; padding: 20px; }
-        header { text-align: center; margin-bottom: 20px; z-index: 10; position: relative; width: 100%; max-width: 500px; }
-        h1 { font-size: clamp(1.8rem, 7vw, 3rem); font-weight: 800; letter-spacing: -2px; background: linear-gradient(135deg, #fff 0%, #aaa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; }
-        .subtitle { color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; }
-        .header-actions { position: absolute; right: 0px; top: 50%; transform: translateY(-50%); display: flex; gap: 10px; }
-        .icon-btn { background: var(--glass-bg); border: 1px solid var(--glass-border); color: #fff; width: 40px; height: 40px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-        .icon-btn:hover { background: rgba(255,255,255,0.15); }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
 
-        .mode-switcher { display: flex; background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 4px; border-radius: 12px; margin-bottom: 25px; width: 100%; max-width: 500px; overflow-x: auto; }
-        .mode-btn { flex: 1; background: transparent; border: none; color: var(--text-secondary); padding: 10px 4px; border-radius: 8px; font-weight: 600; font-size: 0.7rem; cursor: pointer; transition: all 0.3s; white-space: nowrap; }
-        .mode-btn.active { background: var(--accent-color); color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 20px;
+        }
 
-        #game-container { display: flex; flex-direction: column; align-items: center; gap: 30px; width: 100%; max-width: 600px; }
-        #game-board { display: flex; flex-direction: column; gap: 8px; }
-        .row { display: flex; gap: 8px; justify-content: center; }
-        .tile { width: clamp(35px, 10vw, 55px); height: clamp(35px, 10vw, 55px); border: 2px solid var(--tile-border); background: var(--glass-bg); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; font-size: 1.5rem; font-weight: 700; text-transform: uppercase; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); user-select: none; }
-        .tile.space { border: none; background: transparent; backdrop-filter: none; width: 12px; }
-        .tile.pop { transform: scale(1.1); border-color: #fff; }
-        .tile[data-state="correct"] { background-color: var(--correct-color); border-color: var(--correct-color); color: #000; animation: flip 0.6s ease forwards; }
-        .tile[data-state="present"] { background-color: var(--present-color); border-color: var(--present-color); color: #000; animation: flip 0.6s ease forwards; }
-        .tile[data-state="absent"] { background-color: var(--absent-color); border-color: var(--absent-color); opacity: 0.6; animation: flip 0.6s ease forwards; }
-        @keyframes flip { 0% { transform: rotateX(0); } 50% { transform: rotateX(90deg); } 100% { transform: rotateX(0); } }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            z-index: 10;
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+        }
 
-        #keyboard { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 500px; }
-        .kb-row { display: flex; justify-content: center; gap: 4px; }
-        .key { background: var(--glass-bg); border: 1px solid var(--glass-border); color: white; border-radius: 6px; padding: 15px 4px; font-weight: 600; cursor: pointer; text-transform: uppercase; flex: 1; transition: all 0.2s ease; font-size: 0.85rem; -webkit-tap-highlight-color: transparent; }
-        .key.large { flex: 1.5; font-size: 0.7rem; }
-        .key[data-state="correct"] { background: var(--correct-color); color: #000; }
-        .key[data-state="present"] { background: var(--present-color); color: #000; }
-        .key[data-state="absent"] { background: #1e293b; color: #64748b; }
+        h1 {
+            font-size: clamp(1.8rem, 7vw, 3rem);
+            font-weight: 800;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
 
-        /* QUIZ STYLES */
-        #quiz-container { display: none; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
-        .quiz-card { background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 25px; border-radius: 24px; width: 100%; max-width: 400px; text-align: center; }
-        .logo-box { width: 180px; height: 180px; background: white; border-radius: 20px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; padding: 15px; position: relative; overflow: hidden; }
-        .logo-img { max-width: 100%; max-height: 100%; object-fit: contain; transition: filter 0.3s; }
-        .logo-img.blurred { filter: blur(8px) grayscale(0.5) contrast(1.5); }
-        .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%; }
-        .option-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-        .option-btn:hover { background: rgba(255,255,255,0.1); }
-        .option-btn.correct { background: var(--correct-color); color: #000; border-color: var(--correct-color); }
-        .option-btn.wrong { background: #ef4444; color: #fff; border-color: #ef4444; }
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
 
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
-        .modal { background: rgba(255,255,255,0.08); border: 1px solid var(--glass-border); padding: 30px; border-radius: 28px; max-width: 480px; width: 95%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); text-align: center; position: relative; }
-        .close-modal { position: absolute; right: 20px; top: 20px; cursor: pointer; opacity: 0.6; font-size: 1.2rem; }
-        .modern-input { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; color: white; width: 100%; font-size: 1rem; outline: none; text-align: center; }
-        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-        .stat-item .value { font-size: 1.5rem; font-weight: 800; display: block; }
-        .stat-item .label { font-size: 0.6rem; color: var(--text-secondary); text-transform: uppercase; }
-        .leaderboard-container { display: grid; grid-template-columns: 1fr; gap: 15px; text-align: left; }
-        .leaderboard-list { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 16px; max-height: 180px; overflow-y: auto; }
-        .leaderboard-item { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 8px 12px; border-radius: 10px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
-        .leaderboard-item.highlight { border-color: var(--correct-color); background: rgba(74, 222, 128, 0.1); }
-        .rank { font-weight: 800; color: var(--present-color); margin-right: 8px; }
-        .btn-restart { background: #fff; color: #000; border: none; padding: 14px 40px; border-radius: 14px; font-weight: 700; cursor: pointer; margin-top: 15px; width: 100%; }
-        .btn-secondary { background: transparent; color: #fff; border: 1px solid var(--glass-border); padding: 8px 15px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; margin-top: 10px; }
+        .header-actions {
+            position: absolute;
+            right: 0px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 10px;
+        }
 
-        .toast { position: fixed; top: 80px; background: #fff; color: #000; padding: 12px 24px; border-radius: 50px; font-weight: 700; opacity: 0; transform: translateY(-20px); transition: all 0.3s; z-index: 2000; }
+        .icon-btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        /* Mode Switcher */
+        .mode-switcher {
+            display: flex;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .mode-btn.active {
+            background: var(--accent-color);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        #game-board {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .tile {
+            width: clamp(35px, 10vw, 55px);
+            height: clamp(35px, 10vw, 55px);
+            border: 2px solid var(--tile-border);
+            background: var(--glass-bg);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            user-select: none;
+        }
+
+        .tile.space {
+            border: none;
+            background: transparent;
+            backdrop-filter: none;
+            width: 12px;
+        }
+
+        .tile.pop {
+            transform: scale(1.1);
+            border-color: #fff;
+        }
+
+        .tile[data-state="correct"] {
+            background-color: var(--correct-color);
+            border-color: var(--correct-color);
+            color: #000;
+            animation: flip 0.6s ease forwards;
+        }
+
+        .tile[data-state="present"] {
+            background-color: var(--present-color);
+            border-color: var(--present-color);
+            color: #000;
+            animation: flip 0.6s ease forwards;
+        }
+
+        .tile[data-state="absent"] {
+            background-color: var(--absent-color);
+            border-color: var(--absent-color);
+            opacity: 0.6;
+            animation: flip 0.6s ease forwards;
+        }
+
+        @keyframes flip {
+            0% { transform: rotateX(0); }
+            50% { transform: rotateX(90deg); }
+            100% { transform: rotateX(0); }
+        }
+
+        #keyboard {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .kb-row {
+            display: flex;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .key {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: white;
+            border-radius: 6px;
+            padding: 15px 4px;
+            font-weight: 600;
+            cursor: pointer;
+            text-transform: uppercase;
+            flex: 1;
+            transition: all 0.2s ease;
+            font-size: 0.85rem;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .key:active {
+            transform: scale(0.95);
+            background: rgba(255,255,255,0.2);
+        }
+
+        .key.large {
+            flex: 1.5;
+            font-size: 0.7rem;
+        }
+
+        .key[data-state="correct"] { background: var(--correct-color); color: #000; border-color: var(--correct-color); }
+        .key[data-state="present"] { background: var(--present-color); color: #000; border-color: var(--present-color); }
+        .key[data-state="absent"] { background: #1e293b; color: #64748b; border-color: transparent; }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(12px);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--glass-border);
+            padding: 30px;
+            border-radius: 28px;
+            max-width: 480px;
+            width: 95%;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6);
+            text-align: center;
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            cursor: pointer;
+            opacity: 0.6;
+            font-size: 1.2rem;
+        }
+
+        .modal h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            font-weight: 800;
+        }
+
+        .modal h3 {
+            font-size: 1.1rem;
+            margin: 20px 0 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+        }
+
+        .input-group {
+            margin: 20px 0;
+        }
+
+        .modern-input {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--glass-border);
+            padding: 15px;
+            border-radius: 12px;
+            color: white;
+            width: 100%;
+            font-size: 1rem;
+            outline: none;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item .value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            display: block;
+        }
+
+        .stat-item .label {
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .leaderboard-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            text-align: left;
+        }
+
+        .leaderboard-list {
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 16px;
+            max-height: 180px;
+            overflow-y: auto;
+        }
+
+        .leaderboard-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border);
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+
+        .leaderboard-item.highlight {
+            border-color: var(--correct-color);
+            background: rgba(74, 222, 128, 0.1);
+        }
+
+        .leaderboard-item .rank {
+            font-weight: 800;
+            color: var(--present-color);
+            margin-right: 8px;
+        }
+
+        .btn-restart {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 14px 40px;
+            border-radius: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #fff;
+            border: 1px solid var(--glass-border);
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* FENERBAHCE WIN THEME */
+        .win-fenerbahce {
+            border: 4px solid var(--fb-yellow) !important;
+            box-shadow: 0 0 50px rgba(0, 51, 153, 0.5), inset 0 0 20px var(--fb-yellow) !important;
+            background: linear-gradient(135deg, var(--fb-blue) 0%, #001a4d 100%) !important;
+        }
+
+        .toast {
+            position: fixed;
+            top: 80px;
+            background: #fff;
+            color: #000;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2000;
+            pointer-events: none;
+        }
         .toast.show { opacity: 1; transform: translateY(0); }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
     </style>
 </head>
 <body>
 
     <header>
         <div class="header-actions">
-            <button class="icon-btn" onclick="toggleStats()" title="İstatistikler">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+            <button class="icon-btn" onclick="toggleStats()" title="Leaderboard">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
             </button>
         </div>
-        <h1>FOOTBALL HUB</h1>
-        <div class="subtitle" id="game-subtitle">CHOOSE YOUR CHALLENGE</div>
+        <h1>FOOTBALL WORDLE</h1>
+        <div class="subtitle" id="game-subtitle">THE ULTIMATE CLUB CHALLENGE</div>
     </header>
 
     <div class="mode-switcher">
-        <button class="mode-btn active" id="mode-club" onclick="switchMode('club')">CLUB WORDLE</button>
-        <button class="mode-btn" id="mode-player" onclick="switchMode('player')">PLAYER WORDLE</button>
-        <button class="mode-btn" id="mode-manager" onclick="switchMode('manager')">MANAGER WORDLE</button>
-        <button class="mode-btn" id="mode-quiz" onclick="switchMode('quiz')">LOGO QUIZ</button>
+        <button class="mode-btn active" id="mode-club" onclick="switchMode('club')">CLUB</button>
+        <button class="mode-btn" id="mode-player" onclick="switchMode('player')">PLAYER</button>
     </div>
 
     <div id="game-container">
-        <!-- Wordle Content -->
-        <div id="wordle-content">
-            <div id="game-board"></div>
-            <div id="keyboard">
-                <div class="kb-row">
-                    <button class="key" data-key="Q">Q</button><button class="key" data-key="W">W</button><button class="key" data-key="E">E</button><button class="key" data-key="R">R</button><button class="key" data-key="T">T</button><button class="key" data-key="Y">Y</button><button class="key" data-key="U">U</button><button class="key" data-key="I">I</button><button class="key" data-key="O">O</button><button class="key" data-key="P">P</button>
-                </div>
-                <div class="kb-row">
-                    <button class="key" data-key="A">A</button><button class="key" data-key="S">S</button><button class="key" data-key="D">D</button><button class="key" data-key="F">F</button><button class="key" data-key="G">G</button><button class="key" data-key="H">H</button><button class="key" data-key="J">J</button><button class="key" data-key="K">K</button><button class="key" data-key="L">L</button>
-                </div>
-                <div class="kb-row">
-                    <button class="key large" data-key="ENTER">ENTER</button><button class="key" data-key="Z">Z</button><button class="key" data-key="X">X</button><button class="key" data-key="C">C</button><button class="key" data-key="V">V</button><button class="key" data-key="B">B</button><button class="key" data-key="N">N</button><button class="key" data-key="M">M</button><button class="key large" data-key="BACKSPACE">⌫</button>
-                </div>
+        <div id="game-board"></div>
+        <div id="keyboard">
+            <div class="kb-row">
+                <button class="key" data-key="Q">Q</button>
+                <button class="key" data-key="W">W</button>
+                <button class="key" data-key="E">E</button>
+                <button class="key" data-key="R">R</button>
+                <button class="key" data-key="T">T</button>
+                <button class="key" data-key="Y">Y</button>
+                <button class="key" data-key="U">U</button>
+                <button class="key" data-key="I">I</button>
+                <button class="key" data-key="O">O</button>
+                <button class="key" data-key="P">P</button>
             </div>
-        </div>
-
-        <!-- Quiz Content -->
-        <div id="quiz-container">
-            <div class="quiz-card">
-                <div class="logo-box">
-                    <img id="quiz-logo" class="logo-img blurred" src="" alt="Club Logo">
-                </div>
-                <div class="options-grid" id="quiz-options"></div>
+            <div class="kb-row">
+                <button class="key" data-key="A">A</button>
+                <button class="key" data-key="S">S</button>
+                <button class="key" data-key="D">D</button>
+                <button class="key" data-key="F">F</button>
+                <button class="key" data-key="G">G</button>
+                <button class="key" data-key="H">H</button>
+                <button class="key" data-key="J">J</button>
+                <button class="key" data-key="K">K</button>
+                <button class="key" data-key="L">L</button>
+            </div>
+            <div class="kb-row">
+                <button class="key large" data-key="ENTER">ENTER</button>
+                <button class="key" data-key="Z">Z</button>
+                <button class="key" data-key="X">X</button>
+                <button class="key" data-key="C">C</button>
+                <button class="key" data-key="V">V</button>
+                <button class="key" data-key="B">B</button>
+                <button class="key" data-key="N">N</button>
+                <button class="key" data-key="M">M</button>
+                <button class="key large" data-key="BACKSPACE">⌫</button>
             </div>
         </div>
     </div>
 
-    <!-- Modals -->
+    <!-- Login Modal -->
     <div id="login-overlay" class="overlay">
         <div class="modal">
             <h2>İSMİN NE?</h2>
-            <p style="color:var(--text-secondary); margin-bottom: 20px;">İstatistilerini kaydetmek için ismini gir.</p>
-            <input type="text" id="username-input" class="modern-input" placeholder="İsmin" maxlength="15">
-            <button class="btn-restart" onclick="registerUser()">BAŞLA</button>
+            <p style="color:var(--text-secondary); margin-bottom: 20px;">Global Leaderboard'da yer almak için ismini gir.</p>
+            <div class="input-group">
+                <input type="text" id="username-input" class="modern-input" placeholder="İsmin" maxlength="15">
+            </div>
+            <button class="btn-restart" onclick="registerUser()">KARİYERE BAŞLA</button>
         </div>
     </div>
 
+    <!-- Stats Modal -->
     <div id="stats-overlay" class="overlay">
         <div id="stats-modal" class="modal">
             <div class="close-modal" onclick="toggleStats()">✕</div>
             <h2 id="modal-title">İSTATİSTİKLER</h2>
             <div class="stats-grid">
                 <div class="stat-item"><span class="value" id="stats-played">0</span><span class="label">Oynanan</span></div>
-                <div class="stat-item"><span class="value" id="stats-score">0</span><span class="label">Puan</span></div>
+                <div class="stat-item"><span class="value" id="stats-score">0</span><span class="label">Toplam Skor</span></div>
                 <div class="stat-item"><span class="value" id="stats-streak">0</span><span class="label">Seri</span></div>
-                <div class="stat-item"><span class="value" id="stats-max">0</span><span class="label">Rekor</span></div>
+                <div class="stat-item"><span class="value" id="stats-max">0</span><span class="label">En İyi Seri</span></div>
             </div>
             <div class="leaderboard-container">
-                <div id="personal-leaderboard-section"><h3>EN İYİLERİN</h3><div class="leaderboard-list" id="leaderboard"></div></div>
-                <div id="global-leaderboard-section" style="display:none"><h3>GLOBAL</h3><div class="leaderboard-list" id="global-leaderboard"></div></div>
+                <div>
+                    <h3>EN İYİLERİN</h3>
+                    <div class="leaderboard-list" id="leaderboard"></div>
+                </div>
+                <div>
+                    <h3>GLOBAL SIRALAMA</h3>
+                    <div class="leaderboard-list" id="global-leaderboard"></div>
+                </div>
             </div>
-            <button class="btn-restart" onclick="location.reload()">TEKRAR OYNA</button>
+            <button class="btn-restart" id="modal-action-btn" onclick="location.reload()">TEKRAR OYNA</button>
             <button class="btn-secondary" onclick="showNameChange()">İsmi Değiştir</button>
         </div>
     </div>
@@ -165,237 +520,304 @@
     <div id="toast" class="toast"></div>
 
     <script>
-        const API_URL = '/api/leaderboard';
-        
-        // Data
-        const CLUBS = ['Fenerbahce', 'Galatasaray', 'Besiktas', 'Trabzonspor', 'Real Madrid', 'Barcelona', 'Manchester City', 'Arsenal', 'Liverpool', 'Bayern Munich', 'PSG', 'Inter Milan', 'AC Milan', 'Juventus', 'Dortmund', 'Atletico Madrid', 'Chelsea', 'Tottenham', 'Napoli', 'Leverkusen'];
-        const PLAYERS = ['Cristiano Ronaldo', 'Lionel Messi', 'Kylian Mbappe', 'Erling Haaland', 'Jude Bellingham', 'Vinicius Junior', 'Harry Kane', 'Mohamed Salah', 'Arda Guler', 'Mauro Icardi', 'Victor Osimhen', 'Fred', 'Dusan Tadic', 'Rafa Silva', 'Hakan Calhanoglu', 'Lamine Yamal', 'Rodri', 'Kevin De Bruyne'];
-        const MANAGERS = ['Fatih Terim', 'Jose Mourinho', 'Pep Guardiola', 'Jurgen Klopp', 'Carlo Ancelotti', 'Okan Buruk', 'Sergen Yalcin', 'Ismail Kartal', 'Jorge Jesus', 'Senol Gunes', 'Xabi Alonso', 'Mikel Arteta', 'Zinedine Zidane'];
-
-        const QUIZ_DATA = [
-            { name: 'Galatasaray', logo: 'https://upload.wikimedia.org/wikipedia/en/3/31/Galatasaray_Star_Logo.svg' },
-            { name: 'Fenerbahce', logo: 'https://upload.wikimedia.org/wikipedia/en/3/39/Fenerbah%C3%A7e_SK_Logo.svg' },
-            { name: 'Besiktas', logo: 'https://upload.wikimedia.org/wikipedia/en/7/7b/Besiktas_JK_Logo.svg' },
-            { name: 'Trabzonspor', logo: 'https://upload.wikimedia.org/wikipedia/en/a/a3/Trabzonspor_Logo.svg' },
-            { name: 'Real Madrid', logo: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg' },
-            { name: 'Barcelona', logo: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_logo.svg' },
-            { name: 'Manchester City', logo: 'https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg' },
-            { name: 'Bayern Munich', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg' },
-            { name: 'Arsenal', logo: 'https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg' },
-            { name: 'Liverpool', logo: 'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg' },
-            { name: 'PSG', logo: 'https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg' },
-            { name: 'Inter Milan', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg' },
-            { name: 'AC Milan', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg' },
-            { name: 'Juventus', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Juventus_FC_2017_icon_%28black%29.svg' }
+        const CLUBS = [
+            // Super Lig
+            'Fenerbahce', 'Galatasaray', 'Besiktas', 'Trabzonspor', 'Basaksehir',
+            'Kasimpasa', 'Sivasspor', 'Alanyaspor', 'Antalyaspor', 'Rizespor',
+            'Eyupspor', 'Goztepe', 'Gaziantep', 'Samsunspor', 'Bodrumspor',
+            'Konyaspor', 'Adana Demirspor', 'Hatayspor', 'Kayserispor',
+            // TFF 1. Lig
+            'Ankaragucu', 'Istanbulspor', 'Pendikspor', 'Kocaelispor', 'Sakaryaspor',
+            'Arca Corumspor', 'Bandirmaspor', 'Boluspor', 'Genclerbirligi', 'Erzurumspor',
+            'Umraniyespor', 'Manisa FK', 'Ankaraspor', 'Igdir FK', 'Sanliurfaspor',
+            'Adanaspor', 'Karagumruk', 'Yeni Malatyaspor', 'Amed SK',
+            // Premier League
+            'Manchester City', 'Arsenal', 'Liverpool', 'Aston Villa', 'Tottenham',
+            'Chelsea', 'Newcastle', 'Manchester United', 'West Ham', 'Brighton',
+            'Everton', 'Leicester City', 'Wolves', 'Fulham', 'Crystal Palace',
+            'Brentford', 'Bournemouth', 'Nottingham Forest', 'Southampton', 'Ipswich Town',
+            // La Liga
+            'Real Madrid', 'Barcelona', 'Girona', 'Atletico Madrid', 'Athletic Bilbao',
+            'Real Sociedad', 'Real Betis', 'Villarreal', 'Valencia', 'Sevilla',
+            'Espanyol', 'Osasuna', 'Getafe', 'Celta Vigo', 'Mallorca', 'Las Palmas',
+            // Serie A
+            'Inter Milan', 'AC Milan', 'Juventus', 'Atalanta', 'Bologna', 'AS Roma',
+            'Lazio', 'Fiorentina', 'Napoli', 'Torino', 'Monza', 'Genoa', 'Udinese', 'Cagliari',
+            // Bundesliga
+            'Bayer Leverkusen', 'Bayern Munich', 'Stuttgart', 'RB Leipzig', 'Borussia Dortmund',
+            'Frankfurt', 'Hoffenheim', 'Heidenheim', 'Werder Bremen', 'Freiburg', 'Augsburg',
+            'Wolfsburg', 'Monchengladbach', 'Mainz 05', 'Union Berlin', 'St Pauli',
+            // Ligue 1
+            'PSG', 'Monaco', 'Lille', 'Brest', 'Nice', 'Lyon', 'Lens', 'Marseille',
+            'Reims', 'Rennes', 'Toulouse', 'Montpellier', 'Strasbourg', 'Saint-Etienne',
+            // Other European
+            'Ajax', 'PSV Eindhoven', 'Feyenoord', 'Benfica', 'Porto', 'Sporting CP',
+            'Celtic', 'Rangers', 'Brugge', 'Anderlecht', 'Salzburg'
         ];
 
-        // State
+        const PLAYERS = [
+            // Stars & Legends
+            'Cristiano Ronaldo', 'Lionel Messi', 'Kylian Mbappe', 'Erling Haaland', 'Jude Bellingham',
+            'Vinicius Junior', 'Harry Kane', 'Kevin De Bruyne', 'Mohamed Salah', 'Rodri',
+            'Robert Lewandowski', 'Antoine Griezmann', 'Luka Modric', 'Karim Benzema', 'Neymar',
+            // Turkish Stars
+            'Arda Guler', 'Ferdi Kadioglu', 'Kerem Akturkoglu', 'Baris Alper Yilmaz', 'Semih Kilicsoy',
+            'Ismail Yuksek', 'Caglar Soyuncu', 'Mert Gunok', 'Hakan Calhanoglu', 'Kenan Yildiz',
+            'Can Uzun', 'Bertug Yildirim', 'Okay Yokuslu', 'Orkun Kokcu', 'Zeki Celik',
+            'Merih Demiral', 'Altay Bayindir', 'Ugurcan Cakir', 'Irfan Can Kahveci', 'Cengiz Under',
+            // Super Lig Key Players
+            'Mauro Icardi', 'Dusan Tadic', 'Edin Dzeko', 'Sebastian Szymanski', 'Fred',
+            'Victor Osimhen', 'Allan Saint-Maximin', 'Rafa Silva', 'Ciro Immobile', 'Gedson Fernandes',
+            'Lucas Torreira', 'Davinson Sanchez', 'Michy Batshuayi', 'En-Nesyri', 'Sofyan Amrabat',
+            // Premier League
+            'Phil Foden', 'Bukayo Saka', 'Declan Rice', 'Martin Odegaard', 'Cole Palmer',
+            'Virgil van Dijk', 'Alisson Becker', 'Bruno Fernandes', 'Marcus Rashford', 'Son Heung-min',
+            'Alexander-Arnold', 'Ollie Watkins', 'Alexis Mac Allister', 'Dominic Solanke', 'William Saliba',
+            // La Liga
+            'Lamine Yamal', 'Pedri', 'Gavi', 'Federico Valverde', 'Rodrygo Goes',
+            'Aurilien Tchouameni', 'Eduardo Camavinga', 'Eder Militao', 'Ronald Araujo', 'Nico Williams',
+            'Dani Olmo', 'Julian Alvarez', 'Conor Gallagher', 'Alexander Sorloth',
+            // Bundesliga
+            'Florian Wirtz', 'Jamal Musiala', 'Xavi Simons', 'Granit Xhaka', 'Victor Boniface',
+            'Serge Gnabry', 'Leroy Sane', 'Joshua Kimmich', 'Alphonso Davies', 'Alejandro Grimaldo',
+            // Serie A
+            'Rafael Leao', 'Lautaro Martinez', 'Marcus Thuram', 'Nicolo Barella', 'Theo Hernandez',
+            'Dusan Vlahovic', 'Paulo Dybala', 'Khvicha Kvaratskhelia', 'Christian Pulisic', 'Douglas Luiz',
+            // Ligue 1
+            'Bradley Barcola', 'Ousmane Dembele', 'Warren Zaire-Emery', 'Jonathan David', 'Achraf Hakimi',
+            'Vitinha', 'Mason Greenwood'
+        ];
+
+        function normalize(str) {
+            return str.toUpperCase()
+                .replace(/İ/g, 'I')
+                .replace(/I/g, 'I')
+                .replace(/Ğ/g, 'G')
+                .replace(/Ü/g, 'U')
+                .replace(/Ş/g, 'S')
+                .replace(/Ö/g, 'O')
+                .replace(/Ç/g, 'C')
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "");
+        }
+
         let currentGameMode = localStorage.getItem('futbol_wordle_mode') || 'club';
-        let stats = JSON.parse(localStorage.getItem('wordleStats')) || { played: 0, wins: 0, streak: 0, maxStreak: 0, bestRuns: [], totalScore: 0 };
-        let username = localStorage.getItem('futbol_wordle_username');
-        let userUuid = localStorage.getItem('futbol_wordle_uuid') || (()=>{const u=crypto.randomUUID();localStorage.setItem('futbol_wordle_uuid',u);return u;})();
+        let wordList = currentGameMode === 'club' ? CLUBS : PLAYERS;
         
-        let targetWord = '', rawTarget = '', currentRow = 0, currentLetterIndex = 0, gameOver = false, guesses = [];
-        let quizCurrent = null, quizLocked = false, quizTimer = null;
+        let rawTarget = wordList[Math.floor(Math.random() * wordList.length)];
+        let targetWord = normalize(rawTarget);
+        let targetLettersOnly = targetWord.replace(/[^A-Z]/g, '');
+        let letterCount = targetLettersOnly.length;
 
-        // UI Refs
+        let currentRow = 0;
+        let currentLetterIndex = 0;
+        let gameOver = false;
+        let startTime = Date.now();
+        const attempts = 6;
+        let guesses = Array.from({ length: attempts }, () => []);
+
+        const statsKey = currentGameMode === 'club' ? 'wordleStats' : 'playerWordleStats';
+        let stats = JSON.parse(localStorage.getItem(statsKey)) || {
+            played: 0, wins: 0, streak: 0, maxStreak: 0, bestRuns: [], totalScore: 0
+        };
+        let username = localStorage.getItem('futbol_wordle_username');
+
         const board = document.getElementById('game-board');
+        const statsOverlay = document.getElementById('stats-overlay');
         const loginOverlay = document.getElementById('login-overlay');
-        const usernameInput = document.getElementById('username-input');
+        const toast = document.getElementById('toast');
 
-        function normalize(str) { return str.toUpperCase().replace(/[İIĞÜŞÖÇ]/g, m => ({'İ':'I','I':'I','Ğ':'G','Ü':'U','Ş':'S','Ö':'O','Ç':'C'}[m])).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z]/g, ''); }
+        function saveStats() { localStorage.setItem(statsKey, JSON.stringify(stats)); }
+        function saveUser(name) { 
+            username = name;
+            localStorage.setItem('futbol_wordle_username', name); 
+        }
 
         function switchMode(mode) {
+            if (currentGameMode === mode) return;
             localStorage.setItem('futbol_wordle_mode', mode);
             location.reload();
         }
 
-        function init() {
-            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`mode-${currentGameMode}`).classList.add('active');
-
-            if (currentGameMode === 'quiz') {
-                document.getElementById('wordle-content').style.display = 'none';
-                document.getElementById('quiz-container').style.display = 'flex';
-                document.getElementById('game-subtitle').textContent = 'GUESS THE CLUB LOGO';
-                loadQuiz();
-            } else {
-                let list = CLUBS;
-                if (currentGameMode === 'player') list = PLAYERS;
-                if (currentGameMode === 'manager') list = MANAGERS;
-                rawTarget = list[Math.floor(Math.random() * list.length)];
-                targetWord = normalize(rawTarget);
-                guesses = Array.from({length: 6}, () => []);
-                initBoard();
-            }
-            if (!username) { loginOverlay.style.display = 'flex'; usernameInput.focus(); }
-        }
-
         function initBoard() {
+            // Update UI based on mode
+            document.getElementById('mode-club').classList.toggle('active', currentGameMode === 'club');
+            document.getElementById('mode-player').classList.toggle('active', currentGameMode === 'player');
+            document.getElementById('game-subtitle').textContent = currentGameMode === 'club' ? 'THE ULTIMATE CLUB CHALLENGE' : 'GUESS THE STAR PLAYER';
+
             board.innerHTML = '';
-            for (let i = 0; i < 6; i++) {
-                const row = document.createElement('div'); row.className = 'row'; row.id = 'row-' + i;
-                for (let j = 0; j < targetWord.length; j++) {
-                    const tile = document.createElement('div'); tile.className = 'tile'; tile.id = `tile-${i}-${j}`;
+            for (let i = 0; i < attempts; i++) {
+                const row = document.createElement('div');
+                row.className = 'row';
+                row.id = `row-${i}`;
+                let letterIdx = 0;
+                for (let char of targetWord) {
+                    const tile = document.createElement('div');
+                    if (char === ' ' || char === '-' || char === '.') {
+                        tile.className = 'tile space'; tile.textContent = char;
+                    } else {
+                        tile.className = 'tile'; tile.id = `tile-${i}-${letterIdx}`; letterIdx++;
+                    }
                     row.appendChild(tile);
                 }
                 board.appendChild(row);
             }
         }
 
-        // Quiz Logic
-        function loadQuiz() {
-            if (quizTimer) clearTimeout(quizTimer);
-            quizLocked = false;
-            quizCurrent = QUIZ_DATA[Math.floor(Math.random() * QUIZ_DATA.length)];
-            const logo = document.getElementById('quiz-logo');
-            logo.src = quizCurrent.logo;
-            logo.classList.add('blurred');
-
-            const options = [quizCurrent.name];
-            while (options.length < 4) {
-                const r = QUIZ_DATA[Math.floor(Math.random() * QUIZ_DATA.length)].name;
-                if (!options.includes(r)) options.push(r);
-            }
-            options.sort(() => Math.random() - 0.5);
-
-            const optContainer = document.getElementById('quiz-options');
-            optContainer.innerHTML = options.map(o => `<button class="option-btn" onclick="checkQuiz('${o}', this)">${o}</button>`).join('');
+        function showToast(msg) {
+            toast.textContent = msg; toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        function checkQuiz(choice, btn) {
-            if (quizLocked) return;
-            quizLocked = true;
-            const isCorrect = choice === quizCurrent.name;
-            document.getElementById('quiz-logo').classList.remove('blurred');
+        function updateBoard() {
+            const rowTiles = document.querySelectorAll(`#row-${currentRow} .tile:not(.space)`);
+            rowTiles.forEach((tile, idx) => {
+                tile.textContent = guesses[currentRow][idx] || '';
+                tile.classList.toggle('pop', !!guesses[currentRow][idx]);
+            });
+        }
+
+        async function submitGuess() {
+            const currentGuess = guesses[currentRow].join('');
+            if (currentGuess.length !== letterCount) { showToast("YETERSİZ HARF"); return; }
             
-            if (isCorrect) {
-                btn.classList.add('correct');
-                stats.totalScore += 5;
-                showToast("+5 PUAN! HARİKA.");
-            } else {
-                btn.classList.add('wrong');
-                showToast("YANLIŞ! DOĞRU: " + quizCurrent.name);
-                document.querySelectorAll('.option-btn').forEach(b => {
-                    if (b.textContent === quizCurrent.name) b.classList.add('correct');
-                });
-            }
-            
-            stats.played++;
-            saveStats();
-            syncScore();
-            quizTimer = setTimeout(loadQuiz, 2000);
-        }
+            if (currentGameMode === 'club' && currentGuess === normalize('Galatasaray')) { showToast("Cidden mi? Limon siktin keyfimize... 🍋"); }
 
-        // Wordle Logic
-        function handleInput(key) {
-            if (gameOver || currentGameMode === 'quiz' || document.activeElement === usernameInput) return;
-            if (key === 'ENTER') submitGuess();
-            else if (key === 'BACKSPACE') { if (currentLetterIndex > 0) { currentLetterIndex--; guesses[currentRow].pop(); updateWordleRow(); } }
-            else if (/^[A-Z]$/.test(key)) { if (currentLetterIndex < targetWord.length) { guesses[currentRow].push(key); currentLetterIndex++; updateWordleRow(); } }
-        }
+            const rowTiles = document.querySelectorAll(`#row-${currentRow} .tile:not(.space)`);
+            const targetArr = targetLettersOnly.split('');
+            const guessArr = currentGuess.split('');
+            const states = new Array(letterCount).fill('absent');
 
-        function updateWordleRow() {
-            const tiles = document.querySelectorAll(`#row-${currentRow} .tile`);
-            guesses[currentRow].forEach((char, i) => { tiles[i].textContent = char; tiles[i].classList.add('pop'); });
-            for (let i = guesses[currentRow].length; i < targetWord.length; i++) { tiles[i].textContent = ''; tiles[i].classList.remove('pop'); }
-        }
+            guessArr.forEach((char, i) => { if (char === targetArr[i]) { states[i] = 'correct'; targetArr[i] = null; } });
+            guessArr.forEach((char, i) => { if (states[i] !== 'correct') { let idx = targetArr.indexOf(char); if (idx !== -1) { states[i] = 'present'; targetArr[idx] = null; } } });
 
-        function submitGuess() {
-            const guess = guesses[currentRow].join('');
-            if (guess.length !== targetWord.length) return showToast("EKSİK HARF");
-            
-            const tiles = document.querySelectorAll(`#row-${currentRow} .tile`);
-            const targetArr = targetWord.split('');
-            const states = new Array(targetWord.length).fill('absent');
+            states.forEach((state, i) => {
+                setTimeout(() => {
+                    rowTiles[i].setAttribute('data-state', state);
+                    const key = document.querySelector(`.key[data-key="${guessArr[i]}"]`);
+                    if (key && key.getAttribute('data-state') !== 'correct') key.setAttribute('data-state', state);
+                }, i * 150);
+            });
 
-            guesses[currentRow].forEach((char, i) => { if (char === targetArr[i]) { states[i] = 'correct'; targetArr[i] = null; } });
-            guesses[currentRow].forEach((char, i) => { if (states[i] !== 'correct') { let idx = targetArr.indexOf(char); if (idx !== -1) { states[i] = 'present'; targetArr[idx] = null; } } });
-
-            states.forEach((s, i) => setTimeout(() => tiles[i].setAttribute('data-state', s), i * 100));
-
-            if (guess === targetWord) {
-                gameOver = true; stats.totalScore += 20; stats.streak++; stats.wins++;
-                showToast("GOL! +20 PUAN");
-                setTimeout(() => showEndGame(true), 1500);
-            } else if (currentRow === 5) {
-                gameOver = true; stats.streak = 0;
-                showToast("MAÇ BİTTİ: " + rawTarget);
-                setTimeout(() => showEndGame(false), 1500);
+            const isWin = currentGuess === targetLettersOnly;
+            if (isWin || currentRow === attempts - 1) {
+                gameOver = true;
+                updateStats(isWin);
+                setTimeout(() => showEndGame(isWin), letterCount * 150 + 500);
             } else { currentRow++; currentLetterIndex = 0; }
-            
-            stats.played++; saveStats(); syncScore();
         }
 
-        // Global Helpers
-        function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2500); }
-        function saveStats() { localStorage.setItem('wordleStats', JSON.stringify(stats)); }
-        
-        async function syncScore() { 
-            if(!username) return;
-            try {
-                await fetch(API_URL, {
-                    method:'POST', 
-                    headers:{'Content-Type':'application/json'}, 
-                    body:JSON.stringify({name:username, score:stats.totalScore, uuid:userUuid})
-                });
-            } catch (e) {
-                // Silently fail if KV/API is unavailable
-            }
-        }
-        
-        async function loadGlobalLeaderboard() {
-            const glb = document.getElementById('global-leaderboard');
-            const glbSection = document.getElementById('global-leaderboard-section');
-            try {
-                const res = await fetch(API_URL);
-                if (!res.ok) throw new Error();
-                const data = await res.json();
-                if (data && data.length > 0) {
-                    glb.innerHTML = data.map((l, i) => `<div class="leaderboard-item ${l.uuid === userUuid ? 'highlight' : ''}"><span><span class="rank">${i+1}</span> ${l.name}</span><span style="font-weight:800">${l.score}</span></div>`).join('');
-                    // glbSection.style.display = 'block'; // Keeping it hidden as requested
-                }
-            } catch (e) { 
-                glbSection.style.display = 'none';
-            }
-        }
-
-        function loadPersonalLeaderboard() {
-            const plb = document.getElementById('leaderboard');
-            plb.innerHTML = `<div class="leaderboard-item highlight"><span><span class="rank">#</span> ${username || 'Siz'}</span><span style="font-weight:800">${stats.totalScore}</span></div>`;
+        function updateStats(win) {
+            stats.played++;
+            if (win) {
+                stats.wins++; 
+                stats.streak++;
+                stats.totalScore = (stats.totalScore || 0) + 1;
+                if (stats.streak > stats.maxStreak) stats.maxStreak = stats.streak;
+                const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+                stats.bestRuns.push({ guesses: currentRow + 1, time: timeTaken, club: rawTarget });
+                stats.bestRuns.sort((a, b) => a.guesses - b.guesses || a.time - b.time);
+                stats.bestRuns = stats.bestRuns.slice(0, 10);
+            } else { stats.streak = 0; }
+            saveStats();
         }
 
         window.toggleStats = function() {
-            const s = document.getElementById('stats-overlay');
-            if (s.style.display === 'flex') s.style.display = 'none';
-            else {
+            const overlay = document.getElementById('stats-overlay');
+            if (overlay.style.display === 'flex') {
+                overlay.style.display = 'none';
+            } else {
                 document.getElementById('stats-played').textContent = stats.played;
-                document.getElementById('stats-score').textContent = stats.totalScore;
+                document.getElementById('stats-score').textContent = stats.totalScore || 0;
                 document.getElementById('stats-streak').textContent = stats.streak;
                 document.getElementById('stats-max').textContent = stats.maxStreak;
-                loadPersonalLeaderboard();
-                loadGlobalLeaderboard();
-                s.style.display = 'flex';
+                
+                const lb = document.getElementById('leaderboard');
+                lb.innerHTML = stats.bestRuns.length ? stats.bestRuns.map((r, i) => `
+                    <div class="leaderboard-item">
+                        <span><span class="rank">#${i+1}</span> ${r.club}</span>
+                        <span style="opacity:0.6">${r.guesses} deneme</span>
+                    </div>
+                `).join('') : '<p style="text-align:center; opacity:0.3; font-size:0.7rem;">Henüz galibiyet yok</p>';
+
+                const players = [
+                    {name: "Baskan66", score: 84},
+                    {name: "Doğu CD", score: 72},
+                    {name: "Fenerli1907", score: 65},
+                    {name: "pes_master", score: 58},
+                    {name: "Efe_77", score: 49},
+                    {name: "Arda_Guler_Fan", score: 42},
+                    {name: "Gol_Makinesi", score: 38},
+                    {name: "Kramponlu_Dev", score: 31},
+                    {name: "Süper_Lig_Uzmanı", score: 25},
+                    {name: "Tribün_Sesi", score: 19},
+                    {name: username || "Oyuncu", score: stats.totalScore || 0, isUser: true}
+                ].sort((a, b) => b.score - a.score);
+
+                const glb = document.getElementById('global-leaderboard');
+                glb.innerHTML = players.map((l, i) => `
+                    <div class="leaderboard-item ${l.isUser ? 'highlight' : ''}">
+                        <span><span class="rank">${i+1}</span> ${l.name}</span>
+                        <span style="font-weight:800">${l.score}</span>
+                    </div>
+                `).join('');
+                
+                overlay.style.display = 'flex';
             }
         };
 
-        function registerUser() { 
-            const val = usernameInput.value.trim(); 
-            if (!val) return showToast("İSİM GEREKLİ");
-            username = val; localStorage.setItem('futbol_wordle_username', val);
-            loginOverlay.style.display = 'none';
-            syncScore();
-        }
-
         function showEndGame(win) {
-            document.getElementById('modal-title').textContent = win ? "ZAFER!" : "KAYBETTİN!";
+            const modal = document.getElementById('stats-modal');
+            const title = document.getElementById('modal-title');
+            
+            if (win) {
+                if (targetWord === normalize('Fenerbahce')) {
+                    modal.classList.add('win-fenerbahce');
+                    title.innerHTML = "EN BÜYÜK FENERBAHÇE! 💛💙";
+                } else if (targetWord === normalize('Galatasaray')) {
+                    title.textContent = "Sarı-kırmızı bir tat... 🍋";
+                } else { title.textContent = "G O O O A L !"; }
+            } else { 
+                title.textContent = "OYUN BİTTİ: " + rawTarget;
+            }
             toggleStats();
         }
 
-        window.addEventListener('load', init);
+        function handleInput(key) {
+            if (gameOver || loginOverlay.style.display === 'flex') return;
+            if (key === 'ENTER') submitGuess();
+            else if (key === 'BACKSPACE') { if (currentLetterIndex > 0) { currentLetterIndex--; guesses[currentRow].pop(); updateBoard(); } }
+            else if (/^[A-Z]$/.test(key)) { if (currentLetterIndex < letterCount) { guesses[currentRow].push(key); currentLetterIndex++; updateBoard(); } }
+        }
+
+        function registerUser() {
+            const val = document.getElementById('username-input').value.trim();
+            if (!val) { showToast("Bir isim gir!"); return; }
+            saveUser(val);
+            loginOverlay.style.display = 'none';
+            showToast(`Hoş geldin, Manager ${val}!`);
+        }
+
+        function showNameChange() {
+            statsOverlay.style.display = 'none';
+            loginOverlay.style.display = 'flex';
+            document.getElementById('username-input').value = username || '';
+        }
+
+        window.addEventListener('load', () => {
+            if (!username) { loginOverlay.style.display = 'flex'; }
+            initBoard();
+        });
+
         window.addEventListener('keydown', e => {
-            if (e.key === 'Enter' && loginOverlay.style.display === 'flex') registerUser();
-            else handleInput(e.key.toUpperCase());
+            let k = e.key.toUpperCase();
+            if (k === 'BACKSPACE') handleInput('BACKSPACE');
+            else handleInput(k);
+        });
+
+        document.getElementById('keyboard').addEventListener('click', e => {
+            const key = e.target.closest('.key');
+            if (key) handleInput(key.getAttribute('data-key'));
         });
     </script>
 </body>
