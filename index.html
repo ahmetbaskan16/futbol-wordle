@@ -2,7 +2,1175 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" co<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Football Wordle & Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --correct-color: #4ade80;
+            --present-color: #facc15;
+            --absent-color: #475569;
+            --tile-border: #334155;
+            --fb-blue: #003399;
+            --fb-yellow: #fdd017;
+            --gs-red: #a90432;
+            --gs-yellow: #fdb912;
+            --accent-color: #3b82f6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg-gradient); color: var(--text-primary); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; padding: 20px; }
+        header { text-align: center; margin-bottom: 20px; z-index: 10; position: relative; width: 100%; max-width: 500px; }
+        h1 { font-size: clamp(1.8rem, 7vw, 3rem); font-weight: 800; letter-spacing: -2px; background: linear-gradient(135deg, #fff 0%, #aaa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; }
+        .subtitle { color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; }
+        .header-actions { position: absolute; right: 0px; top: 50%; transform: translateY(-50%); display: flex; gap: 10px; }
+        .icon-btn { background: var(--glass-bg); border: 1px solid var(--glass-border); color: #fff; width: 40px; height: 40px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .icon-btn:hover { background: rgba(255,255,255,0.15); }
+
+        .mode-switcher { display: flex; background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 4px; border-radius: 12px; margin-bottom: 25px; width: 100%; max-width: 500px; overflow-x: auto; }
+        .mode-btn { flex: 1; background: transparent; border: none; color: var(--text-secondary); padding: 10px 4px; border-radius: 8px; font-weight: 600; font-size: 0.7rem; cursor: pointer; transition: all 0.3s; white-space: nowrap; }
+        .mode-btn.active { background: var(--accent-color); color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+
+        #game-container { display: flex; flex-direction: column; align-items: center; gap: 30px; width: 100%; max-width: 600px; }
+        #game-board { display: flex; flex-direction: column; gap: 8px; }
+        .row { display: flex; gap: 8px; justify-content: center; }
+        .tile { width: clamp(35px, 10vw, 55px); height: clamp(35px, 10vw, 55px); border: 2px solid var(--tile-border); background: var(--glass-bg); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; font-size: 1.5rem; font-weight: 700; text-transform: uppercase; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); user-select: none; }
+        .tile.space { border: none; background: transparent; backdrop-filter: none; width: 12px; }
+        .tile.pop { transform: scale(1.1); border-color: #fff; }
+        .tile[data-state="correct"] { background-color: var(--correct-color); border-color: var(--correct-color); color: #000; animation: flip 0.6s ease forwards; }
+        .tile[data-state="present"] { background-color: var(--present-color); border-color: var(--present-color); color: #000; animation: flip 0.6s ease forwards; }
+        .tile[data-state="absent"] { background-color: var(--absent-color); border-color: var(--absent-color); opacity: 0.6; animation: flip 0.6s ease forwards; }
+        @keyframes flip { 0% { transform: rotateX(0); } 50% { transform: rotateX(90deg); } 100% { transform: rotateX(0); } }
+
+        #keyboard { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 500px; }
+        .kb-row { display: flex; justify-content: center; gap: 4px; }
+        .key { background: var(--glass-bg); border: 1px solid var(--glass-border); color: white; border-radius: 6px; padding: 15px 4px; font-weight: 600; cursor: pointer; text-transform: uppercase; flex: 1; transition: all 0.2s ease; font-size: 0.85rem; -webkit-tap-highlight-color: transparent; }
+        .key.large { flex: 1.5; font-size: 0.7rem; }
+        .key[data-state="correct"] { background: var(--correct-color); color: #000; }
+        .key[data-state="present"] { background: var(--present-color); color: #000; }
+        .key[data-state="absent"] { background: #1e293b; color: #64748b; }
+
+        /* QUIZ STYLES */
+        #quiz-container { display: none; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
+        .quiz-card { background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 25px; border-radius: 24px; width: 100%; max-width: 400px; text-align: center; }
+        .logo-box { width: 180px; height: 180px; background: white; border-radius: 20px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; padding: 15px; position: relative; overflow: hidden; }
+        .logo-img { max-width: 100%; max-height: 100%; object-fit: contain; transition: filter 0.3s; }
+        .logo-img.blurred { filter: blur(8px) grayscale(0.5) contrast(1.5); }
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%; }
+        .option-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .option-btn:hover { background: rgba(255,255,255,0.1); }
+        .option-btn.correct { background: var(--correct-color); color: #000; border-color: var(--correct-color); }
+        .option-btn.wrong { background: #ef4444; color: #fff; border-color: #ef4444; }
+
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal { background: rgba(255,255,255,0.08); border: 1px solid var(--glass-border); padding: 30px; border-radius: 28px; max-width: 480px; width: 95%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); text-align: center; position: relative; }
+        .close-modal { position: absolute; right: 20px; top: 20px; cursor: pointer; opacity: 0.6; font-size: 1.2rem; }
+        .modern-input { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; color: white; width: 100%; font-size: 1rem; outline: none; text-align: center; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+        .stat-item .value { font-size: 1.5rem; font-weight: 800; display: block; }
+        .stat-item .label { font-size: 0.6rem; color: var(--text-secondary); text-transform: uppercase; }
+        .leaderboard-container { display: grid; grid-template-columns: 1fr; gap: 15px; text-align: left; }
+        .leaderboard-list { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 16px; max-height: 180px; overflow-y: auto; }
+        .leaderboard-item { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 8px 12px; border-radius: 10px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
+        .leaderboard-item.highlight { border-color: var(--correct-color); background: rgba(74, 222, 128, 0.1); }
+        .rank { font-weight: 800; color: var(--present-color); margin-right: 8px; }
+        .btn-restart { background: #fff; color: #000; border: none; padding: 14px 40px; border-radius: 14px; font-weight: 700; cursor: pointer; margin-top: 15px; width: 100%; }
+        .btn-secondary { background: transparent; color: #fff; border: 1px solid var(--glass-border); padding: 8px 15px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; margin-top: 10px; }
+
+        .toast { position: fixed; top: 80px; background: #fff; color: #000; padding: 12px 24px; border-radius: 50px; font-weight: 700; opacity: 0; transform: translateY(-20px); transition: all 0.3s; z-index: 2000; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="toggleStats()" title="İstatistikler">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+            </button>
+        </div>
+        <h1>FOOTBALL HUB</h1>
+        <div class="subtitle" id="game-subtitle">CHOOSE YOUR CHALLENGE</div>
+    </header>
+
+    <div class="mode-switcher">
+        <button class="mode-btn active" id="mode-club" onclick="switchMode('club')">KULÜP</button>
+        <button class="mode-btn" id="mode-player" onclick="switchMode('player')">OYUNCU</button>
+        <button class="mode-btn" id="mode-manager" onclick="switchMode('manager')">TEKNİK DIR.</button>
+        <button class="mode-btn" id="mode-daily" onclick="switchMode('daily')">📅 GÜNLÜK</button>
+        <button class="mode-btn" id="mode-quiz" onclick="switchMode('quiz')">LOGO QUIZ</button>
+    </div>
+
+    <div id="game-container">
+        <!-- Wordle Content -->
+        <div id="wordle-content">
+            <div id="game-board"></div>
+            <!-- Klavye toggler -->
+            <div style="display:flex; justify-content:flex-end; margin-bottom:6px; max-width:500px; width:100%;">
+                <button id="kb-toggle" onclick="toggleKeyboard()" style="background:var(--glass-bg); border:1px solid var(--glass-border); color:var(--text-secondary); padding:4px 12px; border-radius:8px; font-size:0.65rem; font-weight:600; cursor:pointer; letter-spacing:1px;">🇹🇷 TÜRKÇE</button>
+            </div>
+
+            <div id="keyboard">
+                <!-- İngilizce klavye (varsayilan) -->
+                <div class="kb-layout" id="kb-en">
+                    <div class="kb-row">
+                        <button class="key" data-key="Q">Q</button><button class="key" data-key="W">W</button><button class="key" data-key="E">E</button><button class="key" data-key="R">R</button><button class="key" data-key="T">T</button><button class="key" data-key="Y">Y</button><button class="key" data-key="U">U</button><button class="key" data-key="I">I</button><button class="key" data-key="O">O</button><button class="key" data-key="P">P</button>
+                    </div>
+                    <div class="kb-row">
+                        <button class="key" data-key="A">A</button><button class="key" data-key="S">S</button><button class="key" data-key="D">D</button><button class="key" data-key="F">F</button><button class="key" data-key="G">G</button><button class="key" data-key="H">H</button><button class="key" data-key="J">J</button><button class="key" data-key="K">K</button><button class="key" data-key="L">L</button>
+                    </div>
+                    <div class="kb-row">
+                        <button class="key large" data-key="ENTER">ENTER</button><button class="key" data-key="Z">Z</button><button class="key" data-key="X">X</button><button class="key" data-key="C">C</button><button class="key" data-key="V">V</button><button class="key" data-key="B">B</button><button class="key" data-key="N">N</button><button class="key" data-key="M">M</button><button class="key large" data-key="BACKSPACE">⌫</button>
+                    </div>
+                </div>
+
+                <!-- Türkçe klavye (data-key normalize edilmiş hali taşır, label Türkçe gösterir) -->
+                <div class="kb-layout" id="kb-tr" style="display:none">
+                    <div class="kb-row">
+                        <button class="key" data-key="Q">Q</button><button class="key" data-key="W">W</button><button class="key" data-key="E">E</button><button class="key" data-key="R">R</button><button class="key" data-key="T">T</button><button class="key" data-key="Y">Y</button><button class="key" data-key="U">U</button><button class="key" data-key="I">I</button><button class="key" data-key="O">O</button><button class="key" data-key="P">P</button>
+                    </div>
+                    <div class="kb-row">
+                        <button class="key" data-key="A">A</button><button class="key" data-key="S">S</button><button class="key" data-key="D">D</button><button class="key" data-key="F">F</button><button class="key" data-key="G">G</button><button class="key" data-key="H">H</button><button class="key" data-key="J">J</button><button class="key" data-key="K">K</button><button class="key" data-key="L">L</button>
+                    </div>
+                    <div class="kb-row">
+                        <button class="key large" data-key="ENTER">ENTER</button><button class="key" data-key="Z">Z</button><button class="key" data-key="X">X</button><button class="key" data-key="C">C</button><button class="key" data-key="V">V</button><button class="key" data-key="B">B</button><button class="key" data-key="N">N</button><button class="key" data-key="M">M</button><button class="key large" data-key="BACKSPACE">⌫</button>
+                    </div>
+                    <!-- Türkçe ek karakter satırı -->
+                    <div class="kb-row" style="margin-top:4px;">
+                        <button class="key" data-key="S" style="color:var(--present-color)">Ş</button>
+                        <button class="key" data-key="I" style="color:var(--present-color)">İ</button>
+                        <button class="key" data-key="G" style="color:var(--present-color)">Ğ</button>
+                        <button class="key" data-key="U" style="color:var(--present-color)">Ü</button>
+                        <button class="key" data-key="O" style="color:var(--present-color)">Ö</button>
+                        <button class="key" data-key="C" style="color:var(--present-color)">Ç</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Content -->
+        <div id="quiz-container">
+            <div class="quiz-card">
+                <div class="logo-box">
+                    <img id="quiz-logo" class="logo-img blurred" src="" alt="Club Logo">
+                </div>
+                <div class="options-grid" id="quiz-options"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="login-overlay" class="overlay">
+        <div class="modal">
+            <h2>İSMİN NE?</h2>
+            <p style="color:var(--text-secondary); margin-bottom: 20px;">İstatistilerini kaydetmek için ismini gir.</p>
+            <input type="text" id="username-input" class="modern-input" placeholder="İsmin" maxlength="15">
+            <button class="btn-restart" onclick="registerUser()">BAŞLA</button>
+        </div>
+    </div>
+
+    <div id="stats-overlay" class="overlay">
+        <div id="stats-modal" class="modal">
+            <div class="close-modal" onclick="toggleStats()">✕</div>
+            <h2 id="modal-title">İSTATİSTİKLER</h2>
+            <div class="stats-grid">
+                <div class="stat-item"><span class="value" id="stats-played">0</span><span class="label">Oynanan</span></div>
+                <div class="stat-item"><span class="value" id="stats-score">0</span><span class="label">Puan</span></div>
+                <div class="stat-item"><span class="value" id="stats-streak">0</span><span class="label">Seri</span></div>
+                <div class="stat-item"><span class="value" id="stats-max">0</span><span class="label">Rekor</span></div>
+            </div>
+            <div class="leaderboard-container">
+                <div id="personal-leaderboard-section"><h3>EN İYİLERİN</h3><div class="leaderboard-list" id="leaderboard"></div></div>
+                <div id="global-leaderboard-section" style="display:none"><h3>GLOBAL</h3><div class="leaderboard-list" id="global-leaderboard"></div></div>
+            </div>
+            <button class="btn-restart" onclick="location.reload()">TEKRAR OYNA</button>
+            <button class="btn-secondary" onclick="showNameChange()">İsmi Değiştir</button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const API_URL = '/api/leaderboard';
+        
+        // Data
+        const CLUBS = ["Fenerbahce", "Galatasaray", "Besiktas", "Trabzonspor", "Real Madrid", "Barcelona", "Manchester City", "Arsenal", "Liverpool", "Bayern Munich", "PSG", "Inter Milan", "AC Milan", "Juventus", "Dortmund", "Atletico Madrid", "Chelsea", "Tottenham", "Napoli", "Leverkusen", "Sivasspor", "Rizespor", "Kayserispor", "Hatayspor", "Antalyaspor", "Samsunspor", "Alanyaspor", "Eyupspor", "Gaziantep", "Basaksehir", "Konyaspor", "Kasimpasa", "Manchester United", "Real Sociedad", "Rangers", "Lyon", "Marseille", "Sevilla", "Roma", "Lazio", "Valencia", "Fiorentina", "Porto", "Wolfsburg", "Benfica", "Monaco", "Ajax", "Villarreal", "Celtic", "Boca Juniors", "River Plate", "Santos", "Flamengo", "Club America", "Tigres", "Al Hilal", "Al Nassr"];
+        const PLAYERS = ["Cristiano Ronaldo", "Lionel Messi", "Kylian Mbappe", "Erling Haaland", "Jude Bellingham", "Vinicius Junior", "Harry Kane", "Mohamed Salah", "Arda Guler", "Mauro Icardi", "Victor Osimhen", "Fred", "Dusan Tadic", "Rafa Silva", "Hakan Calhanoglu", "Lamine Yamal", "Rodri", "Kevin De Bruyne", "Cengiz Under", "Kerem Akturkoglu", "Ferdi Kadioglu", "Yusuf Yazici", "Merih Demiral", "Okay Yokuslu", "Baris Alper Yilmaz", "Samet Akaydin", "Semih Kilicsoy", "Orkun Kokcu", "Mert Gunok", "Zeki Celik", "Ugurcan Cakir", "Abdulkerim Bardakci", "Raphinha", "Ryan Babel", "Son Heung Min", "Trent Alexander", "Marcus Rashford", "Roberto Firmino", "Olivier Giroud", "Antoine Griezmann", "Bruno Fernandes", "Phil Foden", "Romelu Lukaku", "Bernardo Silva", "Virgil Van Dijk", "Bukayo Saka", "Pedri", "Gavi", "Neymar", "Michy Batshuayi", "Emmanuel Adebayor", "Hakim Ziyech", "Sofyan Amrabat", "Edin Dzeko"];
+        const MANAGERS = ["Fatih Terim", "Jose Mourinho", "Pep Guardiola", "Jurgen Klopp", "Carlo Ancelotti", "Okan Buruk", "Sergen Yalcin", "Ismail Kartal", "Jorge Jesus", "Senol Gunes", "Xabi Alonso", "Mikel Arteta", "Zinedine Zidane", "Ersun Yanal", "Mustafa Denizli", "Abdullah Avci", "Riza Calimbay", "Bulent Uygun", "Erik Ten Hag", "Thomas Tuchel", "Diego Simeone", "Antonio Conte", "Luis Enrique", "Hansi Flick"];
+
+        const QUIZ_DATA = [
+            { name: 'Galatasaray', logo: 'https://upload.wikimedia.org/wikipedia/en/3/31/Galatasaray_Star_Logo.svg' },
+            { name: 'Fenerbahce', logo: 'https://upload.wikimedia.org/wikipedia/en/3/39/Fenerbah%C3%A7e_SK_Logo.svg' },
+            { name: 'Besiktas', logo: 'https://upload.wikimedia.org/wikipedia/en/7/7b/Besiktas_JK_Logo.svg' },
+            { name: 'Trabzonspor', logo: 'https://upload.wikimedia.org/wikipedia/en/a/a3/Trabzonspor_Logo.svg' },
+            { name: 'Real Madrid', logo: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg' },
+            { name: 'Barcelona', logo: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_logo.svg' },
+            { name: 'Manchester City', logo: 'https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg' },
+            { name: 'Bayern Munich', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg' },
+            { name: 'Arsenal', logo: 'https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg' },
+            { name: 'Liverpool', logo: 'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg' },
+            { name: 'PSG', logo: 'https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg' },
+            { name: 'Inter Milan', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg' },
+            { name: 'AC Milan', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg' },
+            { name: 'Juventus', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Juventus_FC_2017_icon_%28black%29.svg' }
+        ];
+
+        // State
+        let currentGameMode = localStorage.getItem('futbol_wordle_mode') || 'club';
+
+        // Gunluk mod: tarihi sayiya cevir, listeye indeks olarak kullan
+        function getDailyIndex(list) {
+            const start = new Date('2025-01-01');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const dayNum = Math.floor((today - start) / 86400000);
+            return dayNum % list.length;
+        }
+
+        function getTodayKey() {
+            const d = new Date();
+            return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+        }
+
+        function formatCountdown() {
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(0, 0, 0, 0);
+            const diff = tomorrow - now;
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }
+        let stats = JSON.parse(localStorage.getItem('wordleStats')) || { played: 0, wins: 0, streak: 0, maxStreak: 0, bestRuns: [], totalScore: 0 };
+        let username = localStorage.getItem('futbol_wordle_username');
+        let userUuid = localStorage.getItem('futbol_wordle_uuid') || (()=>{const u=crypto.randomUUID();localStorage.setItem('futbol_wordle_uuid',u);return u;})();
+        
+        let targetWord = '', rawTarget = '', currentRow = 0, currentLetterIndex = 0, gameOver = false, guesses = [];
+        let quizCurrent = null, quizLocked = false, quizTimer = null;
+
+        // UI Refs
+        const board = document.getElementById('game-board');
+        const loginOverlay = document.getElementById('login-overlay');
+        const usernameInput = document.getElementById('username-input');
+
+        function normalize(str) { return str.toUpperCase().replace(/[İIĞÜŞÖÇ]/g, m => ({'İ':'I','I':'I','Ğ':'G','Ü':'U','Ş':'S','Ö':'O','Ç':'C'}[m])).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z]/g, ''); }
+
+        function switchMode(mode) {
+            localStorage.setItem('futbol_wordle_mode', mode);
+            location.reload();
+        }
+
+        function init() {
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`mode-${currentGameMode}`).classList.add('active');
+
+            if (currentGameMode === 'quiz') {
+                document.getElementById('wordle-content').style.display = 'none';
+                document.getElementById('quiz-container').style.display = 'flex';
+                document.getElementById('game-subtitle').textContent = 'GUESS THE CLUB LOGO';
+                loadQuiz();
+            } else if (currentGameMode === 'daily') {
+                // Bugun oynanmis mi kontrol et
+                const todayKey = getTodayKey();
+                const dailyState = JSON.parse(localStorage.getItem('daily_state') || '{}');
+                
+                // Gunun kelimesini belirle: Club / Player / Manager donusumlu (gun numarasina gore)
+                const start = new Date('2025-01-01');
+                const today = new Date(); today.setHours(0,0,0,0);
+                const dayNum = Math.floor((today - start) / 86400000);
+                const dailyLists = [CLUBS, PLAYERS, MANAGERS];
+                const listNames = ['KULUP WORDLE', 'OYUNCU WORDLE', 'TEKNIK DIREKTOR WORDLE'];
+                const dailyList = dailyLists[dayNum % 3];
+                const dailyListName = listNames[dayNum % 3];
+                rawTarget = dailyList[getDailyIndex(dailyList)];
+                targetWord = normalize(rawTarget);
+                
+                document.getElementById('game-subtitle').textContent = `GUNLUK ${dailyListName} — ${new Date().toLocaleDateString('tr-TR')}`;
+                
+                guesses = Array.from({length: 6}, () => []);
+                initBoard();
+
+                // Daha once oynanmissa tahtayi geri yukle
+                if (dailyState.date === todayKey && dailyState.guesses) {
+                    replayDailyState(dailyState);
+                }
+            } else {
+                let list = CLUBS;
+                if (currentGameMode === 'player') list = PLAYERS;
+                if (currentGameMode === 'manager') list = MANAGERS;
+                rawTarget = list[Math.floor(Math.random() * list.length)];
+                targetWord = normalize(rawTarget);
+                guesses = Array.from({length: 6}, () => []);
+                initBoard();
+            }
+            if (!username) { loginOverlay.style.display = 'flex'; usernameInput.focus(); }
+            applyKeyboardMode();
+        }
+
+        // Gunluk modda onceki tahminleri animasyonsuz geri yukle
+        function replayDailyState(state) {
+            state.guesses.forEach((g, rowIdx) => {
+                if (!g.length) return;
+                guesses[rowIdx] = g;
+                currentRow = rowIdx;
+                currentLetterIndex = g.length;
+                updateWordleRow();
+                // Renkleri hemen uygula (animasyonsuz)
+                const tiles = document.querySelectorAll(`#row-${rowIdx} .tile`);
+                const targetArr = targetWord.split('');
+                const states = new Array(targetWord.length).fill('absent');
+                g.forEach((char, i) => { if (char === targetArr[i]) { states[i] = 'correct'; targetArr[i] = null; } });
+                g.forEach((char, i) => { if (states[i] !== 'correct') { let idx = targetArr.indexOf(char); if (idx !== -1) { states[i] = 'present'; targetArr[idx] = null; } } });
+                states.forEach((s, i) => { tiles[i].setAttribute('data-state', s); tiles[i].style.animation = 'none'; });
+                updateKeyboard(g, states);
+            });
+            if (state.finished) {
+                gameOver = true;
+                currentRow = state.guesses.filter(g => g.length).length - 1;
+                if (state.won) {
+                    showToast('BUGUN ZATEN BULDUN! 🏆');
+                } else {
+                    showToast('BUGUN ZATEN OYNADUN. YARIN TEKRAR GEL!');
+                }
+                showCountdownInModal();
+            } else {
+                currentRow = state.guesses.filter(g => g.length).length;
+                currentLetterIndex = 0;
+            }
+        }
+
+        function updateKeyboard(guess, states) {
+            guess.forEach((char, i) => {
+                // Her iki klavyedeki tüm eşleşen tuşları güncelle
+                document.querySelectorAll(`.key[data-key="${char}"]`).forEach(key => {
+                    const current = key.getAttribute('data-state');
+                    if (current === 'correct') return;
+                    if (states[i] === 'correct' || (!current && states[i] === 'present') || (!current && states[i] === 'absent')) {
+                        key.setAttribute('data-state', states[i]);
+                        // Türkçe ek satırdaki tuşların rengini data-state göre güncelle
+                        key.style.color = '';
+                    }
+                });
+            });
+        }
+
+        function showCountdownInModal() {
+            // Stats modalinin altina geri sayim ekle
+            const existing = document.getElementById('countdown-block');
+            if (existing) existing.remove();
+            const block = document.createElement('div');
+            block.id = 'countdown-block';
+            block.style.cssText = 'margin-top:15px; font-size:1.1rem; font-weight:700; color:var(--correct-color); letter-spacing:2px;';
+            block.innerHTML = `YARIN YENI KELIME: <span id="countdown-timer">${formatCountdown()}</span>`;
+            document.getElementById('stats-modal').appendChild(block);
+            clearInterval(window._countdownInterval);
+            window._countdownInterval = setInterval(() => {
+                const el = document.getElementById('countdown-timer');
+                if (el) el.textContent = formatCountdown();
+            }, 1000);
+        }
+
+        function initBoard() {
+            board.innerHTML = '';
+            for (let i = 0; i < 6; i++) {
+                const row = document.createElement('div'); row.className = 'row'; row.id = 'row-' + i;
+                for (let j = 0; j < targetWord.length; j++) {
+                    const tile = document.createElement('div'); tile.className = 'tile'; tile.id = `tile-${i}-${j}`;
+                    row.appendChild(tile);
+                }
+                board.appendChild(row);
+            }
+        }
+
+        // Quiz Logic
+        function loadQuiz() {
+            if (quizTimer) clearTimeout(quizTimer);
+            quizLocked = false;
+            quizCurrent = QUIZ_DATA[Math.floor(Math.random() * QUIZ_DATA.length)];
+            const logo = document.getElementById('quiz-logo');
+            logo.src = quizCurrent.logo;
+            logo.classList.add('blurred');
+
+            const options = [quizCurrent.name];
+            while (options.length < 4) {
+                const r = QUIZ_DATA[Math.floor(Math.random() * QUIZ_DATA.length)].name;
+                if (!options.includes(r)) options.push(r);
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            const optContainer = document.getElementById('quiz-options');
+            optContainer.innerHTML = options.map(o => `<button class="option-btn" onclick="checkQuiz('${o}', this)">${o}</button>`).join('');
+        }
+
+        function checkQuiz(choice, btn) {
+            if (quizLocked) return;
+            quizLocked = true;
+            const isCorrect = choice === quizCurrent.name;
+            document.getElementById('quiz-logo').classList.remove('blurred');
+            
+            if (isCorrect) {
+                btn.classList.add('correct');
+                stats.totalScore += 5;
+                showToast("+5 PUAN! HARİKA.");
+            } else {
+                btn.classList.add('wrong');
+                showToast("YANLIŞ! DOĞRU: " + quizCurrent.name);
+                document.querySelectorAll('.option-btn').forEach(b => {
+                    if (b.textContent === quizCurrent.name) b.classList.add('correct');
+                });
+            }
+            
+            stats.played++;
+            saveStats();
+            syncScore();
+            quizTimer = setTimeout(loadQuiz, 2000);
+        }
+
+        // Wordle Logic
+        function handleInput(key) {
+            if (gameOver || currentGameMode === 'quiz' || document.activeElement === usernameInput) return;
+            if (key === 'ENTER') submitGuess();
+            else if (key === 'BACKSPACE') { if (currentLetterIndex > 0) { currentLetterIndex--; guesses[currentRow].pop(); updateWordleRow(); } }
+            else if (/^[A-Z]$/.test(key)) { if (currentLetterIndex < targetWord.length) { guesses[currentRow].push(key); currentLetterIndex++; updateWordleRow(); } }
+        }
+
+        function updateWordleRow() {
+            const tiles = document.querySelectorAll(`#row-${currentRow} .tile`);
+            guesses[currentRow].forEach((char, i) => { tiles[i].textContent = char; tiles[i].classList.add('pop'); });
+            for (let i = guesses[currentRow].length; i < targetWord.length; i++) { tiles[i].textContent = ''; tiles[i].classList.remove('pop'); }
+        }
+
+        function submitGuess() {
+            const guess = guesses[currentRow].join('');
+            if (guess.length !== targetWord.length) return showToast("EKSİK HARF");
+            
+            const tiles = document.querySelectorAll(`#row-${currentRow} .tile`);
+            const targetArr = targetWord.split('');
+            const states = new Array(targetWord.length).fill('absent');
+
+            guesses[currentRow].forEach((char, i) => { if (char === targetArr[i]) { states[i] = 'correct'; targetArr[i] = null; } });
+            guesses[currentRow].forEach((char, i) => { if (states[i] !== 'correct') { let idx = targetArr.indexOf(char); if (idx !== -1) { states[i] = 'present'; targetArr[idx] = null; } } });
+
+            states.forEach((s, i) => setTimeout(() => tiles[i].setAttribute('data-state', s), i * 100));
+            setTimeout(() => updateKeyboard(guesses[currentRow], states), targetWord.length * 100);
+
+            if (guess === targetWord) {
+                gameOver = true; stats.totalScore += 20; stats.streak++; stats.wins++;
+                showToast("GOL! +20 PUAN");
+                if (currentGameMode === 'daily') saveDailyState(true);
+                setTimeout(() => showEndGame(true), 1500);
+            } else if (currentRow === 5) {
+                gameOver = true; stats.streak = 0;
+                showToast("MAÇ BİTTİ: " + rawTarget);
+                if (currentGameMode === 'daily') saveDailyState(false);
+                setTimeout(() => showEndGame(false), 1500);
+            } else { currentRow++; currentLetterIndex = 0; }
+            
+            if (currentGameMode === 'daily' && !gameOver) saveDailyState(false);
+            stats.played++; saveStats(); syncScore();
+        }
+
+        // Klavye toggle
+        let kbMode = localStorage.getItem('kb_mode') || 'en';
+
+        function toggleKeyboard() {
+            kbMode = kbMode === 'en' ? 'tr' : 'en';
+            localStorage.setItem('kb_mode', kbMode);
+            applyKeyboardMode();
+        }
+
+        function applyKeyboardMode() {
+            const isTr = kbMode === 'tr';
+            document.getElementById('kb-en').style.display = isTr ? 'none' : 'block';
+            document.getElementById('kb-tr').style.display = isTr ? 'block' : 'none';
+            const btn = document.getElementById('kb-toggle');
+            if (btn) btn.textContent = isTr ? '🇬🇧 İNGİLİZCE' : '🇹🇷 TÜRKÇE';
+        }
+
+        // Gunluk mod kayit/yukle
+        function saveDailyState(finished, won) {
+            const state = {
+                date: getTodayKey(),
+                guesses: guesses.map(g => [...g]),
+                finished: finished,
+                won: won || false
+            };
+            localStorage.setItem('daily_state', JSON.stringify(state));
+        }
+
+        // showEndGame: gunluk modda geri sayim goster
+        // Global Helpers
+        function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2500); }
+        function saveStats() { localStorage.setItem('wordleStats', JSON.stringify(stats)); }
+        
+        async function syncScore() { 
+            if(!username) return;
+            try {
+                await fetch(API_URL, {
+                    method:'POST', 
+                    headers:{'Content-Type':'application/json'}, 
+                    body:JSON.stringify({name:username, score:stats.totalScore, uuid:userUuid})
+                });
+            } catch (e) {
+                // Silently fail if KV/API is unavailable
+            }
+        }
+        
+        async function loadGlobalLeaderboard() {
+            const glb = document.getElementById('global-leaderboard');
+            const glbSection = document.getElementById('global-leaderboard-section');
+            try {
+                const res = await fetch(API_URL);
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                if (data && data.length > 0) {
+                    glb.innerHTML = data.map((l, i) => `<div class="leaderboard-item ${l.uuid === userUuid ? 'highlight' : ''}"><span><span class="rank">${i+1}</span> ${l.name}</span><span style="font-weight:800">${l.score}</span></div>`).join('');
+                    // glbSection.style.display = 'block'; // Keeping it hidden as requested
+                }
+            } catch (e) { 
+                glbSection.style.display = 'none';
+            }
+        }
+
+        function loadPersonalLeaderboard() {
+            const plb = document.getElementById('leaderboard');
+            plb.innerHTML = `<div class="leaderboard-item highlight"><span><span class="rank">#</span> ${username || 'Siz'}</span><span style="font-weight:800">${stats.totalScore}</span></div>`;
+        }
+
+        window.toggleStats = function() {
+            const s = document.getElementById('stats-overlay');
+            if (s.style.display === 'flex') s.style.display = 'none';
+            else {
+                document.getElementById('stats-played').textContent = stats.played;
+                document.getElementById('stats-score').textContent = stats.totalScore;
+                document.getElementById('stats-streak').textContent = stats.streak;
+                document.getElementById('stats-max').textContent = stats.maxStreak;
+                loadPersonalLeaderboard();
+                loadGlobalLeaderboard();
+                s.style.display = 'flex';
+            }
+        };
+
+        function registerUser() { 
+            const val = usernameInput.value.trim(); 
+            if (!val) return showToast("İSİM GEREKLİ");
+            username = val; localStorage.setItem('futbol_wordle_username', val);
+            loginOverlay.style.display = 'none';
+            syncScore();
+        }
+
+        function showEndGame(win) {
+            document.getElementById('modal-title').textContent = win ? "ZAFER! 🏆" : "KAYBETTİN! ⚽";
+            toggleStats();
+            if (currentGameMode === 'daily') {
+                saveDailyState(true, win);
+                setTimeout(showCountdownInModal, 300);
+            }
+        }
+
+        window.addEventListener('load', init);
+        window.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && loginOverlay.style.display === 'flex') registerUser();
+            else handleInput(e.key.toUpperCase());
+        });
+    </script>
+</body>
+</html>="width=device-width, initial-scale=1.0">
+    <title>Elite Football Wordle & Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --correct-color: #4ade80;
+            --present-color: #facc15;
+            --absent-color: #475569;
+            --tile-border: #334155;
+            --fb-blue: #003399;
+            --fb-yellow: #fdd017;
+            --gs-red: #a90432;
+            --gs-yellow: #fdb912;
+            --accent-color: #3b82f6;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg-gradient); color: var(--text-primary); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; padding: 20px; }
+        header { text-align: center; margin-bottom: 20px; z-index: 10; position: relative; width: 100%; max-width: 500px; }
+        h1 { font-size: clamp(1.8rem, 7vw, 3rem); font-weight: 800; letter-spacing: -2px; background: linear-gradient(135deg, #fff 0%, #aaa 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 5px; }
+        .subtitle { color: var(--text-secondary); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; }
+        .header-actions { position: absolute; right: 0px; top: 50%; transform: translateY(-50%); display: flex; gap: 10px; }
+        .icon-btn { background: var(--glass-bg); border: 1px solid var(--glass-border); color: #fff; width: 40px; height: 40px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .icon-btn:hover { background: rgba(255,255,255,0.15); }
+
+        .mode-switcher { display: flex; background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 4px; border-radius: 12px; margin-bottom: 25px; width: 100%; max-width: 500px; overflow-x: auto; }
+        .mode-btn { flex: 1; background: transparent; border: none; color: var(--text-secondary); padding: 10px 4px; border-radius: 8px; font-weight: 600; font-size: 0.7rem; cursor: pointer; transition: all 0.3s; white-space: nowrap; }
+        .mode-btn.active { background: var(--accent-color); color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+
+        #game-container { display: flex; flex-direction: column; align-items: center; gap: 30px; width: 100%; max-width: 600px; }
+        #game-board { display: flex; flex-direction: column; gap: 8px; }
+        .row { display: flex; gap: 8px; justify-content: center; }
+        .tile { width: clamp(35px, 10vw, 55px); height: clamp(35px, 10vw, 55px); border: 2px solid var(--tile-border); background: var(--glass-bg); backdrop-filter: blur(4px); display: flex; justify-content: center; align-items: center; font-size: 1.5rem; font-weight: 700; text-transform: uppercase; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); user-select: none; }
+        .tile.space { border: none; background: transparent; backdrop-filter: none; width: 12px; }
+        .tile.pop { transform: scale(1.1); border-color: #fff; }
+        .tile[data-state="correct"] { background-color: var(--correct-color); border-color: var(--correct-color); color: #000; animation: flip 0.6s ease forwards; }
+        .tile[data-state="present"] { background-color: var(--present-color); border-color: var(--present-color); color: #000; animation: flip 0.6s ease forwards; }
+        .tile[data-state="absent"] { background-color: var(--absent-color); border-color: var(--absent-color); opacity: 0.6; animation: flip 0.6s ease forwards; }
+        @keyframes flip { 0% { transform: rotateX(0); } 50% { transform: rotateX(90deg); } 100% { transform: rotateX(0); } }
+
+        #keyboard { display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 500px; }
+        .kb-row { display: flex; justify-content: center; gap: 4px; }
+        .key { background: var(--glass-bg); border: 1px solid var(--glass-border); color: white; border-radius: 6px; padding: 15px 4px; font-weight: 600; cursor: pointer; text-transform: uppercase; flex: 1; transition: all 0.2s ease; font-size: 0.85rem; -webkit-tap-highlight-color: transparent; }
+        .key.large { flex: 1.5; font-size: 0.7rem; }
+        .key[data-state="correct"] { background: var(--correct-color); color: #000; }
+        .key[data-state="present"] { background: var(--present-color); color: #000; }
+        .key[data-state="absent"] { background: #1e293b; color: #64748b; }
+
+        /* QUIZ STYLES */
+        #quiz-container { display: none; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
+        .quiz-card { background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 25px; border-radius: 24px; width: 100%; max-width: 400px; text-align: center; }
+        .logo-box { width: 180px; height: 180px; background: white; border-radius: 20px; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; padding: 15px; position: relative; overflow: hidden; }
+        .logo-img { max-width: 100%; max-height: 100%; object-fit: contain; transition: filter 0.3s; }
+        .logo-img.blurred { filter: blur(8px) grayscale(0.5) contrast(1.5); }
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; width: 100%; }
+        .option-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; padding: 14px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .option-btn:hover { background: rgba(255,255,255,0.1); }
+        .option-btn.correct { background: var(--correct-color); color: #000; border-color: var(--correct-color); }
+        .option-btn.wrong { background: #ef4444; color: #fff; border-color: #ef4444; }
+
+        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(12px); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .modal { background: rgba(255,255,255,0.08); border: 1px solid var(--glass-border); padding: 30px; border-radius: 28px; max-width: 480px; width: 95%; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6); text-align: center; position: relative; }
+        .close-modal { position: absolute; right: 20px; top: 20px; cursor: pointer; opacity: 0.6; font-size: 1.2rem; }
+        .modern-input { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding: 15px; border-radius: 12px; color: white; width: 100%; font-size: 1rem; outline: none; text-align: center; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+        .stat-item .value { font-size: 1.5rem; font-weight: 800; display: block; }
+        .stat-item .label { font-size: 0.6rem; color: var(--text-secondary); text-transform: uppercase; }
+        .leaderboard-container { display: grid; grid-template-columns: 1fr; gap: 15px; text-align: left; }
+        .leaderboard-list { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 16px; max-height: 180px; overflow-y: auto; }
+        .leaderboard-item { background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); padding: 8px 12px; border-radius: 10px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; }
+        .leaderboard-item.highlight { border-color: var(--correct-color); background: rgba(74, 222, 128, 0.1); }
+        .rank { font-weight: 800; color: var(--present-color); margin-right: 8px; }
+        .btn-restart { background: #fff; color: #000; border: none; padding: 14px 40px; border-radius: 14px; font-weight: 700; cursor: pointer; margin-top: 15px; width: 100%; }
+        .btn-secondary { background: transparent; color: #fff; border: 1px solid var(--glass-border); padding: 8px 15px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; margin-top: 10px; }
+
+        .toast { position: fixed; top: 80px; background: #fff; color: #000; padding: 12px 24px; border-radius: 50px; font-weight: 700; opacity: 0; transform: translateY(-20px); transition: all 0.3s; z-index: 2000; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-actions">
+            <button class="icon-btn" onclick="toggleStats()" title="İstatistikler">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+            </button>
+        </div>
+        <h1>FOOTBALL HUB</h1>
+        <div class="subtitle" id="game-subtitle">CHOOSE YOUR CHALLENGE</div>
+    </header>
+
+    <div class="mode-switcher">
+        <button class="mode-btn active" id="mode-club" onclick="switchMode('club')">KULÜP</button>
+        <button class="mode-btn" id="mode-player" onclick="switchMode('player')">OYUNCU</button>
+        <button class="mode-btn" id="mode-manager" onclick="switchMode('manager')">TEKNİK DIR.</button>
+        <button class="mode-btn" id="mode-daily" onclick="switchMode('daily')">📅 GÜNLÜK</button>
+        <button class="mode-btn" id="mode-quiz" onclick="switchMode('quiz')">LOGO QUIZ</button>
+    </div>
+
+    <div id="game-container">
+        <!-- Wordle Content -->
+        <div id="wordle-content">
+            <div id="game-board"></div>
+            <!-- Klavye toggler -->
+            <div style="display:flex; justify-content:flex-end; margin-bottom:6px; max-width:500px; width:100%;">
+                <button id="kb-toggle" onclick="toggleKeyboard()" style="background:var(--glass-bg); border:1px solid var(--glass-border); color:var(--text-secondary); padding:4px 12px; border-radius:8px; font-size:0.65rem; font-weight:600; cursor:pointer; letter-spacing:1px;">🇹🇷 TÜRKÇE</button>
+            </div>
+
+            <div id="keyboard">
+                <!-- İngilizce klavye (varsayilan) -->
+                <div class="kb-layout" id="kb-en">
+                    <div class="kb-row">
+                        <button class="key" data-key="Q">Q</button><button class="key" data-key="W">W</button><button class="key" data-key="E">E</button><button class="key" data-key="R">R</button><button class="key" data-key="T">T</button><button class="key" data-key="Y">Y</button><button class="key" data-key="U">U</button><button class="key" data-key="I">I</button><button class="key" data-key="O">O</button><button class="key" data-key="P">P</button>
+                    </div>
+                    <div class="kb-row">
+                        <button class="key" data-key="A">A</button><button class="key" data-key="S">S</button><button class="key" data-key="D">D</button><button class="key" data-key="F">F</button><button class="key" data-key="G">G</button><button class="key" data-key="H">H</button><button class="key" data-key="J">J</button><button class="key" data-key="K">K</button><button class="key" data-key="L">L</button>
+                    </div>
+                    <div class="kb-row">
+                        <button class="key large" data-key="ENTER">ENTER</button><button class="key" data-key="Z">Z</button><button class="key" data-key="X">X</button><button class="key" data-key="C">C</button><button class="key" data-key="V">V</button><button class="key" data-key="B">B</button><button class="key" data-key="N">N</button><button class="key" data-key="M">M</button><button class="key large" data-key="BACKSPACE">⌫</button>
+                    </div>
+                </div>
+
+                <!-- Türkçe klavye (data-key normalize edilmiş hali taşır, label Türkçe gösterir) -->
+                <div class="kb-layout" id="kb-tr" style="display:none">
+                    <div class="kb-row">
+                        <button class="key" data-key="Q">Q</button><button class="key" data-key="W">W</button><button class="key" data-key="E">E</button><button class="key" data-key="R">R</button><button class="key" data-key="T">T</button><button class="key" data-key="Y">Y</button><button class="key" data-key="U">U</button><button class="key" data-key="I">I</button><button class="key" data-key="O">O</button><button class="key" data-key="P">P</button>
+                    </div>
+                    <div class="kb-row">
+                        <button class="key" data-key="A">A</button><button class="key" data-key="S">S</button><button class="key" data-key="D">D</button><button class="key" data-key="F">F</button><button class="key" data-key="G">G</button><button class="key" data-key="H">H</button><button class="key" data-key="J">J</button><button class="key" data-key="K">K</button><button class="key" data-key="L">L</button>
+                    </div>
+                    <div class="kb-row">
+                        <button class="key large" data-key="ENTER">ENTER</button><button class="key" data-key="Z">Z</button><button class="key" data-key="X">X</button><button class="key" data-key="C">C</button><button class="key" data-key="V">V</button><button class="key" data-key="B">B</button><button class="key" data-key="N">N</button><button class="key" data-key="M">M</button><button class="key large" data-key="BACKSPACE">⌫</button>
+                    </div>
+                    <!-- Türkçe ek karakter satırı -->
+                    <div class="kb-row" style="margin-top:4px;">
+                        <button class="key" data-key="S" style="color:var(--present-color)">Ş</button>
+                        <button class="key" data-key="I" style="color:var(--present-color)">İ</button>
+                        <button class="key" data-key="G" style="color:var(--present-color)">Ğ</button>
+                        <button class="key" data-key="U" style="color:var(--present-color)">Ü</button>
+                        <button class="key" data-key="O" style="color:var(--present-color)">Ö</button>
+                        <button class="key" data-key="C" style="color:var(--present-color)">Ç</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Content -->
+        <div id="quiz-container">
+            <div class="quiz-card">
+                <div class="logo-box">
+                    <img id="quiz-logo" class="logo-img blurred" src="" alt="Club Logo">
+                </div>
+                <div class="options-grid" id="quiz-options"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="login-overlay" class="overlay">
+        <div class="modal">
+            <h2>İSMİN NE?</h2>
+            <p style="color:var(--text-secondary); margin-bottom: 20px;">İstatistilerini kaydetmek için ismini gir.</p>
+            <input type="text" id="username-input" class="modern-input" placeholder="İsmin" maxlength="15">
+            <button class="btn-restart" onclick="registerUser()">BAŞLA</button>
+        </div>
+    </div>
+
+    <div id="stats-overlay" class="overlay">
+        <div id="stats-modal" class="modal">
+            <div class="close-modal" onclick="toggleStats()">✕</div>
+            <h2 id="modal-title">İSTATİSTİKLER</h2>
+            <div class="stats-grid">
+                <div class="stat-item"><span class="value" id="stats-played">0</span><span class="label">Oynanan</span></div>
+                <div class="stat-item"><span class="value" id="stats-score">0</span><span class="label">Puan</span></div>
+                <div class="stat-item"><span class="value" id="stats-streak">0</span><span class="label">Seri</span></div>
+                <div class="stat-item"><span class="value" id="stats-max">0</span><span class="label">Rekor</span></div>
+            </div>
+            <div class="leaderboard-container">
+                <div id="personal-leaderboard-section"><h3>EN İYİLERİN</h3><div class="leaderboard-list" id="leaderboard"></div></div>
+                <div id="global-leaderboard-section" style="display:none"><h3>GLOBAL</h3><div class="leaderboard-list" id="global-leaderboard"></div></div>
+            </div>
+            <button class="btn-restart" onclick="location.reload()">TEKRAR OYNA</button>
+            <button class="btn-secondary" onclick="showNameChange()">İsmi Değiştir</button>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+        const API_URL = '/api/leaderboard';
+        
+        // Data
+        const CLUBS = ["Fenerbahce", "Galatasaray", "Besiktas", "Trabzonspor", "Real Madrid", "Barcelona", "Manchester City", "Arsenal", "Liverpool", "Bayern Munich", "PSG", "Inter Milan", "AC Milan", "Juventus", "Dortmund", "Atletico Madrid", "Chelsea", "Tottenham", "Napoli", "Leverkusen", "Sivasspor", "Rizespor", "Kayserispor", "Hatayspor", "Antalyaspor", "Samsunspor", "Alanyaspor", "Eyupspor", "Gaziantep", "Basaksehir", "Konyaspor", "Kasimpasa", "Manchester United", "Real Sociedad", "Rangers", "Lyon", "Marseille", "Sevilla", "Roma", "Lazio", "Valencia", "Fiorentina", "Porto", "Wolfsburg", "Benfica", "Monaco", "Ajax", "Villarreal", "Celtic", "Boca Juniors", "River Plate", "Santos", "Flamengo", "Club America", "Tigres", "Al Hilal", "Al Nassr"];
+        const PLAYERS = ["Cristiano Ronaldo", "Lionel Messi", "Kylian Mbappe", "Erling Haaland", "Jude Bellingham", "Vinicius Junior", "Harry Kane", "Mohamed Salah", "Arda Guler", "Mauro Icardi", "Victor Osimhen", "Fred", "Dusan Tadic", "Rafa Silva", "Hakan Calhanoglu", "Lamine Yamal", "Rodri", "Kevin De Bruyne", "Cengiz Under", "Kerem Akturkoglu", "Ferdi Kadioglu", "Yusuf Yazici", "Merih Demiral", "Okay Yokuslu", "Baris Alper Yilmaz", "Samet Akaydin", "Semih Kilicsoy", "Orkun Kokcu", "Mert Gunok", "Zeki Celik", "Ugurcan Cakir", "Abdulkerim Bardakci", "Raphinha", "Ryan Babel", "Son Heung Min", "Trent Alexander", "Marcus Rashford", "Roberto Firmino", "Olivier Giroud", "Antoine Griezmann", "Bruno Fernandes", "Phil Foden", "Romelu Lukaku", "Bernardo Silva", "Virgil Van Dijk", "Bukayo Saka", "Pedri", "Gavi", "Neymar", "Michy Batshuayi", "Emmanuel Adebayor", "Hakim Ziyech", "Sofyan Amrabat", "Edin Dzeko"];
+        const MANAGERS = ["Fatih Terim", "Jose Mourinho", "Pep Guardiola", "Jurgen Klopp", "Carlo Ancelotti", "Okan Buruk", "Sergen Yalcin", "Ismail Kartal", "Jorge Jesus", "Senol Gunes", "Xabi Alonso", "Mikel Arteta", "Zinedine Zidane", "Ersun Yanal", "Mustafa Denizli", "Abdullah Avci", "Riza Calimbay", "Bulent Uygun", "Erik Ten Hag", "Thomas Tuchel", "Diego Simeone", "Antonio Conte", "Luis Enrique", "Hansi Flick"];
+
+        const QUIZ_DATA = [
+            { name: 'Galatasaray', logo: 'https://upload.wikimedia.org/wikipedia/en/3/31/Galatasaray_Star_Logo.svg' },
+            { name: 'Fenerbahce', logo: 'https://upload.wikimedia.org/wikipedia/en/3/39/Fenerbah%C3%A7e_SK_Logo.svg' },
+            { name: 'Besiktas', logo: 'https://upload.wikimedia.org/wikipedia/en/7/7b/Besiktas_JK_Logo.svg' },
+            { name: 'Trabzonspor', logo: 'https://upload.wikimedia.org/wikipedia/en/a/a3/Trabzonspor_Logo.svg' },
+            { name: 'Real Madrid', logo: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg' },
+            { name: 'Barcelona', logo: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_logo.svg' },
+            { name: 'Manchester City', logo: 'https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg' },
+            { name: 'Bayern Munich', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg' },
+            { name: 'Arsenal', logo: 'https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg' },
+            { name: 'Liverpool', logo: 'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg' },
+            { name: 'PSG', logo: 'https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg' },
+            { name: 'Inter Milan', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg' },
+            { name: 'AC Milan', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg' },
+            { name: 'Juventus', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Juventus_FC_2017_icon_%28black%29.svg' }
+        ];
+
+        // State
+        let currentGameMode = localStorage.getItem('futbol_wordle_mode') || 'club';
+
+        // Gunluk mod: tarihi sayiya cevir, listeye indeks olarak kullan
+        function getDailyIndex(list) {
+            const start = new Date('2025-01-01');
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const dayNum = Math.floor((today - start) / 86400000);
+            return dayNum % list.length;
+        }
+
+        function getTodayKey() {
+            const d = new Date();
+            return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+        }
+
+        function formatCountdown() {
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(0, 0, 0, 0);
+            const diff = tomorrow - now;
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }
+        let stats = JSON.parse(localStorage.getItem('wordleStats')) || { played: 0, wins: 0, streak: 0, maxStreak: 0, bestRuns: [], totalScore: 0 };
+        let username = localStorage.getItem('futbol_wordle_username');
+        let userUuid = localStorage.getItem('futbol_wordle_uuid') || (()=>{const u=crypto.randomUUID();localStorage.setItem('futbol_wordle_uuid',u);return u;})();
+        
+        let targetWord = '', rawTarget = '', currentRow = 0, currentLetterIndex = 0, gameOver = false, guesses = [];
+        let quizCurrent = null, quizLocked = false, quizTimer = null;
+
+        // UI Refs
+        const board = document.getElementById('game-board');
+        const loginOverlay = document.getElementById('login-overlay');
+        const usernameInput = document.getElementById('username-input');
+
+        function normalize(str) { return str.toUpperCase().replace(/[İIĞÜŞÖÇ]/g, m => ({'İ':'I','I':'I','Ğ':'G','Ü':'U','Ş':'S','Ö':'O','Ç':'C'}[m])).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z]/g, ''); }
+
+        function switchMode(mode) {
+            localStorage.setItem('futbol_wordle_mode', mode);
+            location.reload();
+        }
+
+        function init() {
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`mode-${currentGameMode}`).classList.add('active');
+
+            if (currentGameMode === 'quiz') {
+                document.getElementById('wordle-content').style.display = 'none';
+                document.getElementById('quiz-container').style.display = 'flex';
+                document.getElementById('game-subtitle').textContent = 'GUESS THE CLUB LOGO';
+                loadQuiz();
+            } else if (currentGameMode === 'daily') {
+                // Bugun oynanmis mi kontrol et
+                const todayKey = getTodayKey();
+                const dailyState = JSON.parse(localStorage.getItem('daily_state') || '{}');
+                
+                // Gunun kelimesini belirle: Club / Player / Manager donusumlu (gun numarasina gore)
+                const start = new Date('2025-01-01');
+                const today = new Date(); today.setHours(0,0,0,0);
+                const dayNum = Math.floor((today - start) / 86400000);
+                const dailyLists = [CLUBS, PLAYERS, MANAGERS];
+                const listNames = ['KULUP WORDLE', 'OYUNCU WORDLE', 'TEKNIK DIREKTOR WORDLE'];
+                const dailyList = dailyLists[dayNum % 3];
+                const dailyListName = listNames[dayNum % 3];
+                rawTarget = dailyList[getDailyIndex(dailyList)];
+                targetWord = normalize(rawTarget);
+                
+                document.getElementById('game-subtitle').textContent = `GUNLUK ${dailyListName} — ${new Date().toLocaleDateString('tr-TR')}`;
+                
+                guesses = Array.from({length: 6}, () => []);
+                initBoard();
+
+                // Daha once oynanmissa tahtayi geri yukle
+                if (dailyState.date === todayKey && dailyState.guesses) {
+                    replayDailyState(dailyState);
+                }
+            } else {
+                let list = CLUBS;
+                if (currentGameMode === 'player') list = PLAYERS;
+                if (currentGameMode === 'manager') list = MANAGERS;
+                rawTarget = list[Math.floor(Math.random() * list.length)];
+                targetWord = normalize(rawTarget);
+                guesses = Array.from({length: 6}, () => []);
+                initBoard();
+            }
+            if (!username) { loginOverlay.style.display = 'flex'; usernameInput.focus(); }
+            applyKeyboardMode();
+        }
+
+        // Gunluk modda onceki tahminleri animasyonsuz geri yukle
+        function replayDailyState(state) {
+            state.guesses.forEach((g, rowIdx) => {
+                if (!g.length) return;
+                guesses[rowIdx] = g;
+                currentRow = rowIdx;
+                currentLetterIndex = g.length;
+                updateWordleRow();
+                // Renkleri hemen uygula (animasyonsuz)
+                const tiles = document.querySelectorAll(`#row-${rowIdx} .tile`);
+                const targetArr = targetWord.split('');
+                const states = new Array(targetWord.length).fill('absent');
+                g.forEach((char, i) => { if (char === targetArr[i]) { states[i] = 'correct'; targetArr[i] = null; } });
+                g.forEach((char, i) => { if (states[i] !== 'correct') { let idx = targetArr.indexOf(char); if (idx !== -1) { states[i] = 'present'; targetArr[idx] = null; } } });
+                states.forEach((s, i) => { tiles[i].setAttribute('data-state', s); tiles[i].style.animation = 'none'; });
+                updateKeyboard(g, states);
+            });
+            if (state.finished) {
+                gameOver = true;
+                currentRow = state.guesses.filter(g => g.length).length - 1;
+                if (state.won) {
+                    showToast('BUGUN ZATEN BULDUN! 🏆');
+                } else {
+                    showToast('BUGUN ZATEN OYNADUN. YARIN TEKRAR GEL!');
+                }
+                showCountdownInModal();
+            } else {
+                currentRow = state.guesses.filter(g => g.length).length;
+                currentLetterIndex = 0;
+            }
+        }
+
+        function updateKeyboard(guess, states) {
+            guess.forEach((char, i) => {
+                // Her iki klavyedeki tüm eşleşen tuşları güncelle
+                document.querySelectorAll(`.key[data-key="${char}"]`).forEach(key => {
+                    const current = key.getAttribute('data-state');
+                    if (current === 'correct') return;
+                    if (states[i] === 'correct' || (!current && states[i] === 'present') || (!current && states[i] === 'absent')) {
+                        key.setAttribute('data-state', states[i]);
+                        // Türkçe ek satırdaki tuşların rengini data-state göre güncelle
+                        key.style.color = '';
+                    }
+                });
+            });
+        }
+
+        function showCountdownInModal() {
+            // Stats modalinin altina geri sayim ekle
+            const existing = document.getElementById('countdown-block');
+            if (existing) existing.remove();
+            const block = document.createElement('div');
+            block.id = 'countdown-block';
+            block.style.cssText = 'margin-top:15px; font-size:1.1rem; font-weight:700; color:var(--correct-color); letter-spacing:2px;';
+            block.innerHTML = `YARIN YENI KELIME: <span id="countdown-timer">${formatCountdown()}</span>`;
+            document.getElementById('stats-modal').appendChild(block);
+            clearInterval(window._countdownInterval);
+            window._countdownInterval = setInterval(() => {
+                const el = document.getElementById('countdown-timer');
+                if (el) el.textContent = formatCountdown();
+            }, 1000);
+        }
+
+        function initBoard() {
+            board.innerHTML = '';
+            for (let i = 0; i < 6; i++) {
+                const row = document.createElement('div'); row.className = 'row'; row.id = 'row-' + i;
+                for (let j = 0; j < targetWord.length; j++) {
+                    const tile = document.createElement('div'); tile.className = 'tile'; tile.id = `tile-${i}-${j}`;
+                    row.appendChild(tile);
+                }
+                board.appendChild(row);
+            }
+        }
+
+        // Quiz Logic
+        function loadQuiz() {
+            if (quizTimer) clearTimeout(quizTimer);
+            quizLocked = false;
+            quizCurrent = QUIZ_DATA[Math.floor(Math.random() * QUIZ_DATA.length)];
+            const logo = document.getElementById('quiz-logo');
+            logo.src = quizCurrent.logo;
+            logo.classList.add('blurred');
+
+            const options = [quizCurrent.name];
+            while (options.length < 4) {
+                const r = QUIZ_DATA[Math.floor(Math.random() * QUIZ_DATA.length)].name;
+                if (!options.includes(r)) options.push(r);
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            const optContainer = document.getElementById('quiz-options');
+            optContainer.innerHTML = options.map(o => `<button class="option-btn" onclick="checkQuiz('${o}', this)">${o}</button>`).join('');
+        }
+
+        function checkQuiz(choice, btn) {
+            if (quizLocked) return;
+            quizLocked = true;
+            const isCorrect = choice === quizCurrent.name;
+            document.getElementById('quiz-logo').classList.remove('blurred');
+            
+            if (isCorrect) {
+                btn.classList.add('correct');
+                stats.totalScore += 5;
+                showToast("+5 PUAN! HARİKA.");
+            } else {
+                btn.classList.add('wrong');
+                showToast("YANLIŞ! DOĞRU: " + quizCurrent.name);
+                document.querySelectorAll('.option-btn').forEach(b => {
+                    if (b.textContent === quizCurrent.name) b.classList.add('correct');
+                });
+            }
+            
+            stats.played++;
+            saveStats();
+            syncScore();
+            quizTimer = setTimeout(loadQuiz, 2000);
+        }
+
+        // Wordle Logic
+        function handleInput(key) {
+            if (gameOver || currentGameMode === 'quiz' || document.activeElement === usernameInput) return;
+            if (key === 'ENTER') submitGuess();
+            else if (key === 'BACKSPACE') { if (currentLetterIndex > 0) { currentLetterIndex--; guesses[currentRow].pop(); updateWordleRow(); } }
+            else if (/^[A-Z]$/.test(key)) { if (currentLetterIndex < targetWord.length) { guesses[currentRow].push(key); currentLetterIndex++; updateWordleRow(); } }
+        }
+
+        function updateWordleRow() {
+            const tiles = document.querySelectorAll(`#row-${currentRow} .tile`);
+            guesses[currentRow].forEach((char, i) => { tiles[i].textContent = char; tiles[i].classList.add('pop'); });
+            for (let i = guesses[currentRow].length; i < targetWord.length; i++) { tiles[i].textContent = ''; tiles[i].classList.remove('pop'); }
+        }
+
+        function submitGuess() {
+            const guess = guesses[currentRow].join('');
+            if (guess.length !== targetWord.length) return showToast("EKSİK HARF");
+            
+            const tiles = document.querySelectorAll(`#row-${currentRow} .tile`);
+            const targetArr = targetWord.split('');
+            const states = new Array(targetWord.length).fill('absent');
+
+            guesses[currentRow].forEach((char, i) => { if (char === targetArr[i]) { states[i] = 'correct'; targetArr[i] = null; } });
+            guesses[currentRow].forEach((char, i) => { if (states[i] !== 'correct') { let idx = targetArr.indexOf(char); if (idx !== -1) { states[i] = 'present'; targetArr[idx] = null; } } });
+
+            states.forEach((s, i) => setTimeout(() => tiles[i].setAttribute('data-state', s), i * 100));
+            setTimeout(() => updateKeyboard(guesses[currentRow], states), targetWord.length * 100);
+
+            if (guess === targetWord) {
+                gameOver = true; stats.totalScore += 20; stats.streak++; stats.wins++;
+                showToast("GOL! +20 PUAN");
+                if (currentGameMode === 'daily') saveDailyState(true);
+                setTimeout(() => showEndGame(true), 1500);
+            } else if (currentRow === 5) {
+                gameOver = true; stats.streak = 0;
+                showToast("MAÇ BİTTİ: " + rawTarget);
+                if (currentGameMode === 'daily') saveDailyState(false);
+                setTimeout(() => showEndGame(false), 1500);
+            } else { currentRow++; currentLetterIndex = 0; }
+            
+            if (currentGameMode === 'daily' && !gameOver) saveDailyState(false);
+            stats.played++; saveStats(); syncScore();
+        }
+
+        // Klavye toggle
+        let kbMode = localStorage.getItem('kb_mode') || 'en';
+
+        function toggleKeyboard() {
+            kbMode = kbMode === 'en' ? 'tr' : 'en';
+            localStorage.setItem('kb_mode', kbMode);
+            applyKeyboardMode();
+        }
+
+        function applyKeyboardMode() {
+            const isTr = kbMode === 'tr';
+            document.getElementById('kb-en').style.display = isTr ? 'none' : 'block';
+            document.getElementById('kb-tr').style.display = isTr ? 'block' : 'none';
+            const btn = document.getElementById('kb-toggle');
+            if (btn) btn.textContent = isTr ? '🇬🇧 İNGİLİZCE' : '🇹🇷 TÜRKÇE';
+        }
+
+        // Gunluk mod kayit/yukle
+        function saveDailyState(finished, won) {
+            const state = {
+                date: getTodayKey(),
+                guesses: guesses.map(g => [...g]),
+                finished: finished,
+                won: won || false
+            };
+            localStorage.setItem('daily_state', JSON.stringify(state));
+        }
+
+        // showEndGame: gunluk modda geri sayim goster
+        // Global Helpers
+        function showToast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'), 2500); }
+        function saveStats() { localStorage.setItem('wordleStats', JSON.stringify(stats)); }
+        
+        async function syncScore() { 
+            if(!username) return;
+            try {
+                await fetch(API_URL, {
+                    method:'POST', 
+                    headers:{'Content-Type':'application/json'}, 
+                    body:JSON.stringify({name:username, score:stats.totalScore, uuid:userUuid})
+                });
+            } catch (e) {
+                // Silently fail if KV/API is unavailable
+            }
+        }
+        
+        async function loadGlobalLeaderboard() {
+            const glb = document.getElementById('global-leaderboard');
+            const glbSection = document.getElementById('global-leaderboard-section');
+            try {
+                const res = await fetch(API_URL);
+                if (!res.ok) throw new Error();
+                const data = await res.json();
+                if (data && data.length > 0) {
+                    glb.innerHTML = data.map((l, i) => `<div class="leaderboard-item ${l.uuid === userUuid ? 'highlight' : ''}"><span><span class="rank">${i+1}</span> ${l.name}</span><span style="font-weight:800">${l.score}</span></div>`).join('');
+                    // glbSection.style.display = 'block'; // Keeping it hidden as requested
+                }
+            } catch (e) { 
+                glbSection.style.display = 'none';
+            }
+        }
+
+        function loadPersonalLeaderboard() {
+            const plb = document.getElementById('leaderboard');
+            plb.innerHTML = `<div class="leaderboard-item highlight"><span><span class="rank">#</span> ${username || 'Siz'}</span><span style="font-weight:800">${stats.totalScore}</span></div>`;
+        }
+
+        window.toggleStats = function() {
+            const s = document.getElementById('stats-overlay');
+            if (s.style.display === 'flex') s.style.display = 'none';
+            else {
+                document.getElementById('stats-played').textContent = stats.played;
+                document.getElementById('stats-score').textContent = stats.totalScore;
+                document.getElementById('stats-streak').textContent = stats.streak;
+                document.getElementById('stats-max').textContent = stats.maxStreak;
+                loadPersonalLeaderboard();
+                loadGlobalLeaderboard();
+                s.style.display = 'flex';
+            }
+        };
+
+        function registerUser() { 
+            const val = usernameInput.value.trim(); 
+            if (!val) return showToast("İSİM GEREKLİ");
+            username = val; localStorage.setItem('futbol_wordle_username', val);
+            loginOverlay.style.display = 'none';
+            syncScore();
+        }
+
+        function showEndGame(win) {
+            document.getElementById('modal-title').textContent = win ? "ZAFER! 🏆" : "KAYBETTİN! ⚽";
+            toggleStats();
+            if (currentGameMode === 'daily') {
+                saveDailyState(true, win);
+                setTimeout(showCountdownInModal, 300);
+            }
+        }
+
+        window.addEventListener('load', init);
+        window.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && loginOverlay.style.display === 'flex') registerUser();
+            else handleInput(e.key.toUpperCase());
+        });
+    </script>
+</body>
+</html>ntent="width=device-width, initial-scale=1.0">
     <title>Elite Football Wordle & Quiz</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -173,71 +1341,21 @@
         const MANAGERS = ['Fatih Terim', 'Jose Mourinho', 'Pep Guardiola', 'Jurgen Klopp', 'Carlo Ancelotti', 'Okan Buruk', 'Sergen Yalcin', 'Ismail Kartal', 'Jorge Jesus', 'Senol Gunes', 'Xabi Alonso', 'Mikel Arteta', 'Zinedine Zidane'];
 
         const QUIZ_DATA = [
-    { name: 'Galatasaray', logo: 'https://upload.wikimedia.org/wikipedia/en/3/31/Galatasaray_Star_Logo.svg' },
-    { name: 'Fenerbahce', logo: 'https://upload.wikimedia.org/wikipedia/en/3/39/Fenerbah%C3%A7e_SK_Logo.svg' },
-    { name: 'Besiktas', logo: 'https://upload.wikimedia.org/wikipedia/en/7/7b/Besiktas_JK_Logo.svg' },
-    { name: 'Trabzonspor', logo: 'https://upload.wikimedia.org/wikipedia/en/a/a3/Trabzonspor_Logo.svg' },
-    { name: 'Real Madrid', logo: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg' },
-    { name: 'Barcelona', logo: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_logo.svg' },
-    { name: 'Manchester City', logo: 'https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg' },
-    { name: 'Bayern Munich', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg' },
-    { name: 'Arsenal', logo: 'https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg' },
-    { name: 'Liverpool', logo: 'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg' },
-    { name: 'PSG', logo: 'https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg' },
-    { name: 'Inter Milan', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg' },
-    { name: 'AC Milan', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg' },
-    { name: 'Juventus', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Juventus_FC_2017_icon_%28black%29.svg' },
-
-    { name: 'Chelsea', logo: 'https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg' },
-    { name: 'Manchester United', logo: 'https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg' },
-    { name: 'Tottenham', logo: 'https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg' },
-    { name: 'Newcastle United', logo: 'https://upload.wikimedia.org/wikipedia/en/5/56/Newcastle_United_Logo.svg' },
-    { name: 'Aston Villa', logo: 'https://upload.wikimedia.org/wikipedia/en/f/f9/Aston_Villa_FC_crest_%282024%29.svg' },
-    { name: 'West Ham', logo: 'https://upload.wikimedia.org/wikipedia/en/c/c2/West_Ham_United_FC_logo.svg' },
-
-    { name: 'Atletico Madrid', logo: 'https://upload.wikimedia.org/wikipedia/en/f/f4/Atletico_Madrid_2017_logo.svg' },
-    { name: 'Sevilla', logo: 'https://upload.wikimedia.org/wikipedia/en/3/3b/Sevilla_FC_logo.svg' },
-    { name: 'Valencia', logo: 'https://upload.wikimedia.org/wikipedia/en/c/ce/Valenciacf.svg' },
-    { name: 'Villarreal', logo: 'https://upload.wikimedia.org/wikipedia/en/7/70/Villarreal_CF_logo.svg' },
-    { name: 'Real Betis', logo: 'https://upload.wikimedia.org/wikipedia/en/1/13/Real_betis_logo.svg' },
-
-    { name: 'Borussia Dortmund', logo: 'https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg' },
-    { name: 'RB Leipzig', logo: 'https://upload.wikimedia.org/wikipedia/en/0/04/RB_Leipzig_2014_logo.svg' },
-    { name: 'Bayer Leverkusen', logo: 'https://upload.wikimedia.org/wikipedia/en/5/59/Bayer_04_Leverkusen_logo.svg' },
-    { name: 'Eintracht Frankfurt', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/04/Eintracht_Frankfurt_Logo.svg' },
-    { name: 'Wolfsburg', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f3/Logo-VfL-Wolfsburg.svg' },
-
-    { name: 'Napoli', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/2d/SSC_Neapel.svg' },
-    { name: 'Roma', logo: 'https://upload.wikimedia.org/wikipedia/en/f/f7/AS_Roma_logo_%282017%29.svg' },
-    { name: 'Lazio', logo: 'https://upload.wikimedia.org/wikipedia/en/c/ce/S.S._Lazio_badge.svg' },
-    { name: 'Atalanta', logo: 'https://upload.wikimedia.org/wikipedia/en/6/66/AtalantaBC.svg' },
-    { name: 'Fiorentina', logo: 'https://upload.wikimedia.org/wikipedia/en/f/f2/ACF_Fiorentina_2.svg' },
-
-    { name: 'Benfica', logo: 'https://upload.wikimedia.org/wikipedia/en/a/a2/SL_Benfica_logo.svg' },
-    { name: 'Porto', logo: 'https://upload.wikimedia.org/wikipedia/en/f/f1/FC_Porto.svg' },
-    { name: 'Sporting CP', logo: 'https://upload.wikimedia.org/wikipedia/en/e/e1/Sporting_Clube_de_Portugal.svg' },
-
-    { name: 'Ajax', logo: 'https://upload.wikimedia.org/wikipedia/en/7/79/Ajax_Amsterdam.svg' },
-    { name: 'PSV Eindhoven', logo: 'https://upload.wikimedia.org/wikipedia/en/e/e1/PSV_Eindhoven.svg' },
-    { name: 'Feyenoord', logo: 'https://upload.wikimedia.org/wikipedia/en/b/b1/Feyenoord_logo.svg' },
-
-    { name: 'Celtic', logo: 'https://upload.wikimedia.org/wikipedia/en/3/35/Celtic_FC.svg' },
-    { name: 'Rangers', logo: 'https://upload.wikimedia.org/wikipedia/en/4/43/Rangers_FC.svg' },
-
-    { name: 'Al Nassr', logo: 'https://upload.wikimedia.org/wikipedia/en/a/a0/Al-Nassr_FC_logo.svg' },
-    { name: 'Al Hilal', logo: 'https://upload.wikimedia.org/wikipedia/en/e/e1/Al_Hilal_SFC_Logo.svg' },
-
-    { name: 'Flamengo', logo: 'https://upload.wikimedia.org/wikipedia/commons/4/43/Flamengo_braz_logo.svg' },
-    { name: 'Palmeiras', logo: 'https://upload.wikimedia.org/wikipedia/en/1/10/Palmeiras_logo.svg' },
-    { name: 'River Plate', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Logo_River_Plate.svg' },
-    { name: 'Boca Juniors', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/35/Boca_Juniors_logo18.svg' },
-
-    { name: 'Samsunspor', logo: 'https://upload.wikimedia.org/wikipedia/tr/4/49/Samsunspor.png' },
-    { name: 'Basaksehir', logo: 'https://upload.wikimedia.org/wikipedia/tr/0/09/%C4%B0stanbul_Ba%C5%9Fak%C5%9Fehir_FK.png' },
-    { name: 'Konyaspor', logo: 'https://upload.wikimedia.org/wikipedia/tr/7/7f/Konyaspor.png' },
-    { name: 'Antalyaspor', logo: 'https://upload.wikimedia.org/wikipedia/tr/8/8b/Antalyaspor_logo.png' },
-    { name: 'Adana Demirspor', logo: 'https://upload.wikimedia.org/wikipedia/tr/5/57/Adana_Demirspor.png' }
-];
+            { name: 'Galatasaray', logo: 'https://upload.wikimedia.org/wikipedia/en/3/31/Galatasaray_Star_Logo.svg' },
+            { name: 'Fenerbahce', logo: 'https://upload.wikimedia.org/wikipedia/en/3/39/Fenerbah%C3%A7e_SK_Logo.svg' },
+            { name: 'Besiktas', logo: 'https://upload.wikimedia.org/wikipedia/en/7/7b/Besiktas_JK_Logo.svg' },
+            { name: 'Trabzonspor', logo: 'https://upload.wikimedia.org/wikipedia/en/a/a3/Trabzonspor_Logo.svg' },
+            { name: 'Real Madrid', logo: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg' },
+            { name: 'Barcelona', logo: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_logo.svg' },
+            { name: 'Manchester City', logo: 'https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg' },
+            { name: 'Bayern Munich', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg' },
+            { name: 'Arsenal', logo: 'https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg' },
+            { name: 'Liverpool', logo: 'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg' },
+            { name: 'PSG', logo: 'https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg' },
+            { name: 'Inter Milan', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg' },
+            { name: 'AC Milan', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg' },
+            { name: 'Juventus', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Juventus_FC_2017_icon_%28black%29.svg' }
+        ];
 
         // State
         let currentGameMode = localStorage.getItem('futbol_wordle_mode') || 'club';
@@ -253,7 +1371,7 @@
         const loginOverlay = document.getElementById('login-overlay');
         const usernameInput = document.getElementById('username-input');
 
-        function normalize(str) { return str.toUpperCase().replace(/[İIĞÜŞÖÇ]/g, m => ({'İ':'I','I':'I','Ğ':'G','Ü':'U','Ş':'S','Ö':'O','Ç':'C'}[m])).normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Z]/g, ''); }
+        function normalize(str) { return str.toUpperCase().replace(/[İIĞÜŞÖÇ]/g, m => ({'İ':'I','I':'I','Ğ':'G','Ü':'U','Ş':'S','Ö':'O','Ç':'C'}[m])).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^A-Z]/g, ''); }
 
         function switchMode(mode) {
             localStorage.setItem('futbol_wordle_mode', mode);
