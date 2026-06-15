@@ -75,7 +75,6 @@
             font-size: 1.2rem;
         }
         .icon-btn:hover { background: rgba(255,255,255,0.15); }
-        
         .mode-container {
             display: flex;
             flex-direction: column;
@@ -106,7 +105,6 @@
         }
         .mode-btn.active { background: var(--accent); color: #fff; box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
         .mode-btn.active-green { background: var(--correct); color: #000; box-shadow: 0 4px 12px rgba(74,222,128,0.3); }
-
         #game-container {
             display: flex;
             flex-direction: column;
@@ -160,7 +158,7 @@
             cursor: pointer;
             text-transform: uppercase;
             flex: 1;
-            transition: background 0.15s, color 0.15s;
+            transition: background 0.15s, color 0.15s, border-color 0.15s;
             font-size: 0.82rem;
             -webkit-tap-highlight-color: transparent;
             min-width: 0;
@@ -256,8 +254,7 @@
 
 <header>
     <div class="header-actions">
-        <!-- İPUCU BUTONU BURAYA EKLENDİ (Başta Gizli) -->
-        <button class="icon-btn" id="hint-btn" onclick="useHint()" title="İpucu Al" style="display: none; border-color: var(--present);">💡</button>
+        <button class="icon-btn" id="hint-btn" onclick="useHint()" title="İpucu Al" style="display:none; border-color:var(--present);">💡</button>
         <button class="icon-btn" onclick="toggleStats()" title="İstatistikler">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
         </button>
@@ -275,9 +272,7 @@
         <button class="mode-btn" id="mode-daily" onclick="switchPlayType(true)">📅 GÜNÜN</button>
         <button class="mode-btn" id="mode-endless" onclick="switchPlayType(false)">♾️ SERBEST</button>
     </div>
-    
-    <!-- LOGO QUIZ GEÇİŞ BUTONU -->
-    <button onclick="window.location.href='logo-quiz.html'" style="margin-top: 12px; width: 100%; background: linear-gradient(135deg, #3b82f6 0%, #a5b4fc 100%); color: #000; border: none; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 0.9rem; transition: opacity 0.2s; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);">
+    <button onclick="window.location.href='logo-quiz.html'" style="margin-top:12px;width:100%;background:linear-gradient(135deg,#3b82f6 0%,#a5b4fc 100%);color:#000;border:none;padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-size:0.9rem;transition:opacity 0.2s;box-shadow:0 4px 15px rgba(59,130,246,0.4);">
         🛡️ LOGO QUIZ OYNA ➔
     </button>
 </div>
@@ -349,36 +344,183 @@
 <div id="toast" class="toast"></div>
 
 <script>
+// ===================== VERİ TABANI =====================
 const CLUBS = [
+    // Süper Lig
     'Fenerbahce','Galatasaray','Besiktas','Trabzonspor','Basaksehir',
     'Kasimpasa','Sivasspor','Alanyaspor','Antalyaspor','Rizespor',
     'Eyupspor','Goztepe','Gaziantep','Samsunspor','Bodrumspor',
     'Konyaspor','Adana Demirspor','Hatayspor','Kayserispor','Karagumruk',
+    'Ankaragucu','Istanbulspor','Pendikspor','Sakaryaspor','Boluspor',
+    'Genclerbirligi','Bursaspor','Altay','Denizlispor','Giresunspor',
+    // Premier League
     'Manchester City','Arsenal','Liverpool','Aston Villa','Tottenham',
     'Chelsea','Newcastle','Manchester United','West Ham','Brighton',
+    'Everton','Leicester City','Wolves','Fulham','Crystal Palace',
+    'Brentford','Bournemouth','Nottingham Forest','Southampton','Ipswich Town',
+    'Leeds United','Sheffield United','Burnley','Watford','Sunderland',
+    'Middlesbrough','Norwich City','Blackburn','Swansea City','Cardiff City',
+    'Stoke City','Derby County','Millwall','Coventry City','Preston',
+    // La Liga
     'Real Madrid','Barcelona','Atletico Madrid','Athletic Bilbao','Real Sociedad',
+    'Real Betis','Villarreal','Valencia','Sevilla','Girona',
+    'Osasuna','Getafe','Celta Vigo','Mallorca','Las Palmas',
+    'Espanyol','Deportivo Alaves','Rayo Vallecano','Real Valladolid','Leganes',
+    'Real Zaragoza','Granada','Almeria','Elche','Cadiz',
+    'Deportivo','Recreativo','Numancia','Racing Santander',
+    // Serie A
     'Inter Milan','AC Milan','Juventus','Atalanta','Bologna',
+    'AS Roma','Lazio','Fiorentina','Napoli','Torino',
+    'Monza','Genoa','Udinese','Cagliari','Verona',
+    'Empoli','Lecce','Como','Parma','Venezia',
+    'Palermo','Sampdoria','Brescia','Frosinone','Spezia',
+    'Pescara','Reggina','Chievo','Siena','Catania',
+    // Bundesliga
     'Bayer Leverkusen','Bayern Munich','Stuttgart','RB Leipzig','Borussia Dortmund',
+    'Eintracht Frankfurt','Hoffenheim','Heidenheim','Werder Bremen','Freiburg',
+    'Augsburg','Wolfsburg','Monchengladbach','Mainz 05','Union Berlin',
+    'St Pauli','Hertha Berlin','Schalke','Hamburger SV','Hannover',
+    'Kaiserslautern','Nurnberg','Paderborn','Bochum','Darmstadt',
+    'Arminia Bielefeld','Greuther Furth','Sandhausen',
+    // Ligue 1
     'PSG','Monaco','Lille','Brest','Nice',
-    'Ajax','PSV Eindhoven','Feyenoord',
-    'Benfica','Porto','Sporting CP',
-    'Boca Juniors','River Plate','Flamengo','Palmeiras'
+    'Lyon','Lens','Marseille','Reims','Rennes',
+    'Toulouse','Montpellier','Strasbourg','Saint-Etienne','Nantes',
+    'Metz','Lorient','Auxerre','Angers','Caen',
+    'Bordeaux','Valenciennes','Guingamp','Troyes','Ajaccio',
+    // Hollanda
+    'Ajax','PSV Eindhoven','Feyenoord','AZ Alkmaar','Twente',
+    'Utrecht','Vitesse','Heerenveen','Groningen','Sparta Rotterdam',
+    // Portekiz
+    'Benfica','Porto','Sporting CP','Braga','Vitoria Guimaraes',
+    'Boavista','Rio Ave','Maritimo','Setubal',
+    // İskoçya
+    'Celtic','Rangers','Hearts','Hibernian','Aberdeen',
+    'Motherwell','Dundee','Kilmarnock',
+    // Belçika
+    'Brugge','Anderlecht','Gent','Antwerp','Standard Liege',
+    'Genk','Charleroi','Mechelen',
+    // Diğer Avrupa
+    'Shakhtar','Dynamo Kyiv','Panathinaikos','Olympiakos','PAOK',
+    'AEK Athens','Slavia Prague','Sparta Prague','Legia Warsaw',
+    'Steaua Bucharest','Dinamo Zagreb','Red Star Belgrade','Partizan',
+    'Rapid Wien','Salzburg','Sturm Graz','Galatasaray',
+    'Young Boys','Basel','Zurich','Servette',
+    'Rosenborg','Molde','Viking','Malmo','IFK Goteborg',
+    'Fenerbahce','HJK Helsinki','Vikingur','Shamrock Rovers',
+    // Güney Amerika
+    'Flamengo','Palmeiras','Santos','Sao Paulo','Corinthians',
+    'Atletico Mineiro','Gremio','Internacional','Fluminense','Vasco',
+    'Boca Juniors','River Plate','Independiente','Racing Club','San Lorenzo',
+    'Estudiantes','Lanus','Huracan','Colon','Rosario Central',
+    'Nacional','Penarol','Colo Colo','Universidad Chile','Universidad Catolica',
+    'LDU Quito','Olimpia','Cerro Porteno','Libertad',
+    // Dünya
+    'Al Hilal','Al Nassr','Al Ittihad','Al Ahly','Wydad',
+    'Mamelodi Sundowns','Zamalek','TP Mazembe',
+    'LA Galaxy','Seattle Sounders','Inter Miami','Toronto FC','New York City',
+    'Portland Timbers','Atlanta United','New England Revolution',
+    'Monterrey','America','Cruz Azul','Chivas','Tigres','Toluca','Santos Laguna',
+    'Kashima Antlers','Urawa Reds','Gamba Osaka','Yokohama','Vissel Kobe',
+    'Ulsan Hyundai','Jeonbuk','Seoul','Suwon',
+    'Melbourne City','Sydney FC','Western Sydney','Auckland City',
+    'Raja Casablanca','Espérance','Ahly Benghazi',
 ];
 
 const PLAYERS = [
+    // Mega Starlar
     'Cristiano Ronaldo','Lionel Messi','Kylian Mbappe','Erling Haaland','Jude Bellingham',
     'Vinicius Junior','Harry Kane','Kevin De Bruyne','Mohamed Salah','Rodri',
     'Robert Lewandowski','Antoine Griezmann','Luka Modric','Karim Benzema','Neymar',
-    'Zinedine Zidane','Thierry Henry','Ronaldo Nazario','Ronaldinho','Kaka',
+    'Kaka','Ronaldinho','Zinedine Zidane','Thierry Henry','Ronaldo Nazario',
+    'Zlatan Ibrahimovic','Didier Drogba','Samuel Eto','Gianluigi Buffon','Andres Iniesta',
+    'Xavi Hernandez','Sergio Ramos','Gerard Pique','Paolo Maldini','Franco Baresi',
+    'Alessandro Del Piero','Roberto Baggio','Gabriel Batistuta','Romario','Rivaldo',
+    'Michael Ballack','Oliver Kahn','Miroslav Klose','Lothar Matthaus','Franz Beckenbauer',
+    'Dennis Bergkamp','Patrick Vieira','Roy Keane','Steven Gerrard','Frank Lampard',
+    'Paul Scholes','Ryan Giggs','Wayne Rooney','Alan Shearer','Michael Owen',
+    'Robbie Fowler','Peter Schmeichel','Edwin van der Sar','Iker Casillas','Dino Zoff',
+    'Gerd Muller','Jurgen Klinsmann','Uwe Seeler','Karl-Heinz Rummenigge',
+    'Marco van Basten','Ruud Gullit','Johan Cruyff','Diego Maradona','Pele',
+    'Eusebio','George Best','Bobby Charlton','Bobby Moore','Gordon Banks',
+    'Roberto Carlos','Cafu','Phillip Lahm','Carles Puyol','John Terry',
+    'Rio Ferdinand','Nemanja Vidic','Jamie Carragher','Ashley Cole',
+    // Türk Yıldızlar
     'Arda Guler','Ferdi Kadioglu','Kerem Akturkoglu','Baris Alper Yilmaz','Semih Kilicsoy',
     'Ismail Yuksek','Caglar Soyuncu','Mert Gunok','Hakan Calhanoglu','Kenan Yildiz',
-    'Mauro Icardi','Dusan Tadic','Edin Dzeko','Sebastian Szymanski','Fred',
-    'Victor Osimhen','Allan Saint-Maximin','Rafa Silva','Ciro Immobile','Gedson Fernandes',
+    'Can Uzun','Okay Yokuslu','Orkun Kokcu','Zeki Celik','Merih Demiral',
+    'Altay Bayindir','Ugurcan Cakir','Irfan Can Kahveci','Cengiz Under','Yusuf Yazici',
+    'Dorukhan Tokoz','Ozan Kabak','Enes Unal','Umut Bozok','Vedat Muriqi',
+    'Emre Belozoglu','Tugay Kerimoglu','Ilhan Mansiz','Nihat Kahveci','Hasan Sas',
+    'Tuncay Sanli','Gokdeniz Karadeniz','Servet Cetin','Samet Akaydin','Kaan Ayhan',
+    'Halil Akbunar','Michy Batshuayi','Hakim Ziyech','Dries Mertens','Wesley Sneijder',
+    'Radamel Falcao','Ryan Babel','Sofyan Amrabat','Lucas Torreira','Davinson Sanchez',
+    'En-Nesyri','Allan Saint-Maximin','Victor Osimhen','Mauro Icardi','Dusan Tadic',
+    'Edin Dzeko','Sebastian Szymanski','Fred','Rafa Silva','Ciro Immobile',
+    'Gedson Fernandes','Harun Tekin','Volkan Demirel','Rustu Recber',
+    // Premier League
     'Phil Foden','Bukayo Saka','Declan Rice','Martin Odegaard','Cole Palmer',
+    'Virgil van Dijk','Alisson Becker','Bruno Fernandes','Marcus Rashford','Son Heung-min',
+    'Ollie Watkins','Alexis Mac Allister','William Saliba','Jarrod Bowen','Eberechi Eze',
+    'Richarlison','Anthony Gordon','Gabriel Martinelli','Leandro Trossard','Jurrien Timber',
+    'Dominic Solanke','Ivan Toney','Callum Wilson','Alexander Isak','Fabian Schar',
+    'James Maddison','Heung-min Son','Cristian Romero','Pedro Porro','Brennan Johnson',
+    'Nicolas Jackson','Enzo Fernandez','Ben Chilwell','Reece James','Trent Alexander-Arnold',
+    'Andrew Robertson','Joe Gomez','Ibrahima Konate','Darwin Nunez','Diogo Jota',
+    'Erling Haaland','Jeremy Doku','Bernardo Silva','Kyle Walker','Ruben Dias',
+    // La Liga
     'Lamine Yamal','Pedri','Gavi','Federico Valverde','Rodrygo Goes',
-    'Florian Wirtz','Jamal Musiala','Xavi Simons','Rafael Leao','Lautaro Martinez'
+    'Aurelien Tchouameni','Eduardo Camavinga','Eder Militao','Ronald Araujo','Nico Williams',
+    'Dani Olmo','Julian Alvarez','Conor Gallagher','Alexander Sorloth','Vitor Roque',
+    'Endrick','Dean Huijsen','Dani Ceballos','Lucas Vazquez','Nacho Fernandez',
+    'Ferran Torres','Joao Felix','Marcos Llorente','Jose Gimenez','Jan Oblak',
+    'Unai Simon','Alejandro Balde','Jules Kounde','Raphinha','Robert Lewandowski',
+    // Bundesliga
+    'Florian Wirtz','Jamal Musiala','Xavi Simons','Granit Xhaka','Victor Boniface',
+    'Serge Gnabry','Leroy Sane','Joshua Kimmich','Alphonso Davies','Alejandro Grimaldo',
+    'Jonathan Tah','Exequiel Palacios','Amine Adli','Patrik Schick','Chris Fuhrich',
+    'Thomas Muller','Manuel Neuer','Leon Goretzka','Dayot Upamecano','Kingsley Coman',
+    'Sadio Mane','Harry Kane','Min-jae Kim','Konrad Laimer','Mathys Tel',
+    'Marco Reus','Marco Rose','Niklas Sule','Mats Hummels','Sven Bender',
+    // Serie A
+    'Rafael Leao','Lautaro Martinez','Marcus Thuram','Nicolo Barella','Theo Hernandez',
+    'Dusan Vlahovic','Paulo Dybala','Khvicha Kvaratskhelia','Christian Pulisic','Douglas Luiz',
+    'Ademola Lookman','Gianluca Scamacca','Davide Frattesi','Federico Chiesa','Matteo Guendouzi',
+    'Lorenzo Pellegrini','Romelu Lukaku','Stephan El Shaarawy','Alessandro Bastoni','Hakan Calhanoglu',
+    'Piotr Zielinski','Matteo Darmian','Federico Dimarco','Yann Bisseck','Carlos Augusto',
+    'Mike Maignan','Malick Thiaw','Fikayo Tomori','Ruben Loftus-Cheek','Samuel Chukwueze',
+    // Ligue 1
+    'Bradley Barcola','Ousmane Dembele','Warren Zaire-Emery','Jonathan David','Achraf Hakimi',
+    'Vitinha','Mason Greenwood','Khephren Thuram','Elye Wahi','Rayan Cherki',
+    'Amine Harit','Alexandre Lacazette','Pierre-Emerick Aubameyang','Karl Toko Ekambi',
+    'Amine Adli','Wissam Ben Yedder','Sofiane Boufal','Nabil Fekir','Houssem Aouar',
+    // Kaleciler
+    'Thibaut Courtois','Gianluigi Donnarumma','Marc-Andre ter Stegen','Jan Oblak',
+    'Ederson','Andre Onana','David Raya','Gregor Kobel','Mike Maignan',
+    'Emiliano Martinez','Yann Sommer','Giorgi Mamardashvili','Ivan Provedel',
+    // Güney Amerika
+    'Enzo Fernandez','Alejandro Garnacho','Giovani Lo Celso','Rodrigo De Paul',
+    'Lautaro Martinez','Julian Alvarez','Paulo Dybala','Lionel Scaloni',
+    'Rodrygo Goes','Richarlison','Raphinha','Lucas Paqueta','Endrick',
+    'Luis Suarez','Darwin Nunez','Federico Valverde','Ronald Araujo','Jose Gimenez',
+    'Alexis Sanchez','Arturo Vidal','Claudio Bravo','Gary Medel','Eduardo Vargas',
+    'James Rodriguez','David Ospina','Radamel Falcao','Juan Cuadrado','Luis Diaz',
+    'Davinson Sanchez','Johan Mojica','Jhon Duran',
+    // Efsaneler
+    'Eric Cantona','David Beckham','Ronaldinho','Robinho','Adriano',
+    'Riquelme','Tevez','Aguero','Hernan Crespo','Ariel Ortega',
+    'Hristo Stoichkov','Davor Suker','Predrag Mijatovic','Clarence Seedorf',
+    'Patrick Kluivert','Marc Overmars','Arjen Robben','Rafael van der Vaart',
+    'Ruud van Nistelrooy','Phillip Cocu','Edgar Davids','Frank Rijkaard',
+    'Paolo Rossi','Luca Toni','Christian Vieri','Filippo Inzaghi','Francesco Totti',
+    'David Trezeguet','Nicolas Anelka','Emmanuel Petit','Marcel Desailly','Lilian Thuram',
+    'Claude Makelele','Robert Pires','Sylvain Wiltord','William Gallas',
+    'Ji-sung Park','Shinji Kagawa','Keisuke Honda','Shinji Okazaki',
+    'Didier Drogba','Michael Essien','Emmanuel Adebayor','Jay-Jay Okocha',
+    'El Hadji Diouf','Nwankwo Kanu','Finidi George','Austin Jay-Jay Okocha',
 ];
 
+// ===================== OYUN MOTORU =====================
 function normalize(str) {
     return str.toUpperCase()
         .replace(/İ/g,'I').replace(/Ğ/g,'G').replace(/Ü/g,'U')
@@ -392,14 +534,11 @@ let wordList = currentGameMode === 'club' ? CLUBS : PLAYERS;
 
 function getTargetWord(list, isDaily) {
     if (!isDaily) return list[Math.floor(Math.random() * list.length)];
-    
     const today = new Date();
-    const modeOffset = currentGameMode === 'club' ? 1 : 2; 
+    const modeOffset = currentGameMode === 'club' ? 1 : 2;
     const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate() + modeOffset;
-    
     const x = Math.sin(seed) * 10000;
-    const index = Math.floor((x - Math.floor(x)) * list.length);
-    return list[index];
+    return list[Math.floor((x - Math.floor(x)) * list.length)];
 }
 
 let rawTarget = getTargetWord(wordList, isDailyMode);
@@ -434,10 +573,8 @@ function switchPlayType(daily) {
 function initBoard() {
     document.getElementById('mode-club').classList.toggle('active', currentGameMode === 'club');
     document.getElementById('mode-player').classList.toggle('active', currentGameMode === 'player');
-    
     document.getElementById('mode-daily').classList.toggle('active-green', isDailyMode);
     document.getElementById('mode-endless').classList.toggle('active-green', !isDailyMode);
-
     document.getElementById('game-subtitle').textContent = currentGameMode === 'club' ? 'THE ULTIMATE CLUB CHALLENGE' : 'GUESS THE STAR PLAYER';
 
     const board = document.getElementById('game-board');
@@ -467,24 +604,18 @@ function showToast(msg) {
 
 function useHint() {
     if (hintUsed || gameOver) return;
-    
     let foundLetters = new Set();
-    for(let i=0; i<currentRow; i++) {
-        guesses[i].forEach(ch => foundLetters.add(ch));
-    }
-    
-    let missingLetters = targetLettersOnly.split('').filter(ch => !foundLetters.has(ch));
-    
-    if(missingLetters.length > 0) {
-        let randomHint = missingLetters[Math.floor(Math.random() * missingLetters.length)];
-        showToast(`💡 İPUCU: Kelimede kesinlikle "${randomHint}" harfi var!`);
+    for (let i = 0; i < currentRow; i++) guesses[i].forEach(ch => foundLetters.add(ch));
+    let missing = targetLettersOnly.split('').filter(ch => !foundLetters.has(ch));
+    if (missing.length > 0) {
+        showToast(`💡 İPUCU: Kelimede "${missing[Math.floor(Math.random()*missing.length)]}" harfi var!`);
     } else {
-        showToast(`💡 İPUCU: Bütün harfleri zaten buldun, sadece yerleri yanlış!`);
+        showToast('💡 Bütün harfleri buldun, sadece yerleri yanlış!');
     }
-    
     hintUsed = true;
-    document.getElementById('hint-btn').style.opacity = '0.4';
-    document.getElementById('hint-btn').style.cursor = 'not-allowed';
+    const btn = document.getElementById('hint-btn');
+    btn.style.opacity = '0.4';
+    btn.style.cursor = 'not-allowed';
 }
 
 function updateBoard() {
@@ -501,12 +632,12 @@ function submitGuess() {
         const row = document.getElementById(`row-${currentRow}`);
         row.classList.add('shake');
         setTimeout(() => row.classList.remove('shake'), 400);
-        showToast("YETERSİZ HARF");
+        showToast('YETERSİZ HARF');
         return;
     }
 
     if (currentGameMode === 'club' && guess === normalize('Galatasaray')) {
-        showToast("Cidden mi? Limon sıktın keyfimize... 🍋");
+        showToast('Cidden mi? Limon sıktın keyfimize... 🍋');
     }
 
     const rowTiles = document.querySelectorAll(`#row-${currentRow} .tile:not(.space)`);
@@ -514,7 +645,11 @@ function submitGuess() {
     const guessArr = guess.split('');
     const states = new Array(letterCount).fill('absent');
 
-    guessArr.forEach((ch, i) => { if (ch === targetArr[i]) { states[i] = 'correct'; targetArr[i] = null; } });
+    // Önce doğru yerdekiler
+    guessArr.forEach((ch, i) => {
+        if (ch === targetArr[i]) { states[i] = 'correct'; targetArr[i] = null; }
+    });
+    // Sonra yanlış yerdekiler
     guessArr.forEach((ch, i) => {
         if (states[i] !== 'correct') {
             const idx = targetArr.indexOf(ch);
@@ -522,6 +657,7 @@ function submitGuess() {
         }
     });
 
+    // Tile + klavye renklendirmesi (cascade animasyon)
     const KB_PRIORITY = { correct: 3, present: 2, absent: 1 };
     states.forEach((state, i) => {
         setTimeout(() => {
@@ -536,16 +672,15 @@ function submitGuess() {
 
     const isWin = guess === targetLettersOnly;
     const delay = letterCount * 120 + 400;
-    
+
     if (isWin || currentRow === attempts - 1) {
         gameOver = true;
         updateStats(isWin);
         setTimeout(() => showEndGame(isWin), delay);
     } else {
-        setTimeout(() => { 
-            currentRow++; 
-            currentLetterIndex = 0; 
-            
+        setTimeout(() => {
+            currentRow++;
+            currentLetterIndex = 0;
             if (currentRow >= 2 && !hintUsed) {
                 document.getElementById('hint-btn').style.display = 'flex';
             }
@@ -582,14 +717,8 @@ window.toggleStats = function() {
         ? stats.bestRuns.map((r,i) => `<div class="leaderboard-item"><span><span class="rank">#${i+1}</span>${r.club}</span><span style="opacity:.6">${r.guesses} deneme</span></div>`).join('')
         : '<p style="text-align:center;opacity:.3;font-size:.7rem;">Henüz galibiyet yok</p>';
 
-    // TEMİZLENMİŞ LOKAL LİDERLİK TABLOSU
-    const fakeDBPlayers = [
-        {name: username || "Sen", score: stats.wins || 0, isUser: true}
-    ];
-
-    document.getElementById('global-leaderboard').innerHTML = fakeDBPlayers.map((l,i) =>
-        `<div class="leaderboard-item ${l.isUser?'highlight':''}"><span><span class="rank">${i+1}</span>${l.name}</span><span style="font-weight:800">${l.score}</span></div>`
-    ).join('');
+    document.getElementById('global-leaderboard').innerHTML =
+        `<div class="leaderboard-item highlight"><span><span class="rank">1</span>${username||'Sen'}</span><span style="font-weight:800">${stats.wins||0}</span></div>`;
 
     overlay.style.display = 'flex';
 };
@@ -600,15 +729,15 @@ function showEndGame(win) {
     if (win) {
         if (targetWord === normalize('Fenerbahce')) {
             modal.classList.add('win-fenerbahce');
-            title.innerHTML = "EN BÜYÜK FENERBAHÇE! 💛💙";
+            title.innerHTML = 'EN BÜYÜK FENERBAHÇE! 💛💙';
         } else if (targetWord === normalize('Galatasaray')) {
-            title.textContent = "Sarı-kırmızı bir tat... 🍋";
+            title.textContent = 'Sarı-kırmızı bir tat... 🍋';
         } else {
-            const msgs = ["G O O O A L ! ⚽","MÜKEMMEL! 🎯","HARIKA! 🔥","SÜPER! 💪","BRAVO! 👏"];
+            const msgs = ['G O O O A L ! ⚽','MÜKEMMEL! 🎯','HARIKA! 🔥','SÜPER! 💪','BRAVO! 👏'];
             title.textContent = msgs[currentRow] || msgs[0];
         }
     } else {
-        title.textContent = "OYUN BİTTİ: " + rawTarget;
+        title.textContent = 'OYUN BİTTİ: ' + rawTarget;
     }
     toggleStats();
 }
@@ -625,7 +754,7 @@ function handleInput(key) {
 
 function registerUser() {
     const val = document.getElementById('username-input').value.trim();
-    if (!val) { showToast("Bir isim gir!"); return; }
+    if (!val) { showToast('Bir isim gir!'); return; }
     saveUser(val);
     document.getElementById('login-overlay').style.display = 'none';
     showToast(`Hoş geldin, Manager ${val}! ⚽`);
