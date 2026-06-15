@@ -23,12 +23,22 @@
         body {
             background: var(--bg); color: var(--text);
             min-height: 100vh; display: flex; flex-direction: column;
-            align-items: center; padding: 20px; overflow-x: hidden;
+            align-items: center; padding: 20px 20px 40px 20px; overflow-x: hidden;
             user-select: none;
         }
-        header { text-align: center; margin-bottom: 30px; width: 100%; max-width: 500px; }
+        header { text-align: center; margin-bottom: 30px; width: 100%; max-width: 500px; position: relative; }
+        
+        /* Geri Dön Butonu */
+        .back-btn {
+            position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+            background: var(--glass); border: 1px solid var(--glass-border);
+            color: #fff; width: 40px; height: 40px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; text-decoration: none; font-size: 1.2rem;
+        }
+
         h1 {
-            font-size: 2.2rem; font-weight: 800; letter-spacing: -1px;
+            font-size: 2rem; font-weight: 800; letter-spacing: -1px;
             background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
@@ -45,7 +55,7 @@
             width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center;
         }
         .logo-container {
-            width: 200px; height: 200px; margin-bottom: 40px;
+            width: 220px; height: 220px; margin-bottom: 30px;
             display: flex; justify-content: center; align-items: center;
             background: #fff; border-radius: 24px; padding: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
@@ -53,8 +63,8 @@
         }
         .logo-img {
             max-width: 100%; max-height: 100%; object-fit: contain;
-            transition: filter 0.5s ease;
-            filter: blur(12px) grayscale(50%); /* Başlangıçta bulanık */
+            transition: filter 0.4s ease;
+            filter: blur(14px) grayscale(60%); /* Safari için biraz daha optimize edildi */
         }
         .logo-img.revealed { filter: blur(0) grayscale(0%); }
         
@@ -63,7 +73,7 @@
         }
         .option-btn {
             background: var(--glass); border: 1px solid var(--glass-border);
-            color: #fff; padding: 20px 10px; border-radius: 16px;
+            color: #fff; padding: 18px 10px; border-radius: 16px;
             font-size: 0.95rem; font-weight: 600; cursor: pointer;
             transition: all 0.2s; -webkit-tap-highlight-color: transparent;
         }
@@ -76,7 +86,7 @@
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px);
             background: #fff; color: #000; padding: 10px 22px; border-radius: 50px;
             font-weight: 700; font-size: 0.85rem; opacity: 0; pointer-events: none;
-            transition: all 0.3s; z-index: 100;
+            transition: all 0.3s; z-index: 100; white-space: nowrap;
         }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
@@ -84,6 +94,7 @@
 <body>
 
 <header>
+    <a href="index.html" class="back-btn">🏠</a>
     <h1>🛡️ LOGO QUIZ</h1>
     <div class="stats-bar">
         <div class="stat"><span class="stat-value" id="score">0</span><span class="stat-label">Güncel Seri</span></div>
@@ -93,7 +104,7 @@
 
 <div class="game-container">
     <div class="logo-container" id="logo-box">
-        <img id="logo" class="logo-img" src="" alt="Kulüp Logosu">
+        <!-- Resim artık JavaScript tarafından dinamik olarak buraya eklenecek -->
     </div>
     
     <div class="options-grid" id="options">
@@ -104,7 +115,7 @@
 <div id="toast" class="toast"></div>
 
 <script>
-// Wikimedia üzerinden çekilen yüksek kaliteli, arka plansız logolar
+// Çoğunluğu PNG formatına çevrildi (Safari SVG Blur hatasını önlemek için)
 const CLUBS = [
     { name: 'Fenerbahçe', logo: 'https://upload.wikimedia.org/wikipedia/tr/8/86/Fenerbah%C3%A7e_SK.png' },
     { name: 'Galatasaray', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f6/Galatasaray_Sports_Club_Logo.png' },
@@ -153,15 +164,26 @@ function shuffleArray(array) {
 
 function loadQuestion() {
     isWaiting = false;
-    const logoImg = document.getElementById('logo');
+    const logoBox = document.getElementById('logo-box');
     const optionsBox = document.getElementById('options');
-    
-    // Logoyu tekrar bulanık yap
-    logoImg.classList.remove('revealed');
     
     // Rastgele doğru cevabı seç
     currentClub = CLUBS[Math.floor(Math.random() * CLUBS.length)];
-    logoImg.src = currentClub.logo;
+
+    // SAFARİ BEYAZ EKRAN ÇÖZÜMÜ: Eski resmi tamamen sil, sıfırdan yeni resim elementi yarat
+    logoBox.innerHTML = '';
+    const newImg = document.createElement('img');
+    newImg.id = 'logo';
+    newImg.className = 'logo-img';
+    
+    // EĞER RESİM YÜKLENEMEZSE VEYA LİNK KIRIKSA: Anında atla ve yeni soru sor
+    newImg.onerror = function() {
+        console.warn(currentClub.name + " logosu yüklenemedi, pas geçiliyor!");
+        loadQuestion(); 
+    };
+
+    newImg.src = currentClub.logo;
+    logoBox.appendChild(newImg);
 
     // 3 Tane yanlış cevap seç
     let wrongClubs = CLUBS.filter(c => c.name !== currentClub.name);
@@ -193,7 +215,7 @@ function handleGuess(btn, guessedName) {
     allBtns.forEach(b => b.disabled = true);
     
     // Gizemi boz, logoyu netleştir!
-    logoImg.classList.add('revealed');
+    if (logoImg) logoImg.classList.add('revealed');
 
     if (guessedName === currentClub.name) {
         // Doğru Bildi
@@ -207,10 +229,9 @@ function handleGuess(btn, guessedName) {
             document.getElementById('high-score').textContent = highScore;
         }
 
-        // Fener bilindiyse ufak bir detay :)
         if(currentClub.name === 'Fenerbahçe') showToast("💛💙 BİLİNMEYECEK GİBİ DEĞİL!");
 
-        setTimeout(loadQuestion, 1500);
+        setTimeout(loadQuestion, 1200);
     } else {
         // Yanlış Bildi
         btn.classList.add('wrong');
