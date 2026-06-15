@@ -64,7 +64,7 @@
         .logo-img {
             max-width: 100%; max-height: 100%; object-fit: contain;
             transition: filter 0.4s ease;
-            filter: blur(14px) grayscale(60%); /* Safari için biraz daha optimize edildi */
+            filter: blur(14px) grayscale(60%);
         }
         .logo-img.revealed { filter: blur(0) grayscale(0%); }
         
@@ -104,7 +104,7 @@
 
 <div class="game-container">
     <div class="logo-container" id="logo-box">
-        <!-- Resim artık JavaScript tarafından dinamik olarak buraya eklenecek -->
+        <!-- Resim JS ile buraya eklenecek -->
     </div>
     
     <div class="options-grid" id="options">
@@ -115,7 +115,6 @@
 <div id="toast" class="toast"></div>
 
 <script>
-// Çoğunluğu PNG formatına çevrildi (Safari SVG Blur hatasını önlemek için)
 const CLUBS = [
     // Süper Lig
     { name: 'Fenerbahçe', logo: 'https://upload.wikimedia.org/wikipedia/tr/8/86/Fenerbah%C3%A7e_SK.png' },
@@ -204,6 +203,9 @@ let highScore = localStorage.getItem('logo_quiz_highscore') || 0;
 let currentClub = null;
 let isWaiting = false;
 
+// YENİ: Torba Sistemi için havuz
+let clubPool = []; 
+
 document.getElementById('high-score').textContent = highScore;
 
 function showToast(msg) {
@@ -225,16 +227,19 @@ function loadQuestion() {
     const logoBox = document.getElementById('logo-box');
     const optionsBox = document.getElementById('options');
     
-    // Rastgele doğru cevabı seç
-    currentClub = CLUBS[Math.floor(Math.random() * CLUBS.length)];
+    // TORBA SİSTEMİ: Havuz boşsa (hepsi sorulduysa) baştan doldur ve karıştır
+    if (clubPool.length === 0) {
+        clubPool = shuffleArray([...CLUBS]);
+    }
+    
+    // Havuzdan son takımı çekip listeden çıkar
+    currentClub = clubPool.pop();
 
-    // SAFARİ BEYAZ EKRAN ÇÖZÜMÜ: Eski resmi tamamen sil, sıfırdan yeni resim elementi yarat
     logoBox.innerHTML = '';
     const newImg = document.createElement('img');
     newImg.id = 'logo';
     newImg.className = 'logo-img';
     
-    // EĞER RESİM YÜKLENEMEZSE VEYA LİNK KIRIKSA: Anında atla ve yeni soru sor
     newImg.onerror = function() {
         console.warn(currentClub.name + " logosu yüklenemedi, pas geçiliyor!");
         loadQuestion(); 
@@ -243,7 +248,7 @@ function loadQuestion() {
     newImg.src = currentClub.logo;
     logoBox.appendChild(newImg);
 
-    // 3 Tane yanlış cevap seç
+    // 3 Tane yanlış cevap seç (Doğru cevap hariç tüm listeden)
     let wrongClubs = CLUBS.filter(c => c.name !== currentClub.name);
     wrongClubs = shuffleArray(wrongClubs).slice(0, 3);
     
@@ -272,11 +277,11 @@ function handleGuess(btn, guessedName) {
     // Tüm butonları tıklanamaz yap
     allBtns.forEach(b => b.disabled = true);
     
-    // Gizemi boz, logoyu netleştir!
+    // Logoyu netleştir
     if (logoImg) logoImg.classList.add('revealed');
 
     if (guessedName === currentClub.name) {
-        // Doğru Bildi
+        // DOĞRU
         btn.classList.add('correct');
         score++;
         document.getElementById('score').textContent = score;
@@ -289,62 +294,21 @@ function handleGuess(btn, guessedName) {
 
         if(currentClub.name === 'Fenerbahçe') showToast("💛💙 BİLİNMEYECEK GİBİ DEĞİL!");
 
-        // HIZLANDIRILDI: Doğru bilince sadece yarım saniye (500ms) bekler
+        // 0.5 saniye bekle ve yeni soruya geç
         setTimeout(loadQuestion, 500);
     } else {
-        // Yanlış Bildi
+        // YANLIŞ
         btn.classList.add('wrong');
         showToast("Seri Bozuldu! Doğrusu: " + currentClub.name);
         score = 0;
         document.getElementById('score').textContent = score;
         
-        // Doğru cevabı yeşil ile göster
         allBtns.forEach(b => {
             if (b.textContent === currentClub.name) b.classList.add('correct');
         });
 
-        // HIZLANDIRILDI: Yanlış bilince doğru cevabı görmek için 1.2 saniye (1200ms) bekler
+        // 1.2 saniye bekle ve yeni soruya geç
         setTimeout(loadQuestion, 1200);
-    }
-}
-
-    const logoImg = document.getElementById('logo');
-    const allBtns = document.querySelectorAll('.option-btn');
-    
-    // Tüm butonları tıklanamaz yap
-    allBtns.forEach(b => b.disabled = true);
-    
-    // Gizemi boz, logoyu netleştir!
-    if (logoImg) logoImg.classList.add('revealed');
-
-    if (guessedName === currentClub.name) {
-        // Doğru Bildi
-        btn.classList.add('correct');
-        score++;
-        document.getElementById('score').textContent = score;
-        
-        if (score > highScore) {
-            highScore = score;
-            localStorage.setItem('logo_quiz_highscore', highScore);
-            document.getElementById('high-score').textContent = highScore;
-        }
-
-        if(currentClub.name === 'Fenerbahçe') showToast("💛💙 BİLİNMEYECEK GİBİ DEĞİL!");
-
-        setTimeout(loadQuestion, 1200);
-    } else {
-        // Yanlış Bildi
-        btn.classList.add('wrong');
-        showToast("Seri Bozuldu! Doğrusu: " + currentClub.name);
-        score = 0;
-        document.getElementById('score').textContent = score;
-        
-        // Doğru cevabı yeşil ile göster
-        allBtns.forEach(b => {
-            if (b.textContent === currentClub.name) b.classList.add('correct');
-        });
-
-        setTimeout(loadQuestion, 2500);
     }
 }
 
