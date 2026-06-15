@@ -481,9 +481,57 @@ let guesses = Array.from({length: attempts}, () => []);
 const statsKey = currentGameMode === 'club' ? 'wordleStats' : 'playerWordleStats';
 let stats = JSON.parse(localStorage.getItem(statsKey)) || {played:0, wins:0, streak:0, maxStreak:0, bestRuns:[], totalScore:0};
 let username = localStorage.getItem('futbol_wordle_username');
+let stats = JSON.parse(localStorage.getItem(statsKey)) || {played:0, wins:0, streak:0, maxStreak:0, bestRuns:[], totalScore:0};
+let username = localStorage.getItem('futbol_wordle_username');
+
+// --- BURAYA EKLİYORUZ ---
+// Benzersiz bir kullanıcı ID'si oluştur (ilk girişte çalışır)
+let userUUID = localStorage.getItem('futbol_wordle_uuid');
+if (!userUUID) {
+    userUUID = crypto.randomUUID();
+    localStorage.setItem('futbol_wordle_uuid', userUUID);
+}
+// ------------------------
 
 function saveStats() { localStorage.setItem(statsKey, JSON.stringify(stats)); }
+function saveStats() { localStorage.setItem(statsKey, JSON.stringify(stats)); }
 function saveUser(name) { username = name; localStorage.setItem('futbol_wordle_username', name); }
+    function saveStats() { localStorage.setItem(statsKey, JSON.stringify(stats)); }
+function saveUser(name) { username = name; localStorage.setItem('futbol_wordle_username', name); }
+
+// --- BURAYA EKLİYORUZ ---
+// Skoru Backend'e Gönder
+async function submitScoreToDB(newScore) {
+    if (!username) return;
+    try {
+        await fetch('/api/leaderboard', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: username, score: newScore, uuid: userUUID })
+        });
+    } catch (error) {
+        console.error('Skor kaydedilemedi:', error);
+    }
+}
+
+// Liderlik Tablosunu Backend'den Çek
+async function fetchGlobalLeaderboard() {
+    try {
+        const res = await fetch('/api/leaderboard');
+        const data = await res.json();
+        
+        const lbContainer = document.getElementById('global-leaderboard');
+        lbContainer.innerHTML = data.map((player, i) =>
+            `<div class="leaderboard-item ${player.uuid === userUUID ? 'highlight' : ''}">
+                <span><span class="rank">${i+1}</span>${player.name}</span>
+                <span style="font-weight:800">${player.score}</span>
+            </div>`
+        ).join('');
+    } catch (error) {
+        console.error('Leaderboard çekilemedi:', error);
+    }
+}
+// ------------------------
 
 function switchMode(mode) {
     if (currentGameMode === mode) return;
@@ -591,9 +639,12 @@ function updateStats(win) {
         stats.bestRuns.push({ guesses: currentRow + 1, time, club: rawTarget });
         stats.bestRuns.sort((a,b) => a.guesses - b.guesses || a.time - b.time);
         stats.bestRuns = stats.bestRuns.slice(0, 10);
+        submitScoreToDB(stats.totalScore); // Her kazandığında skoru gönder
+        // ------------------------
     } else { stats.streak = 0; }
     saveStats();
 }
+  
 
 window.toggleStats = function() {
     const overlay = document.getElementById('stats-overlay');
