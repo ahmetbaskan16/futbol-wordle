@@ -289,6 +289,48 @@ function handleGuess(btn, guessedName) {
 
         if(currentClub.name === 'Fenerbahçe') showToast("💛💙 BİLİNMEYECEK GİBİ DEĞİL!");
 
+        // HIZLANDIRILDI: Doğru bilince sadece yarım saniye (500ms) bekler
+        setTimeout(loadQuestion, 500);
+    } else {
+        // Yanlış Bildi
+        btn.classList.add('wrong');
+        showToast("Seri Bozuldu! Doğrusu: " + currentClub.name);
+        score = 0;
+        document.getElementById('score').textContent = score;
+        
+        // Doğru cevabı yeşil ile göster
+        allBtns.forEach(b => {
+            if (b.textContent === currentClub.name) b.classList.add('correct');
+        });
+
+        // HIZLANDIRILDI: Yanlış bilince doğru cevabı görmek için 1.2 saniye (1200ms) bekler
+        setTimeout(loadQuestion, 1200);
+    }
+}
+
+    const logoImg = document.getElementById('logo');
+    const allBtns = document.querySelectorAll('.option-btn');
+    
+    // Tüm butonları tıklanamaz yap
+    allBtns.forEach(b => b.disabled = true);
+    
+    // Gizemi boz, logoyu netleştir!
+    if (logoImg) logoImg.classList.add('revealed');
+
+    if (guessedName === currentClub.name) {
+        // Doğru Bildi
+        btn.classList.add('correct');
+        score++;
+        document.getElementById('score').textContent = score;
+        
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem('logo_quiz_highscore', highScore);
+            document.getElementById('high-score').textContent = highScore;
+        }
+
+        if(currentClub.name === 'Fenerbahçe') showToast("💛💙 BİLİNMEYECEK GİBİ DEĞİL!");
+
         setTimeout(loadQuestion, 1200);
     } else {
         // Yanlış Bildi
