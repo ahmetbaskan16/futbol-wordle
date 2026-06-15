@@ -117,28 +117,86 @@
 <script>
 // Çoğunluğu PNG formatına çevrildi (Safari SVG Blur hatasını önlemek için)
 const CLUBS = [
+    // Süper Lig
     { name: 'Fenerbahçe', logo: 'https://upload.wikimedia.org/wikipedia/tr/8/86/Fenerbah%C3%A7e_SK.png' },
     { name: 'Galatasaray', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f6/Galatasaray_Sports_Club_Logo.png' },
     { name: 'Beşiktaş', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Be%C5%9Fikta%C5%9F_Logo_Be%C5%9Fikta%C5%9F_Amblem_Be%C5%9Fikta%C5%9F_Arma.png' },
     { name: 'Trabzonspor', logo: 'https://upload.wikimedia.org/wikipedia/tr/a/ab/TrabzonsporAmblemi.png' },
-    { name: 'Real Madrid', logo: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg' },
-    { name: 'Barcelona', logo: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg' },
-    { name: 'Manchester City', logo: 'https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg' },
-    { name: 'Arsenal', logo: 'https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg' },
-    { name: 'Liverpool', logo: 'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg' },
-    { name: 'Chelsea', logo: 'https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg' },
-    { name: 'Bayern Munich', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg' },
-    { name: 'B. Dortmund', logo: 'https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg' },
-    { name: 'Inter Milan', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg' },
-    { name: 'AC Milan', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg' },
-    { name: 'Juventus', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Juventus_FC_2017_icon_%28black%29.svg' },
-    { name: 'PSG', logo: 'https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg' },
-    { name: 'Ajax', logo: 'https://upload.wikimedia.org/wikipedia/en/7/79/Ajax_Amsterdam.svg' },
+    { name: 'Başakşehir', logo: 'https://upload.wikimedia.org/wikipedia/tr/3/37/İstanbul_Başakşehir_FK.png' },
+    { name: 'Sivasspor', logo: 'https://upload.wikimedia.org/wikipedia/tr/thumb/8/88/Sivasspor.png/200px-Sivasspor.png' },
+    { name: 'Kasımpaşa', logo: 'https://upload.wikimedia.org/wikipedia/tr/thumb/1/1a/Kasimpasa_SK.png/200px-Kasimpasa_SK.png' },
+    { name: 'Antalyaspor', logo: 'https://upload.wikimedia.org/wikipedia/tr/thumb/7/77/Antalyaspor_logo.png/200px-Antalyaspor_logo.png' },
+    { name: 'Alanyaspor', logo: 'https://upload.wikimedia.org/wikipedia/tr/thumb/3/36/Alanyaspor_logo.png/200px-Alanyaspor_logo.png' },
+    { name: 'Göztepe', logo: 'https://upload.wikimedia.org/wikipedia/tr/thumb/f/f3/Göztepe_logo.png/200px-Göztepe_logo.png' },
+    { name: 'Konyaspor', logo: 'https://upload.wikimedia.org/wikipedia/tr/thumb/b/b8/Konyaspor_1922_logo.png/200px-Konyaspor_1922_logo.png' },
+    { name: 'Adana Demirspor', logo: 'https://upload.wikimedia.org/wikipedia/tr/thumb/5/52/Adana_Demirspor_logo.png/200px-Adana_Demirspor_logo.png' },
+    { name: 'Kayserispor', logo: 'https://upload.wikimedia.org/wikipedia/tr/thumb/8/81/Kayserispor_logo.png/200px-Kayserispor_logo.png' },
+    { name: 'Samsunspor', logo: 'https://upload.wikimedia.org/wikipedia/tr/thumb/1/18/Samsunspor_logo.png/200px-Samsunspor_logo.png' },
+
+    // Premier Lig
+    { name: 'Manchester City', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/e/eb/Manchester_City_FC_badge.svg/200px-Manchester_City_FC_badge.svg.png' },
+    { name: 'Arsenal', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/53/Arsenal_FC.svg/200px-Arsenal_FC.svg.png' },
+    { name: 'Liverpool', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/0/0c/Liverpool_FC.svg/200px-Liverpool_FC.svg.png' },
+    { name: 'Chelsea', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/c/cc/Chelsea_FC.svg/200px-Chelsea_FC.svg.png' },
+    { name: 'Manchester Utd', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/7/7a/Manchester_United_FC_crest.svg/200px-Manchester_United_FC_crest.svg.png' },
+    { name: 'Tottenham', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/b/b4/Tottenham_Hotspur.svg/200px-Tottenham_Hotspur.svg.png' },
+    { name: 'Aston Villa', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/9/9f/Aston_Villa_logo.svg/200px-Aston_Villa_logo.svg.png' },
+    { name: 'Newcastle', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Newcastle_United_Logo.svg/200px-Newcastle_United_Logo.svg.png' },
+    { name: 'West Ham', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/c/c2/West_Ham_United_FC_logo.svg/200px-West_Ham_United_FC_logo.svg.png' },
+    { name: 'Brighton', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/f/fd/Brighton_%26_Hove_Albion_logo.svg/200px-Brighton_%26_Hove_Albion_logo.svg.png' },
+    { name: 'Everton', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/7/7c/Everton_FC_logo.svg/200px-Everton_FC_logo.svg.png' },
+    { name: 'Crystal Palace', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/0/0c/Crystal_Palace_FC_logo.svg/200px-Crystal_Palace_FC_logo.svg.png' },
+    { name: 'Nottingham F.', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/e/e5/Nottingham_Forest_F.C._logo.svg/200px-Nottingham_Forest_F.C._logo.svg.png' },
+
+    // La Liga
+    { name: 'Real Madrid', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/56/Real_Madrid_CF.svg/200px-Real_Madrid_CF.svg.png' },
+    { name: 'Barcelona', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/4/47/FC_Barcelona_%28crest%29.svg/200px-FC_Barcelona_%28crest%29.svg.png' },
+    { name: 'Atletico Madrid', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/f/f4/Atletico_Madrid_2017_logo.svg/200px-Atletico_Madrid_2017_logo.svg.png' },
+    { name: 'Sevilla', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/3/3b/Sevilla_FC_logo.svg/200px-Sevilla_FC_logo.svg.png' },
+    { name: 'Valencia', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/c/ce/Valenciacf.svg/200px-Valenciacf.svg.png' },
+    { name: 'Villarreal', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/7/70/Villarreal_CF_logo.svg/200px-Villarreal_CF_logo.svg.png' },
+    { name: 'Athletic Bilbao', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/9/98/Club_Athletic_Bilbao_logo.svg/200px-Club_Athletic_Bilbao_logo.svg.png' },
+    { name: 'Real Sociedad', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/f/f1/Real_Sociedad_logo.svg/200px-Real_Sociedad_logo.svg.png' },
+    { name: 'Real Betis', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/1/13/Real_betis_logo.svg/200px-Real_betis_logo.svg.png' },
+
+    // Serie A
+    { name: 'Juventus', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bc/Juventus_FC_2017_icon_%28black%29.svg/200px-Juventus_FC_2017_icon_%28black%29.svg.png' },
+    { name: 'Inter Milan', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/FC_Internazionale_Milano_2021.svg/200px-FC_Internazionale_Milano_2021.svg.png' },
+    { name: 'AC Milan', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Logo_of_AC_Milan.svg/200px-Logo_of_AC_Milan.svg.png' },
+    { name: 'Napoli', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/S.S.C._Napoli_logo.svg/200px-S.S.C._Napoli_logo.svg.png' },
+    { name: 'AS Roma', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/f/f7/AS_Roma_logo_%282017%29.svg/200px-AS_Roma_logo_%282017%29.svg.png' },
+    { name: 'Lazio', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/e/e4/SS_Lazio.svg/200px-SS_Lazio.svg.png' },
+    { name: 'Atalanta', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/6/66/AtalantaBC.svg/200px-AtalantaBC.svg.png' },
+    { name: 'Fiorentina', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/b/ba/ACF_Fiorentina_2.svg/200px-ACF_Fiorentina_2.svg.png' },
+
+    // Bundesliga
+    { name: 'Bayern Munich', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg/200px-FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg.png' },
+    { name: 'B. Dortmund', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Borussia_Dortmund_logo.svg/200px-Borussia_Dortmund_logo.svg.png' },
+    { name: 'B. Leverkusen', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/5/59/Bayer_04_Leverkusen_logo.svg/200px-Bayer_04_Leverkusen_logo.svg.png' },
+    { name: 'RB Leipzig', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/0/04/RB_Leipzig_2014_logo.svg/200px-RB_Leipzig_2014_logo.svg.png' },
+    { name: 'E. Frankfurt', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Eintracht_Frankfurt_Logo.svg/200px-Eintracht_Frankfurt_Logo.svg.png' },
+    { name: 'Stuttgart', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/VfB_Stuttgart_1893_Logo.svg/200px-VfB_Stuttgart_1893_Logo.svg.png' },
+
+    // Ligue 1
+    { name: 'PSG', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/a/a7/Paris_Saint-Germain_F.C..svg/200px-Paris_Saint-Germain_F.C..svg.png' },
+    { name: 'Marseille', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Olympique_Marseille_logo.svg/200px-Olympique_Marseille_logo.svg.png' },
+    { name: 'Lyon', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/c/c6/Olympique_Lyonnais.svg/200px-Olympique_Lyonnais.svg.png' },
+    { name: 'Lille', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/6/6f/Lille_OSC_2018_logo.svg/200px-Lille_OSC_2018_logo.svg.png' },
+    { name: 'Monaco', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/b/ba/AS_Monaco_FC.svg/200px-AS_Monaco_FC.svg.png' },
+
+    // Diğer Avrupa & Dünya
+    { name: 'Ajax', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/7/79/Ajax_Amsterdam.svg/200px-Ajax_Amsterdam.svg.png' },
+    { name: 'PSV Eindhoven', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/0/05/PSV_Eindhoven.svg/200px-PSV_Eindhoven.svg.png' },
+    { name: 'Feyenoord', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Feyenoord_logo.svg/200px-Feyenoord_logo.svg.png' },
+    { name: 'Benfica', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/a/a2/SL_Benfica_logo.svg/200px-SL_Benfica_logo.svg.png' },
+    { name: 'Porto', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/f/f1/FC_Porto.svg/200px-FC_Porto.svg.png' },
+    { name: 'Sporting CP', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/e/e2/Sporting_Clube_de_Portugal_logo.svg/200px-Sporting_Clube_de_Portugal_logo.svg.png' },
+    { name: 'Celtic', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/3/35/Celtic_FC.svg/200px-Celtic_FC.svg.png' },
+    { name: 'Rangers', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/4/43/Rangers_FC.svg/200px-Rangers_FC.svg.png' },
     { name: 'Boca Juniors', logo: 'https://upload.wikimedia.org/wikipedia/commons/c/c9/Boca_juniors_escudo.png' },
     { name: 'River Plate', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Logo_River_Plate.png' },
-    { name: 'Flamengo', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/2e/Flamengo_braz_logo.svg' },
-    { name: 'Aston Villa', logo: 'https://upload.wikimedia.org/wikipedia/en/9/9f/Aston_Villa_logo.svg' },
-    { name: 'Newcastle', logo: 'https://upload.wikimedia.org/wikipedia/en/5/56/Newcastle_United_Logo.svg' }
+    { name: 'Flamengo', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Flamengo_braz_logo.svg/200px-Flamengo_braz_logo.svg.png' },
+    { name: 'Palmeiras', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Palmeiras_logo.svg/200px-Palmeiras_logo.svg.png' }
 ];
 
 let score = 0;
