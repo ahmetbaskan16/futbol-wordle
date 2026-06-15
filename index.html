@@ -248,6 +248,136 @@
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
+        <!-- ROZETLERİN STİLİ -->
+<style>
+/* ... diğer stillerin altına ekle ... */
+
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin: 16px 0;
+    padding: 12px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 14px;
+}
+
+.achievement-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 6px;
+    cursor: help;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.achievement-badge:hover {
+    background: rgba(255,255,255,0.15);
+    border-color: var(--accent);
+    transform: scale(1.1);
+}
+
+.achievement-badge.locked {
+    opacity: 0.3;
+}
+
+.achievement-icon {
+    font-size: 1.8rem;
+    margin-bottom: 2px;
+}
+
+.achievement-name {
+    font-size: 0.5rem;
+    text-align: center;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    line-height: 1;
+}
+
+.tooltip {
+    position: absolute;
+    background: #000;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 0.65rem;
+    bottom: -30px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 100;
+}
+
+.achievement-badge:hover .tooltip {
+    opacity: 1;
+}
+
+.friends-section {
+    margin-top: 20px;
+    padding: 12px;
+    background: var(--glass);
+    border: 1px solid var(--glass-border);
+    border-radius: 14px;
+}
+
+.friends-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.add-friend-input {
+    width: 100%;
+    padding: 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 0.75rem;
+    margin-bottom: 8px;
+}
+
+.friend-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    margin-bottom: 6px;
+    font-size: 0.8rem;
+}
+
+.friend-remove-btn {
+    background: var(--wrong);
+    border: none;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.65rem;
+}
+
+.level-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--accent), #8366ff);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin: 0 4px;
+}
+</style>
     </style>
 </head>
 <body>
@@ -320,30 +450,282 @@
     <div id="stats-modal" class="modal">
         <div class="close-modal" onclick="toggleStats()">✕</div>
         <h2 id="modal-title">İSTATİSTİKLER</h2>
+        
+        <!-- Level Badge -->
+        <div style="text-align: center; margin-bottom: 12px;">
+            <span class="level-badge">⭐ LEVEL <span id="user-level">1</span></span>
+        </div>
+
         <div class="stats-grid">
             <div class="stat-item"><span class="value" id="stats-played">0</span><span class="label">Oynanan</span></div>
             <div class="stat-item"><span class="value" id="stats-score">0</span><span class="label">Galibiyet</span></div>
             <div class="stat-item"><span class="value" id="stats-streak">0</span><span class="label">Seri</span></div>
-            <div class="stat-item"><span class="value" id="stats-max">0</span><span class="label">En İyi Seri</span></div>
+            <div class="stat-item"><span class="value" id="stats-max">0</span><span class="label">En İyi</span></div>
         </div>
-        <div class="leaderboard-container">
-            <div>
-                <h3>EN İYİLERİN</h3>
-                <div class="leaderboard-list" id="leaderboard"></div>
+
+        <!-- ROZETLER -->
+        <h3 style="margin-top: 20px; margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);">🎖️ Kazanılan Rozetler</h3>
+        <div class="achievements-grid" id="achievements-container">
+            <!-- JS ile doldurulur -->
+        </div>
+
+        <!-- ARKADAŞ SEKMESİ -->
+        <div class="friends-section">
+            <div class="friends-header">
+                <h3 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">👫 Arkadaşlar</h3>
+                <button class="mode-btn" style="padding: 6px 12px; font-size: 0.7rem; flex: 0;" onclick="showAddFriendModal()">➕ Ekle</button>
             </div>
-            <div>
-                <h3>LİDERLİK TABLOSU</h3>
-                <div class="leaderboard-list" id="global-leaderboard"></div>
+            <div id="friends-list" style="max-height: 150px; overflow-y: auto;">
+                <!-- Arkadaş listesi burada -->
             </div>
         </div>
+
+        <!-- ARKADAŞ SIRALAMASI -->
+        <h3 style="margin-top: 16px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);">🏆 Arkadaş Sıralaması</h3>
+        <div class="leaderboard-list" id="friends-leaderboard" style="max-height: 160px;">
+            <!-- JS ile doldurulur -->
+        </div>
+
         <button class="btn-restart" onclick="location.reload()">TEKRAR OYNA</button>
         <button class="btn-secondary" onclick="showNameChange()">İsmi Değiştir</button>
     </div>
 </div>
 
-<div id="toast" class="toast"></div>
+<!-- Add Friend Modal -->
+<div id="add-friend-overlay" class="overlay">
+    <div class="modal">
+        <div class="close-modal" onclick="document.getElementById('add-friend-overlay').style.display='none'">✕</div>
+        <h2>👫 Arkadaş Ekle</h2>
+        <p style="color:var(--text-muted);margin-bottom:12px">Arkadaşının UUID'sini gir</p>
+        <input type="text" id="friend-uuid-input" class="modern-input" placeholder="user_xxxxx">
+        <button class="btn-restart" onclick="addFriendFromModal()">EKLE</button>
+    </div>
+</div>
 
 <script>
+    // ===================== ROZET SİSTEMİ =====================
+const ACHIEVEMENTS = {
+  firstWin: { 
+    emoji: '🎯', 
+    name: 'İlk Galibiyet',
+    desc: 'İlk kazanışını aldı'
+  },
+  streak3: { 
+    emoji: '🔥', 
+    name: '3 Seri',
+    desc: '3 galibiyet seri'
+  },
+  streak5: { 
+    emoji: '🌟', 
+    name: '5 Seri',
+    desc: '5 galibiyet seri'
+  },
+  streak10: { 
+    emoji: '👑', 
+    name: '10 Seri',
+    desc: '10 galibiyet seri'
+  },
+  perfect: { 
+    emoji: '⚡', 
+    name: 'Mükemmel',
+    desc: 'Tek denemede bildi'
+  },
+  speed: { 
+    emoji: '🚀', 
+    name: 'Kılıç Hızı',
+    desc: '15 saniyede bitti'
+  },
+  100Games: { 
+    emoji: '💯', 
+    name: '100 Maç',
+    desc: '100 oyun oynadı'
+  },
+  clubMaster: { 
+    emoji: '🏟️', 
+    name: 'Kulüp Ustası',
+    desc: 'Kulüp modunda 20 galibiyet'
+  },
+  playerMaster: { 
+    emoji: '⚽', 
+    name: 'Oyuncu Ustası',
+    desc: 'Oyuncu modunda 20 galibiyet'
+  },
+  weeklyKing: { 
+    emoji: '👸', 
+    name: 'Haftalık Kral',
+    desc: 'Haftanın en iyisi'
+  }
+};
+
+let userUUID = localStorage.getItem('futbol_wordle_uuid');
+if (!userUUID) {
+  userUUID = 'user_' + Math.random().toString(36).substring(2, 11);
+  localStorage.setItem('futbol_wordle_uuid', userUUID);
+}
+
+let userAchievements = [];
+let userFriends = [];
+let userLevel = 1;
+
+// ===================== ROZET KONTROL FONK. =====================
+async function checkAchievements() {
+  const newAchievements = [];
+
+  // İlk Galibiyet
+  if (stats.wins === 1 && !userAchievements.includes('firstWin')) {
+    newAchievements.push('firstWin');
+  }
+
+  // Seri Rozetleri
+  if (stats.streak === 3 && !userAchievements.includes('streak3')) {
+    newAchievements.push('streak3');
+  }
+  if (stats.streak === 5 && !userAchievements.includes('streak5')) {
+    newAchievements.push('streak5');
+  }
+  if (stats.streak === 10 && !userAchievements.includes('streak10')) {
+    newAchievements.push('streak10');
+  }
+
+  // Mükemmel Tahmin
+  if (currentRow === 0 && !userAchievements.includes('perfect')) {
+    newAchievements.push('perfect');
+  }
+
+  // Hız Rozetleri
+  const timeSecs = Math.floor((Date.now() - startTime) / 1000);
+  if (timeSecs <= 15 && !userAchievements.includes('speed')) {
+    newAchievements.push('speed');
+  }
+
+  // 100 Oyun
+  if (stats.played === 100 && !userAchievements.includes('100Games')) {
+    newAchievements.push('100Games');
+  }
+
+  // Master Rozetleri
+  const modeWins = currentGameMode === 'club' ? 
+    (JSON.parse(localStorage.getItem('wordleStats'))?.wins || 0) : 
+    (JSON.parse(localStorage.getItem('playerWordleStats'))?.wins || 0);
+
+  if (modeWins === 20 && !userAchievements.includes('clubMaster') && currentGameMode === 'club') {
+    newAchievements.push('clubMaster');
+  }
+  if (modeWins === 20 && !userAchievements.includes('playerMaster') && currentGameMode === 'player') {
+    newAchievements.push('playerMaster');
+  }
+
+  // Sunucuya Gönder
+  for (const ach of newAchievements) {
+    try {
+      await fetch('/api/leaderboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          uuid: userUUID,
+          action: 'addAchievement',
+          achievement: ach
+        })
+      });
+      userAchievements.push(ach);
+      showToast(`🎖️ YENİ ROZET: ${ACHIEVEMENTS[ach].name}`);
+    } catch (err) {
+      console.error('Rozet kaydı başarısız:', err);
+    }
+  }
+}
+
+async function saveGameStats() {
+  try {
+    await fetch('/api/leaderboard', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        uuid: userUUID,
+        stats: stats
+      })
+    });
+  } catch (err) {
+    console.error('Stats kaydı başarısız:', err);
+  }
+}
+
+async function sendScoreToLeaderboard() {
+  try {
+    await fetch('/api/leaderboard', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        uuid: userUUID,
+        name: username,
+        score: stats.wins,
+        action: 'updateScore'
+      })
+    });
+  } catch (err) {
+    console.error('Skor gönderme başarısız:', err);
+  }
+}
+
+async function loadUserData() {
+  try {
+    const res = await fetch(`/api/leaderboard?filter=personal&uuid=${userUUID}`);
+    const data = await res.json();
+    userAchievements = data.achievements || [];
+    userLevel = data.level || 1;
+  } catch (err) {
+    console.error('Kullanıcı verisi yüklenemedi:', err);
+  }
+}
+
+async function loadFriends() {
+  try {
+    const res = await fetch(`/api/leaderboard?filter=friends&uuid=${userUUID}`);
+    userFriends = await res.json();
+  } catch (err) {
+    console.error('Arkadaş listesi yüklenemedi:', err);
+  }
+}
+
+async function addFriend(friendUUID) {
+  try {
+    const res = await fetch('/api/leaderboard', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        uuid: userUUID,
+        friendUuid: friendUUID,
+        action: 'addFriend'
+      })
+    });
+    if (res.ok) {
+      showToast('👫 Arkadaş eklendi!');
+      await loadFriends();
+    }
+  } catch (err) {
+    console.error('Arkadaş ekleme başarısız:', err);
+  }
+}
+
+async function removeFriend(friendUUID) {
+  try {
+    const res = await fetch('/api/leaderboard', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        uuid: userUUID,
+        friendUuid: friendUUID,
+        action: 'removeFriend'
+      })
+    });
+    if (res.ok) {
+      showToast('👋 Arkadaş çıkarıldı');
+      await loadFriends();
+    }
+  } catch (err) {
+    console.error('Arkadaş çıkarma başarısız:', err);
+  }
+}
 // ===================== VERİ TABANI =====================
 const CLUBS = [
     // Süper Lig
@@ -701,27 +1083,97 @@ function updateStats(win) {
         stats.bestRuns = stats.bestRuns.slice(0, 10);
     } else { stats.streak = 0; }
     saveStats();
+    
+    // 🆕 YENİ KODLAR
+    saveGameStats();        // Sunucuya stat gönder
+    sendScoreToLeaderboard(); // Sıralamaya gönder
+    if (win) {
+      checkAchievements();  // Rozet kontrolü
+    }
 }
-
-window.toggleStats = function() {
+window.toggleStats = async function() {
     const overlay = document.getElementById('stats-overlay');
-    if (overlay.style.display === 'flex') { overlay.style.display = 'none'; return; }
+    if (overlay.style.display === 'flex') { 
+        overlay.style.display = 'none'; 
+        return; 
+    }
 
+    // Verileri yükle
+    await loadUserData();
+    await loadFriends();
+
+    // İstatistikleri göster
     document.getElementById('stats-played').textContent = stats.played;
     document.getElementById('stats-score').textContent = stats.wins || 0;
     document.getElementById('stats-streak').textContent = stats.streak;
     document.getElementById('stats-max').textContent = stats.maxStreak;
+    document.getElementById('user-level').textContent = userLevel;
 
+    // ROZETLER
+    const achContainer = document.getElementById('achievements-container');
+    achContainer.innerHTML = '';
+    
+    Object.entries(ACHIEVEMENTS).forEach(([key, ach]) => {
+        const badge = document.createElement('div');
+        badge.className = 'achievement-badge' + (!userAchievements.includes(key) ? ' locked' : '');
+        badge.innerHTML = `
+            <div class="achievement-icon">${ach.emoji}</div>
+            <div class="achievement-name">${ach.name}</div>
+            <div class="tooltip">${ach.desc}</div>
+        `;
+        achContainer.appendChild(badge);
+    });
+
+    // ARKADAŞ LİSTESİ
+    const friendsList = document.getElementById('friends-list');
+    if (userFriends.length === 0) {
+        friendsList.innerHTML = '<p style="text-align:center;opacity:.4;font-size:.7rem;">Henüz arkadaş yok</p>';
+    } else {
+        friendsList.innerHTML = userFriends.map(friend => `
+            <div class="friend-item">
+                <span>${friend.name} <span style="opacity:.5">(${friend.score} galibiyet)</span></span>
+                <button class="friend-remove-btn" onclick="removeFriend('${friend.uuid}')">Çıkar</button>
+            </div>
+        `).join('');
+    }
+
+    // ARKADAŞ SIRALAMASI
+    const friendsLb = document.getElementById('friends-leaderboard');
+    if (userFriends.length === 0) {
+        friendsLb.innerHTML = '<p style="text-align:center;opacity:.3;font-size:.7rem;">Arkadaş ekle</p>';
+    } else {
+        const sorted = [...userFriends].sort((a,b) => b.score - a.score);
+        friendsLb.innerHTML = sorted.map((f, i) => `
+            <div class="leaderboard-item">
+                <span><span class="rank">#${i+1}</span>${f.name}</span>
+                <span style="font-weight:700">${f.score} 🏆</span>
+            </div>
+        `).join('');
+    }
+
+    // GENEL SIRALAMASİ
     const lb = document.getElementById('leaderboard');
     lb.innerHTML = stats.bestRuns.length
         ? stats.bestRuns.map((r,i) => `<div class="leaderboard-item"><span><span class="rank">#${i+1}</span>${r.club}</span><span style="opacity:.6">${r.guesses} deneme</span></div>`).join('')
         : '<p style="text-align:center;opacity:.3;font-size:.7rem;">Henüz galibiyet yok</p>';
 
-    document.getElementById('global-leaderboard').innerHTML =
-        `<div class="leaderboard-item highlight"><span><span class="rank">1</span>${username||'Sen'}</span><span style="font-weight:800">${stats.wins||0}</span></div>`;
-
     overlay.style.display = 'flex';
 };
+
+function showAddFriendModal() {
+    document.getElementById('add-friend-overlay').style.display = 'flex';
+    document.getElementById('friend-uuid-input').focus();
+}
+
+function addFriendFromModal() {
+    const uuid = document.getElementById('friend-uuid-input').value.trim();
+    if (!uuid) {
+        showToast('UUID gir!');
+        return;
+    }
+    addFriend(uuid);
+    document.getElementById('add-friend-overlay').style.display = 'none';
+}
 
 function showEndGame(win) {
     const modal = document.getElementById('stats-modal');
@@ -768,7 +1220,12 @@ function showNameChange() {
 
 window.addEventListener('load', () => {
     if (!username) document.getElementById('login-overlay').style.display = 'flex';
+    loadUserData();  // 🆕 YENİ - BU SATIRI EKLE
     initBoard();
+});
+
+window.addEventListener('keydown', e => {
+    // klavye kodları...
 });
 
 window.addEventListener('keydown', e => {
