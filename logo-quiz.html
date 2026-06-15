@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Logo Quiz">
+    <title>Futbol Logo Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: radial-gradient(circle at center, #111827 0%, #000000 100%);
+            --glass: rgba(255,255,255,0.05);
+            --glass-border: rgba(255,255,255,0.1);
+            --text: #ffffff;
+            --text-muted: rgba(255,255,255,0.6);
+            --correct: #4ade80;
+            --wrong: #ef4444;
+            --accent: #3b82f6;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body {
+            background: var(--bg); color: var(--text);
+            min-height: 100vh; display: flex; flex-direction: column;
+            align-items: center; padding: 20px; overflow-x: hidden;
+            user-select: none;
+        }
+        header { text-align: center; margin-bottom: 30px; width: 100%; max-width: 500px; }
+        h1 {
+            font-size: 2.2rem; font-weight: 800; letter-spacing: -1px;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .stats-bar {
+            display: flex; justify-content: space-between;
+            background: var(--glass); border: 1px solid var(--glass-border);
+            padding: 12px 20px; border-radius: 16px; margin-top: 15px;
+        }
+        .stat { text-align: center; }
+        .stat-value { font-size: 1.4rem; font-weight: 800; display: block; }
+        .stat-label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        
+        .game-container {
+            width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center;
+        }
+        .logo-container {
+            width: 200px; height: 200px; margin-bottom: 40px;
+            display: flex; justify-content: center; align-items: center;
+            background: #fff; border-radius: 24px; padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.3s;
+        }
+        .logo-img {
+            max-width: 100%; max-height: 100%; object-fit: contain;
+            transition: filter 0.5s ease;
+            filter: blur(12px) grayscale(50%); /* Başlangıçta bulanık */
+        }
+        .logo-img.revealed { filter: blur(0) grayscale(0%); }
+        
+        .options-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%;
+        }
+        .option-btn {
+            background: var(--glass); border: 1px solid var(--glass-border);
+            color: #fff; padding: 20px 10px; border-radius: 16px;
+            font-size: 0.95rem; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; -webkit-tap-highlight-color: transparent;
+        }
+        .option-btn:active { transform: scale(0.95); }
+        .option-btn.correct { background: var(--correct); color: #000; border-color: var(--correct); box-shadow: 0 0 20px rgba(74,222,128,0.4); }
+        .option-btn.wrong { background: var(--wrong); color: #fff; border-color: var(--wrong); opacity: 0.8; }
+        .option-btn:disabled { cursor: not-allowed; }
+
+        .toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-20px);
+            background: #fff; color: #000; padding: 10px 22px; border-radius: 50px;
+            font-weight: 700; font-size: 0.85rem; opacity: 0; pointer-events: none;
+            transition: all 0.3s; z-index: 100;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🛡️ LOGO QUIZ</h1>
+    <div class="stats-bar">
+        <div class="stat"><span class="stat-value" id="score">0</span><span class="stat-label">Güncel Seri</span></div>
+        <div class="stat"><span class="stat-value" id="high-score">0</span><span class="stat-label">En İyi Seri</span></div>
+    </div>
+</header>
+
+<div class="game-container">
+    <div class="logo-container" id="logo-box">
+        <img id="logo" class="logo-img" src="" alt="Kulüp Logosu">
+    </div>
+    
+    <div class="options-grid" id="options">
+        <!-- Butonlar JS ile buraya gelecek -->
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+// Wikimedia üzerinden çekilen yüksek kaliteli, arka plansız logolar
+const CLUBS = [
+    { name: 'Fenerbahçe', logo: 'https://upload.wikimedia.org/wikipedia/tr/8/86/Fenerbah%C3%A7e_SK.png' },
+    { name: 'Galatasaray', logo: 'https://upload.wikimedia.org/wikipedia/commons/f/f6/Galatasaray_Sports_Club_Logo.png' },
+    { name: 'Beşiktaş', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Be%C5%9Fikta%C5%9F_Logo_Be%C5%9Fikta%C5%9F_Amblem_Be%C5%9Fikta%C5%9F_Arma.png' },
+    { name: 'Trabzonspor', logo: 'https://upload.wikimedia.org/wikipedia/tr/a/ab/TrabzonsporAmblemi.png' },
+    { name: 'Real Madrid', logo: 'https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg' },
+    { name: 'Barcelona', logo: 'https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg' },
+    { name: 'Manchester City', logo: 'https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg' },
+    { name: 'Arsenal', logo: 'https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg' },
+    { name: 'Liverpool', logo: 'https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg' },
+    { name: 'Chelsea', logo: 'https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg' },
+    { name: 'Bayern Munich', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg' },
+    { name: 'B. Dortmund', logo: 'https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg' },
+    { name: 'Inter Milan', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg' },
+    { name: 'AC Milan', logo: 'https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg' },
+    { name: 'Juventus', logo: 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Juventus_FC_2017_icon_%28black%29.svg' },
+    { name: 'PSG', logo: 'https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg' },
+    { name: 'Ajax', logo: 'https://upload.wikimedia.org/wikipedia/en/7/79/Ajax_Amsterdam.svg' },
+    { name: 'Boca Juniors', logo: 'https://upload.wikimedia.org/wikipedia/commons/c/c9/Boca_juniors_escudo.png' },
+    { name: 'River Plate', logo: 'https://upload.wikimedia.org/wikipedia/commons/3/3f/Logo_River_Plate.png' },
+    { name: 'Flamengo', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/2e/Flamengo_braz_logo.svg' },
+    { name: 'Aston Villa', logo: 'https://upload.wikimedia.org/wikipedia/en/9/9f/Aston_Villa_logo.svg' },
+    { name: 'Newcastle', logo: 'https://upload.wikimedia.org/wikipedia/en/5/56/Newcastle_United_Logo.svg' }
+];
+
+let score = 0;
+let highScore = localStorage.getItem('logo_quiz_highscore') || 0;
+let currentClub = null;
+let isWaiting = false;
+
+document.getElementById('high-score').textContent = highScore;
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+function loadQuestion() {
+    isWaiting = false;
+    const logoImg = document.getElementById('logo');
+    const optionsBox = document.getElementById('options');
+    
+    // Logoyu tekrar bulanık yap
+    logoImg.classList.remove('revealed');
+    
+    // Rastgele doğru cevabı seç
+    currentClub = CLUBS[Math.floor(Math.random() * CLUBS.length)];
+    logoImg.src = currentClub.logo;
+
+    // 3 Tane yanlış cevap seç
+    let wrongClubs = CLUBS.filter(c => c.name !== currentClub.name);
+    wrongClubs = shuffleArray(wrongClubs).slice(0, 3);
+    
+    // Doğru ve yanlışları birleştirip karıştır
+    let allOptions = [currentClub, ...wrongClubs];
+    allOptions = shuffleArray(allOptions);
+
+    // Butonları oluştur
+    optionsBox.innerHTML = '';
+    allOptions.forEach(club => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = club.name;
+        btn.onclick = () => handleGuess(btn, club.name);
+        optionsBox.appendChild(btn);
+    });
+}
+
+function handleGuess(btn, guessedName) {
+    if (isWaiting) return;
+    isWaiting = true;
+
+    const logoImg = document.getElementById('logo');
+    const allBtns = document.querySelectorAll('.option-btn');
+    
+    // Tüm butonları tıklanamaz yap
+    allBtns.forEach(b => b.disabled = true);
+    
+    // Gizemi boz, logoyu netleştir!
+    logoImg.classList.add('revealed');
+
+    if (guessedName === currentClub.name) {
+        // Doğru Bildi
+        btn.classList.add('correct');
+        score++;
+        document.getElementById('score').textContent = score;
+        
+        if (score > highScore) {
+            highScore = score;
+            localStorage.setItem('logo_quiz_highscore', highScore);
+            document.getElementById('high-score').textContent = highScore;
+        }
+
+        // Fener bilindiyse ufak bir detay :)
+        if(currentClub.name === 'Fenerbahçe') showToast("💛💙 BİLİNMEYECEK GİBİ DEĞİL!");
+
+        setTimeout(loadQuestion, 1500);
+    } else {
+        // Yanlış Bildi
+        btn.classList.add('wrong');
+        showToast("Seri Bozuldu! Doğrusu: " + currentClub.name);
+        score = 0;
+        document.getElementById('score').textContent = score;
+        
+        // Doğru cevabı yeşil ile göster
+        allBtns.forEach(b => {
+            if (b.textContent === currentClub.name) b.classList.add('correct');
+        });
+
+        setTimeout(loadQuestion, 2500);
+    }
+}
+
+// Oyunu Başlat
+window.onload = loadQuestion;
+</script>
+</body>
+</html>
