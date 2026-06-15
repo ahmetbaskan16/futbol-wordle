@@ -75,6 +75,7 @@
             font-size: 1.2rem;
         }
         .icon-btn:hover { background: rgba(255,255,255,0.15); }
+        
         .mode-container {
             display: flex;
             flex-direction: column;
@@ -105,6 +106,7 @@
         }
         .mode-btn.active { background: var(--accent); color: #fff; box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
         .mode-btn.active-green { background: var(--correct); color: #000; box-shadow: 0 4px 12px rgba(74,222,128,0.3); }
+
         #game-container {
             display: flex;
             flex-direction: column;
@@ -158,7 +160,7 @@
             cursor: pointer;
             text-transform: uppercase;
             flex: 1;
-            transition: background 0.15s, color 0.15s, border-color 0.15s;
+            transition: background 0.15s, color 0.15s;
             font-size: 0.82rem;
             -webkit-tap-highlight-color: transparent;
             min-width: 0;
@@ -248,140 +250,14 @@
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
-        /* ROZETLERİN STİLİ */
-
-.achievements-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
-    margin: 16px 0;
-    padding: 12px;
-    background: rgba(0,0,0,0.2);
-    border-radius: 14px;
-}
-
-.achievement-badge {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 60px;
-    height: 60px;
-    background: var(--glass);
-    border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    padding: 6px;
-    cursor: help;
-    transition: all 0.2s;
-    position: relative;
-}
-
-.achievement-badge:hover {
-    background: rgba(255,255,255,0.15);
-    border-color: var(--accent);
-    transform: scale(1.1);
-}
-
-.achievement-badge.locked {
-    opacity: 0.3;
-}
-
-.achievement-icon {
-    font-size: 1.8rem;
-    margin-bottom: 2px;
-}
-
-.achievement-name {
-    font-size: 0.5rem;
-    text-align: center;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    line-height: 1;
-}
-
-.tooltip {
-    position: absolute;
-    background: #000;
-    color: #fff;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 0.65rem;
-    bottom: -30px;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s;
-    z-index: 100;
-}
-
-.achievement-badge:hover .tooltip {
-    opacity: 1;
-}
-
-.friends-section {
-    margin-top: 20px;
-    padding: 12px;
-    background: var(--glass);
-    border: 1px solid var(--glass-border);
-    border-radius: 14px;
-}
-
-.friends-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
-}
-
-.add-friend-input {
-    width: 100%;
-    padding: 8px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--glass-border);
-    border-radius: 8px;
-    color: #fff;
-    font-size: 0.75rem;
-    margin-bottom: 8px;
-}
-
-.friend-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px;
-    background: rgba(0,0,0,0.2);
-    border-radius: 8px;
-    margin-bottom: 6px;
-    font-size: 0.8rem;
-}
-
-.friend-remove-btn {
-    background: var(--wrong);
-    border: none;
-    color: #fff;
-    padding: 4px 8px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.65rem;
-}
-
-.level-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, var(--accent), #8366ff);
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    margin: 0 4px;
-}
-</style>
+    </style>
 </head>
 <body>
 
 <header>
     <div class="header-actions">
-        <button class="icon-btn" id="hint-btn" onclick="useHint()" title="İpucu Al" style="display:none; border-color:var(--present);">💡</button>
+        <!-- İPUCU BUTONU BURAYA EKLENDİ (Başta Gizli) -->
+        <button class="icon-btn" id="hint-btn" onclick="useHint()" title="İpucu Al" style="display: none; border-color: var(--present);">💡</button>
         <button class="icon-btn" onclick="toggleStats()" title="İstatistikler">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
         </button>
@@ -399,7 +275,9 @@
         <button class="mode-btn" id="mode-daily" onclick="switchPlayType(true)">📅 GÜNÜN</button>
         <button class="mode-btn" id="mode-endless" onclick="switchPlayType(false)">♾️ SERBEST</button>
     </div>
-    <button onclick="window.location.href='logo-quiz.html'" style="margin-top:12px;width:100%;background:linear-gradient(135deg,#3b82f6 0%,#a5b4fc 100%);color:#000;border:none;padding:12px;border-radius:12px;font-weight:800;cursor:pointer;font-size:0.9rem;transition:opacity 0.2s;box-shadow:0 4px 15px rgba(59,130,246,0.4);">
+    
+    <!-- LOGO QUIZ GEÇİŞ BUTONU -->
+    <button onclick="window.location.href='logo-quiz.html'" style="margin-top: 12px; width: 100%; background: linear-gradient(135deg, #3b82f6 0%, #a5b4fc 100%); color: #000; border: none; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 0.9rem; transition: opacity 0.2s; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);">
         🛡️ LOGO QUIZ OYNA ➔
     </button>
 </div>
@@ -447,472 +325,60 @@
     <div id="stats-modal" class="modal">
         <div class="close-modal" onclick="toggleStats()">✕</div>
         <h2 id="modal-title">İSTATİSTİKLER</h2>
-        
-        <!-- Level Badge -->
-        <div style="text-align: center; margin-bottom: 12px;">
-            <span class="level-badge">⭐ LEVEL <span id="user-level">1</span></span>
-        </div>
-
         <div class="stats-grid">
             <div class="stat-item"><span class="value" id="stats-played">0</span><span class="label">Oynanan</span></div>
             <div class="stat-item"><span class="value" id="stats-score">0</span><span class="label">Galibiyet</span></div>
             <div class="stat-item"><span class="value" id="stats-streak">0</span><span class="label">Seri</span></div>
-            <div class="stat-item"><span class="value" id="stats-max">0</span><span class="label">En İyi</span></div>
+            <div class="stat-item"><span class="value" id="stats-max">0</span><span class="label">En İyi Seri</span></div>
         </div>
-
-        <!-- ROZETLER -->
-        <h3 style="margin-top: 20px; margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);">🎖️ Kazanılan Rozetler</h3>
-        <div class="achievements-grid" id="achievements-container">
-            <!-- JS ile doldurulur -->
-        </div>
-
-        
-        <!-- EN İYİ OYUNLAR + GENEL SIRALAMASI -->
         <div class="leaderboard-container">
             <div>
-                <h3 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);">📊 En İyi Oyunlar</h3>
+                <h3>EN İYİLERİN</h3>
                 <div class="leaderboard-list" id="leaderboard"></div>
             </div>
             <div>
-                <h3 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);">🏆 Genel Sıralama</h3>
+                <h3>LİDERLİK TABLOSU</h3>
                 <div class="leaderboard-list" id="global-leaderboard"></div>
             </div>
         </div>
-
-<!-- ARKADAŞ SEKMESİ -->
-        <div class="friends-section">
-            <div class="friends-header">
-                <h3 style="font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;">👫 Arkadaşlar</h3>
-                <button class="mode-btn" style="padding: 6px 12px; font-size: 0.7rem; flex: 0;" onclick="showAddFriendModal()">➕ Ekle</button>
-            </div>
-            <div id="friends-list" style="max-height: 150px; overflow-y: auto;">
-                <!-- Arkadaş listesi burada -->
-            </div>
-        </div>
-
-        <!-- ARKADAŞ SIRALAMASI -->
-        <h3 style="margin-top: 16px; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);">🏆 Arkadaş Sıralaması</h3>
-        <div class="leaderboard-list" id="friends-leaderboard" style="max-height: 160px;">
-            <!-- JS ile doldurulur -->
-        </div>
-
         <button class="btn-restart" onclick="location.reload()">TEKRAR OYNA</button>
         <button class="btn-secondary" onclick="showNameChange()">İsmi Değiştir</button>
     </div>
 </div>
 
-<!-- Add Friend Modal -->
-<div id="add-friend-overlay" class="overlay">
-    <div class="modal">
-        <div class="close-modal" onclick="document.getElementById('add-friend-overlay').style.display='none'">✕</div>
-        <h2>👫 Arkadaş Ekle</h2>
-        <p style="color:var(--text-muted);margin-bottom:12px">Arkadaşının UUID'sini gir</p>
-        <input type="text" id="friend-uuid-input" class="modern-input" placeholder="user_xxxxx">
-        <button class="btn-restart" onclick="addFriendFromModal()">EKLE</button>
-    </div>
-</div>
+<div id="toast" class="toast"></div>
 
 <script>
-    // ===================== ROZET SİSTEMİ =====================
-const ACHIEVEMENTS = {
-  firstWin: { 
-    emoji: '🎯', 
-    name: 'İlk Galibiyet',
-    desc: 'İlk kazanışını aldı'
-  },
-  streak3: { 
-    emoji: '🔥', 
-    name: '3 Seri',
-    desc: '3 galibiyet seri'
-  },
-  streak5: { 
-    emoji: '🌟', 
-    name: '5 Seri',
-    desc: '5 galibiyet seri'
-  },
-  streak10: { 
-    emoji: '👑', 
-    name: '10 Seri',
-    desc: '10 galibiyet seri'
-  },
-  perfect: { 
-    emoji: '⚡', 
-    name: 'Mükemmel',
-    desc: 'Tek denemede bildi'
-  },
-  speed: { 
-    emoji: '🚀', 
-    name: 'Kılıç Hızı',
-    desc: '15 saniyede bitti'
-  },
-  100Games: { 
-    emoji: '💯', 
-    name: '100 Maç',
-    desc: '100 oyun oynadı'
-  },
-  clubMaster: { 
-    emoji: '🏟️', 
-    name: 'Kulüp Ustası',
-    desc: 'Kulüp modunda 20 galibiyet'
-  },
-  playerMaster: { 
-    emoji: '⚽', 
-    name: 'Oyuncu Ustası',
-    desc: 'Oyuncu modunda 20 galibiyet'
-  },
-  weeklyKing: { 
-    emoji: '👸', 
-    name: 'Haftalık Kral',
-    desc: 'Haftanın en iyisi'
-  }
-};
-
-let userUUID = localStorage.getItem('futbol_wordle_uuid');
-if (!userUUID) {
-  userUUID = 'user_' + Math.random().toString(36).substring(2, 11);
-  localStorage.setItem('futbol_wordle_uuid', userUUID);
-}
-
-let userAchievements = [];
-let userFriends = [];
-let userLevel = 1;
-
-// ===================== ROZET KONTROL FONK. =====================
-async function checkAchievements() {
-  const newAchievements = [];
-
-  // İlk Galibiyet
-  if (stats.wins === 1 && !userAchievements.includes('firstWin')) {
-    newAchievements.push('firstWin');
-  }
-
-  // Seri Rozetleri
-  if (stats.streak === 3 && !userAchievements.includes('streak3')) {
-    newAchievements.push('streak3');
-  }
-  if (stats.streak === 5 && !userAchievements.includes('streak5')) {
-    newAchievements.push('streak5');
-  }
-  if (stats.streak === 10 && !userAchievements.includes('streak10')) {
-    newAchievements.push('streak10');
-  }
-
-  // Mükemmel Tahmin
-  if (currentRow === 0 && !userAchievements.includes('perfect')) {
-    newAchievements.push('perfect');
-  }
-
-  // Hız Rozetleri
-  const timeSecs = Math.floor((Date.now() - startTime) / 1000);
-  if (timeSecs <= 15 && !userAchievements.includes('speed')) {
-    newAchievements.push('speed');
-  }
-
-  // 100 Oyun
-  if (stats.played === 100 && !userAchievements.includes('100Games')) {
-    newAchievements.push('100Games');
-  }
-
-  // Master Rozetleri
-  const modeWins = currentGameMode === 'club' ? 
-    (JSON.parse(localStorage.getItem('wordleStats'))?.wins || 0) : 
-    (JSON.parse(localStorage.getItem('playerWordleStats'))?.wins || 0);
-
-  if (modeWins === 20 && !userAchievements.includes('clubMaster') && currentGameMode === 'club') {
-    newAchievements.push('clubMaster');
-  }
-  if (modeWins === 20 && !userAchievements.includes('playerMaster') && currentGameMode === 'player') {
-    newAchievements.push('playerMaster');
-  }
-
-  // Sunucuya Gönder
-  for (const ach of newAchievements) {
-    try {
-      await fetch('/api/leaderboard', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          uuid: userUUID,
-          action: 'addAchievement',
-          achievement: ach
-        })
-      });
-      userAchievements.push(ach);
-      showToast(`🎖️ YENİ ROZET: ${ACHIEVEMENTS[ach].name}`);
-    } catch (err) {
-      console.error('Rozet kaydı başarısız:', err);
-    }
-  }
-}
-
-async function saveGameStats() {
-  try {
-    await fetch('/api/leaderboard', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        uuid: userUUID,
-        stats: stats
-      })
-    });
-  } catch (err) {
-    console.error('Stats kaydı başarısız:', err);
-  }
-}
-
-async function sendScoreToLeaderboard() {
-  try {
-    await fetch('/api/leaderboard', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        uuid: userUUID,
-        name: username,
-        score: stats.wins,
-        action: 'updateScore'
-      })
-    });
-  } catch (err) {
-    console.error('Skor gönderme başarısız:', err);
-  }
-}
-
-async function loadUserData() {
-  try {
-    const res = await fetch(`/api/leaderboard?filter=personal&uuid=${userUUID}`);
-    const data = await res.json();
-    userAchievements = data.achievements || [];
-    userLevel = data.level || 1;
-  } catch (err) {
-    console.error('Kullanıcı verisi yüklenemedi:', err);
-  }
-}
-
-async function loadFriends() {
-  try {
-    const res = await fetch(`/api/leaderboard?filter=friends&uuid=${userUUID}`);
-    userFriends = await res.json();
-  } catch (err) {
-    console.error('Arkadaş listesi yüklenemedi:', err);
-  }
-}
-
-async function addFriend(friendUUID) {
-  try {
-    const res = await fetch('/api/leaderboard', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        uuid: userUUID,
-        friendUuid: friendUUID,
-        action: 'addFriend'
-      })
-    });
-    if (res.ok) {
-      showToast('👫 Arkadaş eklendi!');
-      await loadFriends();
-    }
-  } catch (err) {
-    console.error('Arkadaş ekleme başarısız:', err);
-  }
-}
-
-async function removeFriend(friendUUID) {
-  try {
-    const res = await fetch('/api/leaderboard', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        uuid: userUUID,
-        friendUuid: friendUUID,
-        action: 'removeFriend'
-      })
-    });
-    if (res.ok) {
-      showToast('👋 Arkadaş çıkarıldı');
-      await loadFriends();
-    }
-  } catch (err) {
-    console.error('Arkadaş çıkarma başarısız:', err);
-  }
-}
-// ===================== VERİ TABANI =====================
 const CLUBS = [
-    // Süper Lig
     'Fenerbahce','Galatasaray','Besiktas','Trabzonspor','Basaksehir',
     'Kasimpasa','Sivasspor','Alanyaspor','Antalyaspor','Rizespor',
     'Eyupspor','Goztepe','Gaziantep','Samsunspor','Bodrumspor',
     'Konyaspor','Adana Demirspor','Hatayspor','Kayserispor','Karagumruk',
-    'Ankaragucu','Istanbulspor','Pendikspor','Sakaryaspor','Boluspor',
-    'Genclerbirligi','Bursaspor','Altay','Denizlispor','Giresunspor',
-    // Premier League
     'Manchester City','Arsenal','Liverpool','Aston Villa','Tottenham',
     'Chelsea','Newcastle','Manchester United','West Ham','Brighton',
-    'Everton','Leicester City','Wolves','Fulham','Crystal Palace',
-    'Brentford','Bournemouth','Nottingham Forest','Southampton','Ipswich Town',
-    'Leeds United','Sheffield United','Burnley','Watford','Sunderland',
-    'Middlesbrough','Norwich City','Blackburn','Swansea City','Cardiff City',
-    'Stoke City','Derby County','Millwall','Coventry City','Preston',
-    // La Liga
     'Real Madrid','Barcelona','Atletico Madrid','Athletic Bilbao','Real Sociedad',
-    'Real Betis','Villarreal','Valencia','Sevilla','Girona',
-    'Osasuna','Getafe','Celta Vigo','Mallorca','Las Palmas',
-    'Espanyol','Deportivo Alaves','Rayo Vallecano','Real Valladolid','Leganes',
-    'Real Zaragoza','Granada','Almeria','Elche','Cadiz',
-    'Deportivo','Recreativo','Numancia','Racing Santander',
-    // Serie A
     'Inter Milan','AC Milan','Juventus','Atalanta','Bologna',
-    'AS Roma','Lazio','Fiorentina','Napoli','Torino',
-    'Monza','Genoa','Udinese','Cagliari','Verona',
-    'Empoli','Lecce','Como','Parma','Venezia',
-    'Palermo','Sampdoria','Brescia','Frosinone','Spezia',
-    'Pescara','Reggina','Chievo','Siena','Catania',
-    // Bundesliga
     'Bayer Leverkusen','Bayern Munich','Stuttgart','RB Leipzig','Borussia Dortmund',
-    'Eintracht Frankfurt','Hoffenheim','Heidenheim','Werder Bremen','Freiburg',
-    'Augsburg','Wolfsburg','Monchengladbach','Mainz 05','Union Berlin',
-    'St Pauli','Hertha Berlin','Schalke','Hamburger SV','Hannover',
-    'Kaiserslautern','Nurnberg','Paderborn','Bochum','Darmstadt',
-    'Arminia Bielefeld','Greuther Furth','Sandhausen',
-    // Ligue 1
     'PSG','Monaco','Lille','Brest','Nice',
-    'Lyon','Lens','Marseille','Reims','Rennes',
-    'Toulouse','Montpellier','Strasbourg','Saint-Etienne','Nantes',
-    'Metz','Lorient','Auxerre','Angers','Caen',
-    'Bordeaux','Valenciennes','Guingamp','Troyes','Ajaccio',
-    // Hollanda
-    'Ajax','PSV Eindhoven','Feyenoord','AZ Alkmaar','Twente',
-    'Utrecht','Vitesse','Heerenveen','Groningen','Sparta Rotterdam',
-    // Portekiz
-    'Benfica','Porto','Sporting CP','Braga','Vitoria Guimaraes',
-    'Boavista','Rio Ave','Maritimo','Setubal',
-    // İskoçya
-    'Celtic','Rangers','Hearts','Hibernian','Aberdeen',
-    'Motherwell','Dundee','Kilmarnock',
-    // Belçika
-    'Brugge','Anderlecht','Gent','Antwerp','Standard Liege',
-    'Genk','Charleroi','Mechelen',
-    // Diğer Avrupa
-    'Shakhtar','Dynamo Kyiv','Panathinaikos','Olympiakos','PAOK',
-    'AEK Athens','Slavia Prague','Sparta Prague','Legia Warsaw',
-    'Steaua Bucharest','Dinamo Zagreb','Red Star Belgrade','Partizan',
-    'Rapid Wien','Salzburg','Sturm Graz','Galatasaray',
-    'Young Boys','Basel','Zurich','Servette',
-    'Rosenborg','Molde','Viking','Malmo','IFK Goteborg',
-    'Fenerbahce','HJK Helsinki','Vikingur','Shamrock Rovers',
-    // Güney Amerika
-    'Flamengo','Palmeiras','Santos','Sao Paulo','Corinthians',
-    'Atletico Mineiro','Gremio','Internacional','Fluminense','Vasco',
-    'Boca Juniors','River Plate','Independiente','Racing Club','San Lorenzo',
-    'Estudiantes','Lanus','Huracan','Colon','Rosario Central',
-    'Nacional','Penarol','Colo Colo','Universidad Chile','Universidad Catolica',
-    'LDU Quito','Olimpia','Cerro Porteno','Libertad',
-    // Dünya
-    'Al Hilal','Al Nassr','Al Ittihad','Al Ahly','Wydad',
-    'Mamelodi Sundowns','Zamalek','TP Mazembe',
-    'LA Galaxy','Seattle Sounders','Inter Miami','Toronto FC','New York City',
-    'Portland Timbers','Atlanta United','New England Revolution',
-    'Monterrey','America','Cruz Azul','Chivas','Tigres','Toluca','Santos Laguna',
-    'Kashima Antlers','Urawa Reds','Gamba Osaka','Yokohama','Vissel Kobe',
-    'Ulsan Hyundai','Jeonbuk','Seoul','Suwon',
-    'Melbourne City','Sydney FC','Western Sydney','Auckland City',
-    'Raja Casablanca','Espérance','Ahly Benghazi',
+    'Ajax','PSV Eindhoven','Feyenoord',
+    'Benfica','Porto','Sporting CP',
+    'Boca Juniors','River Plate','Flamengo','Palmeiras'
 ];
 
 const PLAYERS = [
-    // Mega Starlar
     'Cristiano Ronaldo','Lionel Messi','Kylian Mbappe','Erling Haaland','Jude Bellingham',
     'Vinicius Junior','Harry Kane','Kevin De Bruyne','Mohamed Salah','Rodri',
     'Robert Lewandowski','Antoine Griezmann','Luka Modric','Karim Benzema','Neymar',
-    'Kaka','Ronaldinho','Zinedine Zidane','Thierry Henry','Ronaldo Nazario',
-    'Zlatan Ibrahimovic','Didier Drogba','Samuel Eto','Gianluigi Buffon','Andres Iniesta',
-    'Xavi Hernandez','Sergio Ramos','Gerard Pique','Paolo Maldini','Franco Baresi',
-    'Alessandro Del Piero','Roberto Baggio','Gabriel Batistuta','Romario','Rivaldo',
-    'Michael Ballack','Oliver Kahn','Miroslav Klose','Lothar Matthaus','Franz Beckenbauer',
-    'Dennis Bergkamp','Patrick Vieira','Roy Keane','Steven Gerrard','Frank Lampard',
-    'Paul Scholes','Ryan Giggs','Wayne Rooney','Alan Shearer','Michael Owen',
-    'Robbie Fowler','Peter Schmeichel','Edwin van der Sar','Iker Casillas','Dino Zoff',
-    'Gerd Muller','Jurgen Klinsmann','Uwe Seeler','Karl-Heinz Rummenigge',
-    'Marco van Basten','Ruud Gullit','Johan Cruyff','Diego Maradona','Pele',
-    'Eusebio','George Best','Bobby Charlton','Bobby Moore','Gordon Banks',
-    'Roberto Carlos','Cafu','Phillip Lahm','Carles Puyol','John Terry',
-    'Rio Ferdinand','Nemanja Vidic','Jamie Carragher','Ashley Cole',
-    // Türk Yıldızlar
+    'Zinedine Zidane','Thierry Henry','Ronaldo Nazario','Ronaldinho','Kaka',
     'Arda Guler','Ferdi Kadioglu','Kerem Akturkoglu','Baris Alper Yilmaz','Semih Kilicsoy',
     'Ismail Yuksek','Caglar Soyuncu','Mert Gunok','Hakan Calhanoglu','Kenan Yildiz',
-    'Can Uzun','Okay Yokuslu','Orkun Kokcu','Zeki Celik','Merih Demiral',
-    'Altay Bayindir','Ugurcan Cakir','Irfan Can Kahveci','Cengiz Under','Yusuf Yazici',
-    'Dorukhan Tokoz','Ozan Kabak','Enes Unal','Umut Bozok','Vedat Muriqi',
-    'Emre Belozoglu','Tugay Kerimoglu','Ilhan Mansiz','Nihat Kahveci','Hasan Sas',
-    'Tuncay Sanli','Gokdeniz Karadeniz','Servet Cetin','Samet Akaydin','Kaan Ayhan',
-    'Halil Akbunar','Michy Batshuayi','Hakim Ziyech','Dries Mertens','Wesley Sneijder',
-    'Radamel Falcao','Ryan Babel','Sofyan Amrabat','Lucas Torreira','Davinson Sanchez',
-    'En-Nesyri','Allan Saint-Maximin','Victor Osimhen','Mauro Icardi','Dusan Tadic',
-    'Edin Dzeko','Sebastian Szymanski','Fred','Rafa Silva','Ciro Immobile',
-    'Gedson Fernandes','Harun Tekin','Volkan Demirel','Rustu Recber',
-    // Premier League
+    'Mauro Icardi','Dusan Tadic','Edin Dzeko','Sebastian Szymanski','Fred',
+    'Victor Osimhen','Allan Saint-Maximin','Rafa Silva','Ciro Immobile','Gedson Fernandes',
     'Phil Foden','Bukayo Saka','Declan Rice','Martin Odegaard','Cole Palmer',
-    'Virgil van Dijk','Alisson Becker','Bruno Fernandes','Marcus Rashford','Son Heung-min',
-    'Ollie Watkins','Alexis Mac Allister','William Saliba','Jarrod Bowen','Eberechi Eze',
-    'Richarlison','Anthony Gordon','Gabriel Martinelli','Leandro Trossard','Jurrien Timber',
-    'Dominic Solanke','Ivan Toney','Callum Wilson','Alexander Isak','Fabian Schar',
-    'James Maddison','Heung-min Son','Cristian Romero','Pedro Porro','Brennan Johnson',
-    'Nicolas Jackson','Enzo Fernandez','Ben Chilwell','Reece James','Trent Alexander-Arnold',
-    'Andrew Robertson','Joe Gomez','Ibrahima Konate','Darwin Nunez','Diogo Jota',
-    'Erling Haaland','Jeremy Doku','Bernardo Silva','Kyle Walker','Ruben Dias',
-    // La Liga
     'Lamine Yamal','Pedri','Gavi','Federico Valverde','Rodrygo Goes',
-    'Aurelien Tchouameni','Eduardo Camavinga','Eder Militao','Ronald Araujo','Nico Williams',
-    'Dani Olmo','Julian Alvarez','Conor Gallagher','Alexander Sorloth','Vitor Roque',
-    'Endrick','Dean Huijsen','Dani Ceballos','Lucas Vazquez','Nacho Fernandez',
-    'Ferran Torres','Joao Felix','Marcos Llorente','Jose Gimenez','Jan Oblak',
-    'Unai Simon','Alejandro Balde','Jules Kounde','Raphinha','Robert Lewandowski',
-    // Bundesliga
-    'Florian Wirtz','Jamal Musiala','Xavi Simons','Granit Xhaka','Victor Boniface',
-    'Serge Gnabry','Leroy Sane','Joshua Kimmich','Alphonso Davies','Alejandro Grimaldo',
-    'Jonathan Tah','Exequiel Palacios','Amine Adli','Patrik Schick','Chris Fuhrich',
-    'Thomas Muller','Manuel Neuer','Leon Goretzka','Dayot Upamecano','Kingsley Coman',
-    'Sadio Mane','Harry Kane','Min-jae Kim','Konrad Laimer','Mathys Tel',
-    'Marco Reus','Marco Rose','Niklas Sule','Mats Hummels','Sven Bender',
-    // Serie A
-    'Rafael Leao','Lautaro Martinez','Marcus Thuram','Nicolo Barella','Theo Hernandez',
-    'Dusan Vlahovic','Paulo Dybala','Khvicha Kvaratskhelia','Christian Pulisic','Douglas Luiz',
-    'Ademola Lookman','Gianluca Scamacca','Davide Frattesi','Federico Chiesa','Matteo Guendouzi',
-    'Lorenzo Pellegrini','Romelu Lukaku','Stephan El Shaarawy','Alessandro Bastoni','Hakan Calhanoglu',
-    'Piotr Zielinski','Matteo Darmian','Federico Dimarco','Yann Bisseck','Carlos Augusto',
-    'Mike Maignan','Malick Thiaw','Fikayo Tomori','Ruben Loftus-Cheek','Samuel Chukwueze',
-    // Ligue 1
-    'Bradley Barcola','Ousmane Dembele','Warren Zaire-Emery','Jonathan David','Achraf Hakimi',
-    'Vitinha','Mason Greenwood','Khephren Thuram','Elye Wahi','Rayan Cherki',
-    'Amine Harit','Alexandre Lacazette','Pierre-Emerick Aubameyang','Karl Toko Ekambi',
-    'Amine Adli','Wissam Ben Yedder','Sofiane Boufal','Nabil Fekir','Houssem Aouar',
-    // Kaleciler
-    'Thibaut Courtois','Gianluigi Donnarumma','Marc-Andre ter Stegen','Jan Oblak',
-    'Ederson','Andre Onana','David Raya','Gregor Kobel','Mike Maignan',
-    'Emiliano Martinez','Yann Sommer','Giorgi Mamardashvili','Ivan Provedel',
-    // Güney Amerika
-    'Enzo Fernandez','Alejandro Garnacho','Giovani Lo Celso','Rodrigo De Paul',
-    'Lautaro Martinez','Julian Alvarez','Paulo Dybala','Lionel Scaloni',
-    'Rodrygo Goes','Richarlison','Raphinha','Lucas Paqueta','Endrick',
-    'Luis Suarez','Darwin Nunez','Federico Valverde','Ronald Araujo','Jose Gimenez',
-    'Alexis Sanchez','Arturo Vidal','Claudio Bravo','Gary Medel','Eduardo Vargas',
-    'James Rodriguez','David Ospina','Radamel Falcao','Juan Cuadrado','Luis Diaz',
-    'Davinson Sanchez','Johan Mojica','Jhon Duran',
-    // Efsaneler
-    'Eric Cantona','David Beckham','Ronaldinho','Robinho','Adriano',
-    'Riquelme','Tevez','Aguero','Hernan Crespo','Ariel Ortega',
-    'Hristo Stoichkov','Davor Suker','Predrag Mijatovic','Clarence Seedorf',
-    'Patrick Kluivert','Marc Overmars','Arjen Robben','Rafael van der Vaart',
-    'Ruud van Nistelrooy','Phillip Cocu','Edgar Davids','Frank Rijkaard',
-    'Paolo Rossi','Luca Toni','Christian Vieri','Filippo Inzaghi','Francesco Totti',
-    'David Trezeguet','Nicolas Anelka','Emmanuel Petit','Marcel Desailly','Lilian Thuram',
-    'Claude Makelele','Robert Pires','Sylvain Wiltord','William Gallas',
-    'Ji-sung Park','Shinji Kagawa','Keisuke Honda','Shinji Okazaki',
-    'Didier Drogba','Michael Essien','Emmanuel Adebayor','Jay-Jay Okocha',
-    'El Hadji Diouf','Nwankwo Kanu','Finidi George','Austin Jay-Jay Okocha',
+    'Florian Wirtz','Jamal Musiala','Xavi Simons','Rafael Leao','Lautaro Martinez'
 ];
 
-// ===================== OYUN MOTORU =====================
 function normalize(str) {
     return str.toUpperCase()
         .replace(/İ/g,'I').replace(/Ğ/g,'G').replace(/Ü/g,'U')
@@ -926,11 +392,14 @@ let wordList = currentGameMode === 'club' ? CLUBS : PLAYERS;
 
 function getTargetWord(list, isDaily) {
     if (!isDaily) return list[Math.floor(Math.random() * list.length)];
+    
     const today = new Date();
-    const modeOffset = currentGameMode === 'club' ? 1 : 2;
+    const modeOffset = currentGameMode === 'club' ? 1 : 2; 
     const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate() + modeOffset;
+    
     const x = Math.sin(seed) * 10000;
-    return list[Math.floor((x - Math.floor(x)) * list.length)];
+    const index = Math.floor((x - Math.floor(x)) * list.length);
+    return list[index];
 }
 
 let rawTarget = getTargetWord(wordList, isDailyMode);
@@ -965,8 +434,10 @@ function switchPlayType(daily) {
 function initBoard() {
     document.getElementById('mode-club').classList.toggle('active', currentGameMode === 'club');
     document.getElementById('mode-player').classList.toggle('active', currentGameMode === 'player');
+    
     document.getElementById('mode-daily').classList.toggle('active-green', isDailyMode);
     document.getElementById('mode-endless').classList.toggle('active-green', !isDailyMode);
+
     document.getElementById('game-subtitle').textContent = currentGameMode === 'club' ? 'THE ULTIMATE CLUB CHALLENGE' : 'GUESS THE STAR PLAYER';
 
     const board = document.getElementById('game-board');
@@ -996,18 +467,24 @@ function showToast(msg) {
 
 function useHint() {
     if (hintUsed || gameOver) return;
+    
     let foundLetters = new Set();
-    for (let i = 0; i < currentRow; i++) guesses[i].forEach(ch => foundLetters.add(ch));
-    let missing = targetLettersOnly.split('').filter(ch => !foundLetters.has(ch));
-    if (missing.length > 0) {
-        showToast(`💡 İPUCU: Kelimede "${missing[Math.floor(Math.random()*missing.length)]}" harfi var!`);
-    } else {
-        showToast('💡 Bütün harfleri buldun, sadece yerleri yanlış!');
+    for(let i=0; i<currentRow; i++) {
+        guesses[i].forEach(ch => foundLetters.add(ch));
     }
+    
+    let missingLetters = targetLettersOnly.split('').filter(ch => !foundLetters.has(ch));
+    
+    if(missingLetters.length > 0) {
+        let randomHint = missingLetters[Math.floor(Math.random() * missingLetters.length)];
+        showToast(`💡 İPUCU: Kelimede kesinlikle "${randomHint}" harfi var!`);
+    } else {
+        showToast(`💡 İPUCU: Bütün harfleri zaten buldun, sadece yerleri yanlış!`);
+    }
+    
     hintUsed = true;
-    const btn = document.getElementById('hint-btn');
-    btn.style.opacity = '0.4';
-    btn.style.cursor = 'not-allowed';
+    document.getElementById('hint-btn').style.opacity = '0.4';
+    document.getElementById('hint-btn').style.cursor = 'not-allowed';
 }
 
 function updateBoard() {
@@ -1024,12 +501,12 @@ function submitGuess() {
         const row = document.getElementById(`row-${currentRow}`);
         row.classList.add('shake');
         setTimeout(() => row.classList.remove('shake'), 400);
-        showToast('YETERSİZ HARF');
+        showToast("YETERSİZ HARF");
         return;
     }
 
     if (currentGameMode === 'club' && guess === normalize('Galatasaray')) {
-        showToast('Cidden mi? Limon sıktın keyfimize... 🍋');
+        showToast("Cidden mi? Limon sıktın keyfimize... 🍋");
     }
 
     const rowTiles = document.querySelectorAll(`#row-${currentRow} .tile:not(.space)`);
@@ -1037,11 +514,7 @@ function submitGuess() {
     const guessArr = guess.split('');
     const states = new Array(letterCount).fill('absent');
 
-    // Önce doğru yerdekiler
-    guessArr.forEach((ch, i) => {
-        if (ch === targetArr[i]) { states[i] = 'correct'; targetArr[i] = null; }
-    });
-    // Sonra yanlış yerdekiler
+    guessArr.forEach((ch, i) => { if (ch === targetArr[i]) { states[i] = 'correct'; targetArr[i] = null; } });
     guessArr.forEach((ch, i) => {
         if (states[i] !== 'correct') {
             const idx = targetArr.indexOf(ch);
@@ -1049,7 +522,6 @@ function submitGuess() {
         }
     });
 
-    // Tile + klavye renklendirmesi (cascade animasyon)
     const KB_PRIORITY = { correct: 3, present: 2, absent: 1 };
     states.forEach((state, i) => {
         setTimeout(() => {
@@ -1064,15 +536,16 @@ function submitGuess() {
 
     const isWin = guess === targetLettersOnly;
     const delay = letterCount * 120 + 400;
-
+    
     if (isWin || currentRow === attempts - 1) {
         gameOver = true;
         updateStats(isWin);
         setTimeout(() => showEndGame(isWin), delay);
     } else {
-        setTimeout(() => {
-            currentRow++;
-            currentLetterIndex = 0;
+        setTimeout(() => { 
+            currentRow++; 
+            currentLetterIndex = 0; 
+            
             if (currentRow >= 2 && !hintUsed) {
                 document.getElementById('hint-btn').style.display = 'flex';
             }
@@ -1093,97 +566,33 @@ function updateStats(win) {
         stats.bestRuns = stats.bestRuns.slice(0, 10);
     } else { stats.streak = 0; }
     saveStats();
-    
-    // 🆕 YENİ KODLAR
-    saveGameStats();        // Sunucuya stat gönder
-    sendScoreToLeaderboard(); // Sıralamaya gönder
-    if (win) {
-      checkAchievements();  // Rozet kontrolü
-    }
 }
-window.toggleStats = async function() {
+
+window.toggleStats = function() {
     const overlay = document.getElementById('stats-overlay');
-    if (overlay.style.display === 'flex') { 
-        overlay.style.display = 'none'; 
-        return; 
-    }
+    if (overlay.style.display === 'flex') { overlay.style.display = 'none'; return; }
 
-    // Verileri yükle
-    await loadUserData();
-    await loadFriends();
-
-    // İstatistikleri göster
     document.getElementById('stats-played').textContent = stats.played;
     document.getElementById('stats-score').textContent = stats.wins || 0;
     document.getElementById('stats-streak').textContent = stats.streak;
     document.getElementById('stats-max').textContent = stats.maxStreak;
-    document.getElementById('user-level').textContent = userLevel;
 
-    // ROZETLER
-    const achContainer = document.getElementById('achievements-container');
-    achContainer.innerHTML = '';
-    
-    Object.entries(ACHIEVEMENTS).forEach(([key, ach]) => {
-        const badge = document.createElement('div');
-        badge.className = 'achievement-badge' + (!userAchievements.includes(key) ? ' locked' : '');
-        badge.innerHTML = `
-            <div class="achievement-icon">${ach.emoji}</div>
-            <div class="achievement-name">${ach.name}</div>
-            <div class="tooltip">${ach.desc}</div>
-        `;
-        achContainer.appendChild(badge);
-    });
-
-    // ARKADAŞ LİSTESİ
-    const friendsList = document.getElementById('friends-list');
-    if (userFriends.length === 0) {
-        friendsList.innerHTML = '<p style="text-align:center;opacity:.4;font-size:.7rem;">Henüz arkadaş yok</p>';
-    } else {
-        friendsList.innerHTML = userFriends.map(friend => `
-            <div class="friend-item">
-                <span>${friend.name} <span style="opacity:.5">(${friend.score} galibiyet)</span></span>
-                <button class="friend-remove-btn" onclick="removeFriend('${friend.uuid}')">Çıkar</button>
-            </div>
-        `).join('');
-    }
-
-    // ARKADAŞ SIRALAMASI
-    const friendsLb = document.getElementById('friends-leaderboard');
-    if (userFriends.length === 0) {
-        friendsLb.innerHTML = '<p style="text-align:center;opacity:.3;font-size:.7rem;">Arkadaş ekle</p>';
-    } else {
-        const sorted = [...userFriends].sort((a,b) => b.score - a.score);
-        friendsLb.innerHTML = sorted.map((f, i) => `
-            <div class="leaderboard-item">
-                <span><span class="rank">#${i+1}</span>${f.name}</span>
-                <span style="font-weight:700">${f.score} 🏆</span>
-            </div>
-        `).join('');
-    }
-
-    // GENEL SIRALAMASİ
     const lb = document.getElementById('leaderboard');
     lb.innerHTML = stats.bestRuns.length
         ? stats.bestRuns.map((r,i) => `<div class="leaderboard-item"><span><span class="rank">#${i+1}</span>${r.club}</span><span style="opacity:.6">${r.guesses} deneme</span></div>`).join('')
         : '<p style="text-align:center;opacity:.3;font-size:.7rem;">Henüz galibiyet yok</p>';
 
+    // TEMİZLENMİŞ LOKAL LİDERLİK TABLOSU
+    const fakeDBPlayers = [
+        {name: username || "Sen", score: stats.wins || 0, isUser: true}
+    ];
+
+    document.getElementById('global-leaderboard').innerHTML = fakeDBPlayers.map((l,i) =>
+        `<div class="leaderboard-item ${l.isUser?'highlight':''}"><span><span class="rank">${i+1}</span>${l.name}</span><span style="font-weight:800">${l.score}</span></div>`
+    ).join('');
+
     overlay.style.display = 'flex';
 };
-
-function showAddFriendModal() {
-    document.getElementById('add-friend-overlay').style.display = 'flex';
-    document.getElementById('friend-uuid-input').focus();
-}
-
-function addFriendFromModal() {
-    const uuid = document.getElementById('friend-uuid-input').value.trim();
-    if (!uuid) {
-        showToast('UUID gir!');
-        return;
-    }
-    addFriend(uuid);
-    document.getElementById('add-friend-overlay').style.display = 'none';
-}
 
 function showEndGame(win) {
     const modal = document.getElementById('stats-modal');
@@ -1191,15 +600,15 @@ function showEndGame(win) {
     if (win) {
         if (targetWord === normalize('Fenerbahce')) {
             modal.classList.add('win-fenerbahce');
-            title.innerHTML = 'EN BÜYÜK FENERBAHÇE! 💛💙';
+            title.innerHTML = "EN BÜYÜK FENERBAHÇE! 💛💙";
         } else if (targetWord === normalize('Galatasaray')) {
-            title.textContent = 'Sarı-kırmızı bir tat... 🍋';
+            title.textContent = "Sarı-kırmızı bir tat... 🍋";
         } else {
-            const msgs = ['G O O O A L ! ⚽','MÜKEMMEL! 🎯','HARIKA! 🔥','SÜPER! 💪','BRAVO! 👏'];
+            const msgs = ["G O O O A L ! ⚽","MÜKEMMEL! 🎯","HARIKA! 🔥","SÜPER! 💪","BRAVO! 👏"];
             title.textContent = msgs[currentRow] || msgs[0];
         }
     } else {
-        title.textContent = 'OYUN BİTTİ: ' + rawTarget;
+        title.textContent = "OYUN BİTTİ: " + rawTarget;
     }
     toggleStats();
 }
@@ -1216,7 +625,7 @@ function handleInput(key) {
 
 function registerUser() {
     const val = document.getElementById('username-input').value.trim();
-    if (!val) { showToast('Bir isim gir!'); return; }
+    if (!val) { showToast("Bir isim gir!"); return; }
     saveUser(val);
     document.getElementById('login-overlay').style.display = 'none';
     showToast(`Hoş geldin, Manager ${val}! ⚽`);
@@ -1228,9 +637,8 @@ function showNameChange() {
     document.getElementById('username-input').value = username || '';
 }
 
-window.addEventListener('load', async () => {
+window.addEventListener('load', () => {
     if (!username) document.getElementById('login-overlay').style.display = 'flex';
-    await loadUserData();
     initBoard();
 });
 
