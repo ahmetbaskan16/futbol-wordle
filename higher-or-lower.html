@@ -6,6 +6,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Higher or Lower">
+    <meta name="referrer" content="no-referrer">
+    
     <title>⚽ Higher or Lower - Futbol FC 26</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -332,7 +334,6 @@
     <div style="width:38px"></div>
 </header>
 
-<!-- Score Bar -->
 <div class="score-bar">
     <div class="score-card">
         <span class="score-val" id="streak-val">0</span>
@@ -348,7 +349,6 @@
     </div>
 </div>
 
-<!-- Category Switcher -->
 <div class="cat-switcher">
     <button class="cat-btn active" data-cat="marketValue" onclick="switchCat(this,'marketValue')">💶 Değer</button>
     <button class="cat-btn" data-cat="goals" onclick="switchCat(this,'goals')">⚽ Gol</button>
@@ -356,9 +356,7 @@
     <button class="cat-btn" data-cat="age" onclick="switchCat(this,'age')">🎂 Yaş</button>
 </div>
 
-<!-- Game Area -->
 <div id="game-area">
-    <!-- Left card (known) -->
     <div class="player-card" id="card-left">
         <div class="player-img-wrap">
             <img class="player-img" id="img-left" src="" alt="">
@@ -374,7 +372,6 @@
 
     <div class="vs-divider">VS</div>
 
-    <!-- Right card (mystery) -->
     <div class="player-card" id="card-right">
         <div class="player-img-wrap">
             <img class="player-img" id="img-right" src="" alt="">
@@ -386,11 +383,9 @@
             <span class="stat-label-txt" id="cat-label-right"></span>
             <span class="stat-value-txt hidden-stat" id="val-right">???</span>
         </div>
-        <!-- Result badge appears after guess -->
         <div class="result-badge" id="result-badge" style="display:none"></div>
     </div>
 
-    <!-- Buttons -->
     <div class="btn-row" id="btn-row">
         <button class="guess-btn higher" onclick="makeGuess('higher')">▲ DAHA YÜKSEK</button>
         <button class="guess-btn lower"  onclick="makeGuess('lower')">▼ DAHA DÜŞÜK</button>
@@ -399,7 +394,6 @@
     <button class="btn-next" id="btn-next" onclick="nextRound()">SONRAKI ➔</button>
 </div>
 
-<!-- Game Over Modal -->
 <div class="overlay" id="gameover-overlay">
     <div class="modal">
         <div class="modal-emoji" id="go-emoji">💥</div>
@@ -481,9 +475,6 @@ function getStat(p, cat) {
 function fmtStat(v, cat) {
     switch(cat) { case 'marketValue': return `€${v}M`; case 'goals': return `${v} Gol`; case 'rating': return `${v}`; case 'age': return `${v} Yaş`; }
 }
-function proxyImg(url) {
-    return url; // Doğrudan orijinal bağlantıyı kullanıyoruz (Proxy iptal)
-}
 
 /* ─────────── STATE ─────────── */
 let category = 'marketValue';
@@ -518,12 +509,13 @@ function renderCard(side, player, hideVal) {
     const valEl = document.getElementById(`val-${side}`);
     const lblEl = document.getElementById(`cat-label-${side}`);
 
-    // Görsel yüklenmezse placeholder göster
+    // HATA YAKALAYICI YEDEK GÖRSEL (AVATAR)
     img.onerror = function() {
-        this.src = `https://placehold.co/450x450/111111/ffffff?text=${encodeURIComponent(player.name)}`;
+        this.onerror = null; 
+        this.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(player.name)}&background=1a1a2e&color=fff&size=400&font-size=0.33`;
     };
 
-    img.src = proxyImg(player.image);
+    img.src = player.image;
     img.alt = player.name;
     name.textContent = player.name;
     meta.innerHTML = `<span class="badge">🏟 ${player.club}</span><span class="badge">🌍 ${player.nationality}</span><span class="badge">📍 ${player.position}</span>`;
