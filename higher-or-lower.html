@@ -7,7 +7,6 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Higher or Lower">
     <meta name="referrer" content="no-referrer">
-    
     <title>⚽ Higher or Lower - Futbol FC 26</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -334,6 +333,7 @@
     <div style="width:38px"></div>
 </header>
 
+<!-- Score Bar -->
 <div class="score-bar">
     <div class="score-card">
         <span class="score-val" id="streak-val">0</span>
@@ -349,6 +349,7 @@
     </div>
 </div>
 
+<!-- Category Switcher -->
 <div class="cat-switcher">
     <button class="cat-btn active" data-cat="marketValue" onclick="switchCat(this,'marketValue')">💶 Değer</button>
     <button class="cat-btn" data-cat="goals" onclick="switchCat(this,'goals')">⚽ Gol</button>
@@ -356,7 +357,9 @@
     <button class="cat-btn" data-cat="age" onclick="switchCat(this,'age')">🎂 Yaş</button>
 </div>
 
+<!-- Game Area -->
 <div id="game-area">
+    <!-- Left card (known) -->
     <div class="player-card" id="card-left">
         <div class="player-img-wrap">
             <img class="player-img" id="img-left" src="" alt="">
@@ -372,6 +375,7 @@
 
     <div class="vs-divider">VS</div>
 
+    <!-- Right card (mystery) -->
     <div class="player-card" id="card-right">
         <div class="player-img-wrap">
             <img class="player-img" id="img-right" src="" alt="">
@@ -383,9 +387,11 @@
             <span class="stat-label-txt" id="cat-label-right"></span>
             <span class="stat-value-txt hidden-stat" id="val-right">???</span>
         </div>
+        <!-- Result badge appears after guess -->
         <div class="result-badge" id="result-badge" style="display:none"></div>
     </div>
 
+    <!-- Buttons -->
     <div class="btn-row" id="btn-row">
         <button class="guess-btn higher" onclick="makeGuess('higher')">▲ DAHA YÜKSEK</button>
         <button class="guess-btn lower"  onclick="makeGuess('lower')">▼ DAHA DÜŞÜK</button>
@@ -394,6 +400,7 @@
     <button class="btn-next" id="btn-next" onclick="nextRound()">SONRAKI ➔</button>
 </div>
 
+<!-- Game Over Modal -->
 <div class="overlay" id="gameover-overlay">
     <div class="modal">
         <div class="modal-emoji" id="go-emoji">💥</div>
@@ -413,7 +420,7 @@
 /* ─────────── PLAYER DATA (FC 26 / 2026 GÜNCEL) ─────────── */
 const PLAYERS = [
   { id:'erling-haaland', name:'Erling Haaland', image:'https://upload.wikimedia.org/wikipedia/commons/0/07/Erling_Haaland_2023.jpg', marketValue:180, rating:92, goals:342, age:25, club:'Manchester City', nationality:'Norveç', position:'Santrafor' },
-  { id:'kylian-mbappe', name:'Kylian Mbappé', image:'https://upload.wikimedia.org/wikipedia/commons/1/1e/Picture_with_Mbappé_%28cropped%29.jpg', marketValue:180, rating:91, goals:388, age:27, club:'Real Madrid', nationality:'Fransa', position:'Sol Kanat' },
+  { id:'kylian-mbappe', name:'Kylian Mbappé', image:'https://upload.wikimedia.org/wikipedia/commons/b/b3/Kylian_Mbapp%C3%A9_2022_%28cropped%29.jpg', marketValue:180, rating:91, goals:388, age:27, club:'Real Madrid', nationality:'Fransa', position:'Sol Kanat' },
   { id:'jude-bellingham', name:'Jude Bellingham', image:'https://upload.wikimedia.org/wikipedia/commons/1/14/Jude_Bellingham_2024.jpg', marketValue:180, rating:90, goals:82, age:23, club:'Real Madrid', nationality:'İngiltere', position:'Orta Saha' },
   { id:'vinicius-junior', name:'Vinícius Júnior', image:'https://upload.wikimedia.org/wikipedia/commons/f/f3/Vinicius_Junior_2021.jpg', marketValue:180, rating:91, goals:132, age:25, club:'Real Madrid', nationality:'Brezilya', position:'Sol Kanat' },
   { id:'phil-foden', name:'Phil Foden', image:'https://upload.wikimedia.org/wikipedia/commons/0/07/Phil_Foden_2024_%28cropped%29.jpg', marketValue:140, rating:89, goals:112, age:26, club:'Manchester City', nationality:'İngiltere', position:'Sağ Kanat' },
@@ -476,6 +483,16 @@ function fmtStat(v, cat) {
     switch(cat) { case 'marketValue': return `€${v}M`; case 'goals': return `${v} Gol`; case 'rating': return `${v}`; case 'age': return `${v} Yaş`; }
 }
 
+/* ─────────── WIKIPEDIA GÖRSEL DÜZELTİCİ ─────────── */
+function proxyImg(url) {
+    // Eğer link Wikipedia linkiyse, kırılan yollar yerine resmi API yönlendirmesini kullan
+    if (url.includes('wikimedia.org')) {
+        const filename = url.split('/').pop(); // Dosyanın tam ismini al (örn: Marcus_Rashford.jpg)
+        return `https://commons.wikimedia.org/w/index.php?title=Special:Redirect/file/${filename}&width=500`;
+    }
+    return url;
+}
+
 /* ─────────── STATE ─────────── */
 let category = 'marketValue';
 let streak = 0;
@@ -509,13 +526,15 @@ function renderCard(side, player, hideVal) {
     const valEl = document.getElementById(`val-${side}`);
     const lblEl = document.getElementById(`cat-label-${side}`);
 
-    // HATA YAKALAYICI YEDEK GÖRSEL (AVATAR)
+    // GÖRSEL TAMAMEN SİLİNMİŞSE DEVREYE GİREN KUSURSUZ YEDEK SİSTEM
     img.onerror = function() {
         this.onerror = null; 
-        this.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(player.name)}&background=1a1a2e&color=fff&size=400&font-size=0.33`;
+        // Oyuncunun baş harflerinden oluşan, arkaplanı koyu lacivert şık bir görsel oluştur
+        this.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(player.name)}&background=1a1a2e&color=fff&size=500&font-size=0.4&bold=true`;
     };
 
-    img.src = player.image;
+    // Güvenli proxyImg fonksiyonunu kullanarak resmi ata
+    img.src = proxyImg(player.image);
     img.alt = player.name;
     name.textContent = player.name;
     meta.innerHTML = `<span class="badge">🏟 ${player.club}</span><span class="badge">🌍 ${player.nationality}</span><span class="badge">📍 ${player.position}</span>`;
