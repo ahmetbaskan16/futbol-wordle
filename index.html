@@ -29,6 +29,7 @@
                 <div class="user-menu">
                     <div class="user-avatar" id="user-avatar">?</div>
                 </div>
+                <button class="menu-toggle" id="menu-toggle">☰</button>
             </div>
         </div>
     </header>
@@ -40,6 +41,44 @@
             <a href="leaderboard.html" class="nav-tab">Sıralama</a>
             <a href="stats.html" class="nav-tab">İstatistikler</a>
         </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
+    <div class="mobile-menu" id="mobile-menu">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h3 style="margin: 0;">Menü</h3>
+            <button id="close-menu" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">✕</button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            <a href="index.html" class="nav-tab active">Ana Sayfa</a>
+            <a href="missions.html" class="nav-tab">Görevler</a>
+            <a href="leaderboard.html" class="nav-tab">Sıralama</a>
+            <a href="stats.html" class="nav-tab">İstatistikler</a>
+            <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 10px 0;">
+            <a href="#" class="nav-tab">Ayarlar</a>
+            <a href="#" class="nav-tab">Çıkış Yap</a>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="bottom-nav-item active">
+            <span class="icon">🏠</span>
+            <span>Ana Sayfa</span>
+        </a>
+        <a href="missions.html" class="bottom-nav-item">
+            <span class="icon">🎯</span>
+            <span>Görevler</span>
+        </a>
+        <a href="leaderboard.html" class="bottom-nav-item">
+            <span class="icon">🏆</span>
+            <span>Sıralama</span>
+        </a>
+        <a href="stats.html" class="bottom-nav-item">
+            <span class="icon">📊</span>
+            <span>Profil</span>
+        </a>
     </nav>
 
     <main class="container main">
@@ -57,7 +96,7 @@
         </section>
 
         <section class="games-grid">
-            <a href="wordle.html?mode=club" class="game-card club">
+            <a href="wordle.html?mode=club" class="game-card club glass-card">
                 <span class="new-badge">Yeni</span>
                 <div class="game-card-icon">🏗️</div>
                 <h3 class="game-card-title">Kulüp Wordle</h3>
@@ -68,7 +107,7 @@
                 </div>
             </a>
 
-            <a href="wordle.html?mode=player" class="game-card player">
+            <a href="wordle.html?mode=player" class="game-card player glass-card">
                 <div class="game-card-icon">👤</div>
                 <h3 class="game-card-title">Oyuncu Wordle</h3>
                 <p class="game-card-desc">Transfer geçmişi ve özelliklerine göre gizli oyuncuyu bul.</p>
@@ -78,7 +117,7 @@
                 </div>
             </a>
 
-            <a href="higher-or-lower.html" class="game-card daily">
+            <a href="higher-or-lower.html" class="game-card daily glass-card">
                 <div class="game-card-icon">📊</div>
                 <h3 class="game-card-title">Alt-Üst</h3>
                 <p class="game-card-desc">Hangi oyuncunun piyasa değeri veya gol sayısı daha fazla?</p>
@@ -88,7 +127,7 @@
                 </div>
             </a>
 
-            <a href="logo-quiz.html" class="game-card infinite">
+            <a href="logo-quiz.html" class="game-card infinite glass-card">
                 <div class="game-card-icon">🎨</div>
                 <h3 class="game-card-title">Logo Quiz</h3>
                 <p class="game-card-desc">Hızla değişen logoları tanı, en yüksek skoru yap.</p>
