@@ -258,8 +258,11 @@
     <div class="header-actions">
         <!-- İPUCU BUTONU BURAYA EKLENDİ (Başta Gizli) -->
         <button class="icon-btn" id="hint-btn" onclick="useHint()" title="İpucu Al" style="display: none; border-color: var(--present);">💡</button>
+        <button class="icon-btn" onclick="window.location.href='leaderboard.html'" title="Leaderboard">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </button>
         <button class="icon-btn" onclick="toggleStats()" title="İstatistikler">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 12a8 8 0 0 1 16 0 8 8 0 0 1-16 0M12 9v6M9 15h6"/></svg>
         </button>
     </div>
     <h1>⚽ FUTBOL WORDLE</h1>
@@ -277,12 +280,12 @@
     </div>
     
     <!-- LOGO QUIZ GEÇİŞ BUTONU -->
-    <button onclick="window.location.href='logo-quiz.html'" style="margin-top: 12px; width: 100%; background: linear-gradient(135deg, #3b82f6 0%, #a5b4fc 100%); color: #000; border: none; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 0.9rem; transition: opacity 0.2s; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);">
+    <button onclick="window.location.href='logo-quiz.html'" style="margin-top: 12px; width: 100%; background: linear-gradient(135deg, #3b82f6 0%, #a5b4fc 100%); color: #000; border: none; padding: 11px 0; border-radius: 10px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: opacity 0.2s;">
         🛡️ LOGO QUIZ OYNA ➔
     </button>
-    <button onclick="window.location.href='higher-or-lower.html'" style="margin-top: 8px; width: 100%; background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); color: #000; border: none; padding: 12px; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 0.9rem; transition: opacity 0.2s; box-shadow: 0 4px 15px rgba(74, 222, 128, 0.4);">
-    📊 HIGHER OR LOWER OYNA ➔
-</button>
+    <button onclick="window.location.href='higher-or-lower.html'" style="margin-top: 8px; width: 100%; background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); color: #000; border: none; padding: 11px 0; border-radius: 10px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: opacity 0.2s;">
+        📊 HIGHER OR LOWER OYNA ➔
+    </button>
 </div>
 
 <div id="game-container">
@@ -585,7 +588,6 @@ window.toggleStats = function() {
         ? stats.bestRuns.map((r,i) => `<div class="leaderboard-item"><span><span class="rank">#${i+1}</span>${r.club}</span><span style="opacity:.6">${r.guesses} deneme</span></div>`).join('')
         : '<p style="text-align:center;opacity:.3;font-size:.7rem;">Henüz galibiyet yok</p>';
 
-    // TEMİZLENMİŞ LOKAL LİDERLİK TABLOSU
     const fakeDBPlayers = [
         {name: username || "Sen", score: stats.wins || 0, isUser: true}
     ];
