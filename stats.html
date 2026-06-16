@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İstatistikler - Futbol Wordle</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container header-content">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">⚽</div>
+                <span class="logo-text">FUTBOL WORDLE</span>
+            </a>
+            <div class="header-stats" id="header-stats-container">
+                <!-- Loaded by app.js -->
+            </div>
+        </div>
+    </header>
+
+    <nav class="container">
+        <div class="nav-tabs">
+            <a href="index.html" class="nav-tab">Ana Sayfa</a>
+            <a href="missions.html" class="nav-tab">Görevler</a>
+            <a href="leaderboard.html" class="nav-tab">Sıralama</a>
+            <a href="stats.html" class="nav-tab active">İstatistikler</a>
+        </div>
+    </nav>
+
+    <main class="container main">
+        <h2 class="section-title">Kariyer Özeti</h2>
+        
+        <div class="stats-grid">
+            <div class="stat-card highlight">
+                <div class="stat-icon">📈</div>
+                <div class="stat-value" id="stat-win-rate">65%</div>
+                <div class="stat-label">Galibiyet Oranı</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🎮</div>
+                <div class="stat-value" id="stat-total-games">124</div>
+                <div class="stat-label">Toplam Oyun</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🔥</div>
+                <div class="stat-value" id="stat-streak">7</div>
+                <div class="stat-label">Mevcut Seri</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👑</div>
+                <div class="stat-value" id="stat-best-streak">14</div>
+                <div class="stat-label">En İyi Seri</div>
+            </div>
+        </div>
+
+        <section class="card" style="margin-top: 32px;">
+            <div class="card-header">
+                <h3 class="card-title">Başarımlar</h3>
+                <span class="card-badge">8 / 24</span>
+            </div>
+            <div class="missions-grid">
+                <div class="mission-card completed">
+                    <div class="mission-icon">🎓</div>
+                    <div class="mission-content">
+                        <div class="mission-title">Mezun</div>
+                        <div class="mission-desc">İlk seviyeyi tamamla</div>
+                    </div>
+                </div>
+                <div class="mission-card completed">
+                    <div class="mission-icon">⚡</div>
+                    <div class="mission-content">
+                        <div class="mission-title">Hızlı Karar</div>
+                        <div class="mission-desc">Logo Quiz de 20 skora ulaş</div>
+                    </div>
+                </div>
+                <div class="mission-card" style="opacity: 0.5;">
+                    <div class="mission-icon">💎</div>
+                    <div class="mission-content">
+                        <div class="mission-title">Koleksiyoner</div>
+                        <div class="mission-desc">Tüm logoları en az bir kez gör</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script src="js/animations.js"></script>
+    <script>
+        // Update stats from local storage
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = JSON.parse(localStorage.getItem('fw_user_data'));
+            if (user) {
+                document.getElementById('stat-total-games').textContent = user.totalGames || 0;
+                document.getElementById('stat-streak').textContent = user.currentStreak || 0;
+                document.getElementById('stat-best-streak').textContent = user.bestStreak || 0;
+                const rate = user.totalGames > 0 ? Math.round((user.wins / user.totalGames) * 100) : 0;
+                document.getElementById('stat-win-rate').textContent = `${rate}%`;
+            }
+        });
+    </script>
+</body>
+</html>
