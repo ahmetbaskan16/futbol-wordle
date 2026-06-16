@@ -3,11 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Futbol Wordle</title>
+  <title>⚽ Futbol Wordle</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+  <!-- Header -->
   <header class="header">
     <div class="container header-content">
       <a href="index.html" class="logo">
@@ -17,12 +18,28 @@
       <a href="index.html" class="user-avatar">🏠</a>
     </div>
   </header>
-  
+
+  <!-- Game Container -->
   <main class="main container">
     <div id="game-container"></div>
   </main>
-  
+
+  <!-- Scripts - BUNLAR ÖNEMLİ! -->
   <script src="js/app.js"></script>
+  <script src="js/animations.js"></script>
+  <script>
+    // URL'den modu al (club veya player)
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode') || 'club';
+    
+    // Oyunu başlat
+    let wordleGame;
+    document.addEventListener('DOMContentLoaded', () => {
+      if (document.getElementById('game-container')) {
+        wordleGame = new WordleGame(mode);
+      }
+    });
+  </script>
   <script src="js/games.js"></script>
 </body>
 </html>
