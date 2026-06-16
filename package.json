@@ -3,7 +3,5 @@
   "version": "1.0.0",
   "description": "Elite Football Wordle Game",
   "main": "index.html",
-  "dependencies": {
-    "@vercel/kv": "^1.0.1"
-  }
+  "dependencies": {}
 }
