@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Leaderboard">
+    <title>Futbol Wordle - Leaderboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
+            --glass: rgba(255,255,255,0.05);
+            --glass-border: rgba(255,255,255,0.1);
+            --text: #ffffff;
+            --text-muted: rgba(255,255,255,0.7);
+            --correct: #4ade80;
+            --present: #facc15;
+            --accent: #3b82f6;
+            --gold: #fbbf24;
+            --silver: #d1d5db;
+            --bronze: #f97316;
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px;
+            overflow-x: hidden;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+            width: 100%;
+            max-width: 700px;
+            position: relative;
+        }
+        
+        .back-btn {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: background 0.2s;
+            text-decoration: none;
+        }
+        
+        .back-btn:hover {
+            background: rgba(255,255,255,0.15);
+        }
+        
+        h1 {
+            font-size: clamp(1.8rem, 6vw, 2.8rem);
+            font-weight: 800;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #fff 0%, #aaa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        /* Game Tabs */
+        .tabs-container {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-bottom: 24px;
+            width: 100%;
+            max-width: 700px;
+            flex-wrap: wrap;
+        }
+        
+        .tab-btn {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .tab-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .tab-btn.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(59,130,246,0.3);
+        }
+        
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 700px;
+        }
+        
+        .filter-btn {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-btn.active {
+            background: var(--present);
+            color: #000;
+            border-color: var(--present);
+        }
+        
+        /* Leaderboard Container */
+        .leaderboard-container {
+            width: 100%;
+            max-width: 700px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .leaderboard-wrapper {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 16px;
+            backdrop-filter: blur(10px);
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.2s;
+        }
+        
+        .leaderboard-item:hover {
+            background: rgba(0,0,0,0.5);
+            border-color: rgba(255,255,255,0.1);
+        }
+        
+        .leaderboard-item.highlight {
+            background: rgba(59,130,246,0.15);
+            border-color: var(--accent);
+            box-shadow: 0 0 16px rgba(59,130,246,0.2);
+        }
+        
+        .rank {
+            font-size: 1.6rem;
+            font-weight: 800;
+            width: 50px;
+            text-align: center;
+            min-width: 50px;
+        }
+        
+        .rank.first {
+            color: var(--gold);
+            font-size: 1.8rem;
+        }
+        
+        .rank.second {
+            color: var(--silver);
+        }
+        
+        .rank.third {
+            color: var(--bronze);
+        }
+        
+        .player-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .player-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+            word-break: break-word;
+        }
+        
+        .player-stats {
+            display: flex;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        .stat-badge {
+            background: rgba(255,255,255,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .player-score {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+            min-width: 80px;
+            text-align: right;
+        }
+        
+        .main-score {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--correct);
+        }
+        
+        .sub-score {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+        }
+        
+        .empty-state svg {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        /* Top 3 Podium */
+        .podium {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        
+        .podium-item {
+            background: var(--glass);
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .podium-item.first {
+            border-color: var(--gold);
+            background: rgba(251,191,36,0.1);
+            order: 2;
+        }
+        
+        .podium-item.second {
+            border-color: var(--silver);
+            background: rgba(209,213,219,0.1);
+            order: 1;
+        }
+        
+        .podium-item.third {
+            border-color: var(--bronze);
+            background: rgba(249,115,22,0.1);
+            order: 3;
+        }
+        
+        .podium-rank {
+            font-size: 2rem;
+            font-weight: 800;
+        }
+        
+        .podium-rank.first { color: var(--gold); }
+        .podium-rank.second { color: var(--silver); }
+        .podium-rank.third { color: var(--bronze); }
+        
+        .podium-name {
+            font-weight: 700;
+            font-size: 0.9rem;
+            word-break: break-word;
+        }
+        
+        .podium-score {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--correct);
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--glass-border);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 76px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: #fff;
+            color: #000;
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
+            z-index: 2000;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        @media (max-width: 600px) {
+            .podium {
+                margin-bottom: 16px;
+            }
+            
+            .player-score {
+                min-width: 60px;
+            }
+            
+            .main-score {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="back-btn">🏠</a>
+    <h1>🏆 LEADERBOARD</h1>
+    <div class="subtitle">Global Rankings</div>
+</header>
+
+<!-- Game Tabs -->
+<div class="tabs-container">
+    <button class="tab-btn active" onclick="switchGame('wordle')">⚽ WORDLE</button>
+    <button class="tab-btn" onclick="switchGame('hol')">📊 HIGHER/LOWER</button>
+    <button class="tab-btn" onclick="switchGame('logo')">🛡️ LOGO QUIZ</button>
+    <button class="tab-btn" onclick="switchGame('combined')">🎯 COMBINED</button>
+</div>
+
+<!-- Filter Tabs -->
+<div class="filter-tabs" id="filter-tabs">
+    <button class="filter-btn active" onclick="switchFilter('all')">📊 ALL TIME</button>
+    <button class="filter-btn" onclick="switchFilter('club')">🏟 CLUB MODE</button>
+    <button class="filter-btn" onclick="switchFilter('player')">👤 PLAYER MODE</button>
+</div>
+
+<!-- Leaderboard -->
+<div class="leaderboard-container">
+    <!-- Podium (Top 3) -->
+    <div class="podium" id="podium"></div>
+    
+    <!-- Ranking List -->
+    <div class="leaderboard-wrapper">
+        <div id="leaderboard-list"></div>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════ */
+/* LEADERBOARD DATA MANAGER */
+/* ═══════════════════════════════════════════════════════════════ */
+
+const LOCAL_DATA = {
+    wordle_club: () => JSON.parse(localStorage.getItem('wordleStats') || '{}'),
+    wordle_player: () => JSON.parse(localStorage.getItem('playerWordleStats') || '{}'),
+    hol: () => ({ streak: parseInt(localStorage.getItem('hl_best') || '0') }),
+    logo: () => ({ highScore: parseInt(localStorage.getItem('logo_quiz_highscore') || '0') }),
+};
+
+let currentGame = 'wordle';
+let currentFilter = 'all';
+let username = localStorage.getItem('futbol_wordle_username') || 'Anonymous';
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* HELPER FUNCTIONS */
+/* ═══════════════════════════════════════════════════════════════ */
+
+function getGameStats() {
+    let stats = [];
+    
+    if (currentGame === 'wordle') {
+        const clubStats = LOCAL_DATA.wordle_club();
+        const playerStats = LOCAL_DATA.wordle_player();
+        
+        let clubData = {
+            name: username,
+            mode: 'club',
+            wins: clubStats.wins || 0,
+            played: clubStats.played || 0,
+            streak: clubStats.streak || 0,
+            maxStreak: clubStats.maxStreak || 0,
+            winRate: clubStats.played ? Math.round((clubStats.wins / clubStats.played) * 100) : 0
+        };
+        
+        let playerData = {
+            name: username,
+            mode: 'player',
+            wins: playerStats.wins || 0,
+            played: playerStats.played || 0,
+            streak: playerStats.streak || 0,
+            maxStreak: playerStats.maxStreak || 0,
+            winRate: playerStats.played ? Math.round((playerStats.wins / playerStats.played) * 100) : 0
+        };
+        
+        if (currentFilter === 'all') stats = [clubData, playerData];
+        else if (currentFilter === 'club') stats = [clubData];
+        else if (currentFilter === 'player') stats = [playerData];
+        
+        stats.sort((a, b) => (b.wins - a.wins) || (b.streak - a.streak));
+        
+    } else if (currentGame === 'hol') {
+        const holStats = LOCAL_DATA.hol();
+        stats = [{
+            name: username,
+            score: holStats.streak,
+            best: holStats.streak,
+            type: 'Higher or Lower'
+        }];
+        stats.sort((a, b) => b.score - a.score);
+        
+    } else if (currentGame === 'logo') {
+        const logoStats = LOCAL_DATA.logo();
+        stats = [{
+            name: username,
+            score: logoStats.highScore,
+            best: logoStats.highScore,
+            type: 'Logo Quiz'
+        }];
+        stats.sort((a, b) => b.score - a.score);
+        
+    } else if (currentGame === 'combined') {
+        const clubWordle = LOCAL_DATA.wordle_club();
+        const playerWordle = LOCAL_DATA.wordle_player();
+        const holStats = LOCAL_DATA.hol();
+        const logoStats = LOCAL_DATA.logo();
+        
+        const totalWins = (clubWordle.wins || 0) + (playerWordle.wins || 0);
+        const totalScore = totalWins + (holStats.streak || 0) + (logoStats.highScore || 0);
+        
+        stats = [{
+            name: username,
+            totalWins,
+            totalScore,
+            hol: holStats.streak || 0,
+            logo: logoStats.highScore || 0,
+            wordle: totalWins
+        }];
+        stats.sort((a, b) => b.totalScore - a.totalScore);
+    }
+    
+    return stats;
+}
+
+function renderPodium(stats) {
+    const podiumEl = document.getElementById('podium');
+    podiumEl.innerHTML = '';
+    
+    if (stats.length === 0) return;
+    
+    // Get top 3
+    const top3 = stats.slice(0, 3);
+    const positions = ['second', 'first', 'third'];
+    
+    top3.forEach((stat, idx) => {
+        const div = document.createElement('div');
+        div.className = `podium-item ${positions[idx]}`;
+        
+        let score = '';
+        if (currentGame === 'wordle') {
+            score = stat.wins;
+        } else if (currentGame === 'hol') {
+            score = stat.best;
+        } else if (currentGame === 'logo') {
+            score = stat.best;
+        } else if (currentGame === 'combined') {
+            score = stat.totalScore;
+        }
+        
+        div.innerHTML = `
+            <div class="podium-rank ${positions[idx]}">${['🥈', '🥇', '🥉'][idx]}</div>
+            <div class="podium-name">${stat.name}</div>
+            <div class="podium-score">${score}</div>
+        `;
+        podiumEl.appendChild(div);
+    });
+}
+
+function renderLeaderboard(stats) {
+    const listEl = document.getElementById('leaderboard-list');
+    listEl.innerHTML = '';
+    
+    if (stats.length === 0) {
+        listEl.innerHTML = '<div class="empty-state"><p>No stats yet. Start playing! 🎮</p></div>';
+        return;
+    }
+    
+    stats.forEach((stat, idx) => {
+        const div = document.createElement('div');
+        div.className = 'leaderboard-item';
+        
+        let score = '';
+        let subScore = '';
+        let statBadges = '';
+        
+        if (currentGame === 'wordle') {
+            score = stat.wins;
+            subScore = `${stat.played} played`;
+            statBadges = `
+                <span class="stat-badge">🔥 ${stat.maxStreak} streak</span>
+                <span class="stat-badge">📊 ${stat.winRate}%</span>
+            `;
+        } else if (currentGame === 'hol') {
+            score = stat.best;
+            subScore = 'Best Streak';
+        } else if (currentGame === 'logo') {
+            score = stat.best;
+            subScore = 'High Score';
+        } else if (currentGame === 'combined') {
+            score = stat.totalScore;
+            subScore = `⚽ ${stat.wordle} | 📊 ${stat.hol} | 🛡️ ${stat.logo}`;
+        }
+        
+        const medalEmoji = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : '';
+        const rankClass = idx === 0 ? 'first' : idx === 1 ? 'second' : idx === 2 ? 'third' : '';
+        
+        div.innerHTML = `
+            <div class="rank ${rankClass}">${medalEmoji || `#${idx + 1}`}</div>
+            <div class="player-info">
+                <div class="player-name">${stat.name}</div>
+                <div class="player-stats">
+                    ${statBadges || `<span class="stat-badge">${subScore}</span>`}
+                </div>
+            </div>
+            <div class="player-score">
+                <div class="main-score">${score}</div>
+                <div class="sub-score">${currentGame === 'wordle' ? 'wins' : 'score'}</div>
+            </div>
+        `;
+        listEl.appendChild(div);
+    });
+}
+
+function render() {
+    // Hide/show filter tabs based on game
+    const filterTabs = document.getElementById('filter-tabs');
+    if (currentGame === 'wordle') {
+        filterTabs.style.display = 'flex';
+    } else {
+        filterTabs.style.display = 'none';
+    }
+    
+    const stats = getGameStats();
+    renderPodium(stats);
+    renderLeaderboard(stats);
+}
+
+function switchGame(game) {
+    currentGame = game;
+    currentFilter = 'all'; // Reset filter
+    
+    // Update active tab
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    render();
+}
+
+function switchFilter(filter) {
+    currentFilter = filter;
+    
+    // Update active filter
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    render();
+}
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// Initialize
+window.onload = () => {
+    render();
+};
+</script>
+
+</body>
+</html>
