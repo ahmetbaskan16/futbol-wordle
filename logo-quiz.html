@@ -114,6 +114,9 @@
 
 <div id="toast" class="toast"></div>
 
+<!-- Scripts -->
+<script src="js/app.js"></script>
+<script src="js/missions.js"></script>
 <script>
 const CLUBS = [
     // Süper Lig
@@ -166,7 +169,7 @@ let highScore = localStorage.getItem('logo_quiz_highscore') || 0;
 let currentClub = null;
 let isWaiting = false;
 
-// YENİ: Torba Sistemi için havuz
+// TORBA SİSTEMİ: Havuz boşsa (hepsi sorulduysa) baştan doldur ve karıştır
 let clubPool = []; 
 
 document.getElementById('high-score').textContent = highScore;
@@ -190,12 +193,10 @@ function loadQuestion() {
     const logoBox = document.getElementById('logo-box');
     const optionsBox = document.getElementById('options');
     
-    // TORBA SİSTEMİ: Havuz boşsa (hepsi sorulduysa) baştan doldur ve karıştır
     if (clubPool.length === 0) {
         clubPool = shuffleArray([...CLUBS]);
     }
     
-    // Havuzdan son takımı çekip listeden çıkar
     currentClub = clubPool.pop();
 
     logoBox.innerHTML = '';
@@ -211,15 +212,12 @@ function loadQuestion() {
     newImg.src = currentClub.logo;
     logoBox.appendChild(newImg);
 
-    // 3 Tane yanlış cevap seç (Doğru cevap hariç tüm listeden)
     let wrongClubs = CLUBS.filter(c => c.name !== currentClub.name);
     wrongClubs = shuffleArray(wrongClubs).slice(0, 3);
     
-    // Doğru ve yanlışları birleştirip karıştır
     let allOptions = [currentClub, ...wrongClubs];
     allOptions = shuffleArray(allOptions);
 
-    // Butonları oluştur
     optionsBox.innerHTML = '';
     allOptions.forEach(club => {
         const btn = document.createElement('button');
@@ -237,14 +235,10 @@ function handleGuess(btn, guessedName) {
     const logoImg = document.getElementById('logo');
     const allBtns = document.querySelectorAll('.option-btn');
     
-    // Tüm butonları tıklanamaz yap
     allBtns.forEach(b => b.disabled = true);
-    
-    // Logoyu netleştir
     if (logoImg) logoImg.classList.add('revealed');
 
     if (guessedName === currentClub.name) {
-        // DOĞRU
         btn.classList.add('correct');
         score++;
         document.getElementById('score').textContent = score;
@@ -255,27 +249,29 @@ function handleGuess(btn, guessedName) {
             document.getElementById('high-score').textContent = highScore;
         }
 
-        if(currentClub.name === 'Fenerbahçe') showToast("💛💙 BİLİNMEYECEK GİBİ DEĞİL!");
+        if (window.app) {
+            window.app.addXP(10);
+            updateMissionProgress('score_20_logo', score, true);
+        }
 
-        // 0.5 saniye bekle ve yeni soruya geç
+        if(currentClub.name === 'Fenerbahçe') showToast("💛💙 BİLİNMEYECEK GİBİ DEĞİL!");
         setTimeout(loadQuestion, 500);
     } else {
-        // YANLIŞ
         btn.classList.add('wrong');
         showToast("Seri Bozuldu! Doğrusu: " + currentClub.name);
         score = 0;
         document.getElementById('score').textContent = score;
         
+        if (window.app) window.app.addLoss();
+
         allBtns.forEach(b => {
             if (b.textContent === currentClub.name) b.classList.add('correct');
         });
 
-        // 1.2 saniye bekle ve yeni soruya geç
         setTimeout(loadQuestion, 1200);
     }
 }
 
-// Oyunu Başlat
 window.onload = loadQuestion;
 </script>
 </body>
