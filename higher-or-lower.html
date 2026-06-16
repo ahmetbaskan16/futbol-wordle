@@ -419,59 +419,111 @@
 <script>
 /* ─────────── PLAYER DATA (FC 26 / 2026 GÜNCEL) ─────────── */
 const PLAYERS = [
-  { id:'erling-haaland', name:'Erling Haaland', image:'https://upload.wikimedia.org/wikipedia/commons/0/07/Erling_Haaland_2023.jpg', marketValue:180, rating:92, goals:342, age:25, club:'Manchester City', nationality:'Norveç', position:'Santrafor' },
-  { id:'kylian-mbappe', name:'Kylian Mbappé', image:'https://upload.wikimedia.org/wikipedia/commons/b/b3/Kylian_Mbapp%C3%A9_2022_%28cropped%29.jpg', marketValue:180, rating:91, goals:388, age:27, club:'Real Madrid', nationality:'Fransa', position:'Sol Kanat' },
-  { id:'jude-bellingham', name:'Jude Bellingham', image:'https://upload.wikimedia.org/wikipedia/commons/1/14/Jude_Bellingham_2024.jpg', marketValue:180, rating:90, goals:82, age:23, club:'Real Madrid', nationality:'İngiltere', position:'Orta Saha' },
-  { id:'vinicius-junior', name:'Vinícius Júnior', image:'https://upload.wikimedia.org/wikipedia/commons/f/f3/Vinicius_Junior_2021.jpg', marketValue:180, rating:91, goals:132, age:25, club:'Real Madrid', nationality:'Brezilya', position:'Sol Kanat' },
-  { id:'phil-foden', name:'Phil Foden', image:'https://upload.wikimedia.org/wikipedia/commons/0/07/Phil_Foden_2024_%28cropped%29.jpg', marketValue:140, rating:89, goals:112, age:26, club:'Manchester City', nationality:'İngiltere', position:'Sağ Kanat' },
-  { id:'bukayo-saka', name:'Bukayo Saka', image:'https://upload.wikimedia.org/wikipedia/commons/3/3a/Bukayo_Saka_2021_%28cropped%29.jpg', marketValue:150, rating:88, goals:94, age:24, club:'Arsenal', nationality:'İngiltere', position:'Sağ Kanat' },
-  { id:'florian-wirtz', name:'Florian Wirtz', image:'https://upload.wikimedia.org/wikipedia/commons/a/af/Florian_Wirtz_2023.jpg', marketValue:150, rating:89, goals:76, age:23, club:'Bayer Leverkusen', nationality:'Almanya', position:'Oyun Kurucu' },
-  { id:'lamine-yamal', name:'Lamine Yamal', image:'https://upload.wikimedia.org/wikipedia/commons/d/da/Spain_vs._Georgia_2024-06-30-221_%28cropped%29.jpg', marketValue:160, rating:86, goals:34, age:18, club:'Barcelona', nationality:'İspanya', position:'Sağ Kanat' },
-  { id:'rodri', name:'Rodri', image:'https://upload.wikimedia.org/wikipedia/commons/f/ff/Rodri_2020_%28cropped%29.jpg', marketValue:110, rating:91, goals:36, age:29, club:'Manchester City', nationality:'İspanya', position:'Ön Libero' },
-  { id:'cole-palmer', name:'Cole Palmer', image:'https://upload.wikimedia.org/wikipedia/commons/c/c1/Cole_Palmer_2024.jpg', marketValue:110, rating:87, goals:68, age:24, club:'Chelsea', nationality:'İngiltere', position:'Ofansif Orta Saha' },
-  { id:'declan-rice', name:'Declan Rice', image:'https://upload.wikimedia.org/wikipedia/commons/e/ea/West_Ham_v_Arsenal%2C_11_Feb_2024_%281%29_%28cropped%29.jpg', marketValue:110, rating:86, goals:34, age:27, club:'Arsenal', nationality:'İngiltere', position:'Orta Saha' },
-  { id:'harry-kane', name:'Harry Kane', image:'https://upload.wikimedia.org/wikipedia/commons/1/1b/Harry_Kane_2024.jpg', marketValue:90, rating:90, goals:468, age:32, club:'Bayern Münih', nationality:'İngiltere', position:'Santrafor' },
-  { id:'jamal-musiala', name:'Jamal Musiala', image:'https://upload.wikimedia.org/wikipedia/commons/e/e3/Jamal_Musiala_2022_%28cropped%29.jpg', marketValue:130, rating:88, goals:72, age:23, club:'Bayern Münih', nationality:'Almanya', position:'Orta Saha' },
-  { id:'martin-odegaard', name:'Martin Ødegaard', image:'https://upload.wikimedia.org/wikipedia/commons/e/ec/West_Ham_v_Arsenal%2C_11_Feb_2024_%2814%29_%28cropped%29.jpg', marketValue:100, rating:88, goals:69, age:27, club:'Arsenal', nationality:'Norveç', position:'Oyun Kurucu' },
-  { id:'victor-osimhen', name:'Victor Osimhen', image:'https://upload.wikimedia.org/wikipedia/commons/f/fa/Victor_Osimhen_2023_%28cropped%29.jpg', marketValue:90, rating:88, goals:154, age:27, club:'Galatasaray', nationality:'Nijerya', position:'Santrafor' },
-  { id:'federico-valverde', name:'Federico Valverde', image:'https://upload.wikimedia.org/wikipedia/commons/b/ba/Fede_Valverde_2022_%28cropped%29.jpg', marketValue:120, rating:89, goals:46, age:27, club:'Real Madrid', nationality:'Uruguay', position:'Orta Saha' },
-  { id:'rafael-leao', name:'Rafael Leão', image:'https://upload.wikimedia.org/wikipedia/commons/c/c5/Rafael_Le%C3%A3o_2021_%28cropped%29.jpg', marketValue:85, rating:86, goals:82, age:26, club:'Milan', nationality:'Portekiz', position:'Sol Kanat' },
-  { id:'pedri', name:'Pedri', image:'https://upload.wikimedia.org/wikipedia/commons/0/07/Pedri_2021_%28cropped%29.jpg', marketValue:80, rating:86, goals:26, age:23, club:'Barcelona', nationality:'İspanya', position:'Orta Saha' },
-  { id:'lautaro-martinez', name:'Lautaro Martínez', image:'https://upload.wikimedia.org/wikipedia/commons/0/07/Lautaro_Mart%C3%ADnez_2024.jpg', marketValue:110, rating:89, goals:198, age:28, club:'Inter Milan', nationality:'Arjantin', position:'Santrafor' },
-  { id:'viktor-gyokeres', name:'Viktor Gyökeres', image:'https://upload.wikimedia.org/wikipedia/commons/2/2a/Viktor_Gy%C3%B6keres_2023.jpg', marketValue:90, rating:85, goals:174, age:28, club:'Sporting CP', nationality:'İsveç', position:'Santrafor' },
-  { id:'rodrygo', name:'Rodrygo', image:'https://upload.wikimedia.org/wikipedia/commons/9/9e/Rodrygo_2022.jpg', marketValue:110, rating:86, goals:78, age:25, club:'Real Madrid', nationality:'Brezilya', position:'Sağ Kanat' },
-  { id:'khvicha', name:'Khvicha Kvaratskhelia', image:'https://upload.wikimedia.org/wikipedia/commons/1/10/Khvicha_Kvaratskhelia_2022.jpg', marketValue:80, rating:86, goals:59, age:25, club:'Napoli', nationality:'Gürcistan', position:'Sol Kanat' },
-  { id:'ruben-dias', name:'Rúben Dias', image:'https://upload.wikimedia.org/wikipedia/commons/3/36/R%C3%BAben_Dias_2022.jpg', marketValue:80, rating:89, goals:16, age:29, club:'Manchester City', nationality:'Portekiz', position:'Stoper' },
-  { id:'bruno-fernandes', name:'Bruno Fernandes', image:'https://upload.wikimedia.org/wikipedia/commons/c/c5/Bruno_Fernandes_2021_%28cropped%29.jpg', marketValue:65, rating:87, goals:196, age:31, club:'Manchester United', nationality:'Portekiz', position:'Ofansif Orta Saha' },
-  { id:'salah', name:'Mohamed Salah', image:'https://upload.wikimedia.org/wikipedia/commons/c/c1/Mohamed_Salah_2018.jpg', marketValue:50, rating:88, goals:354, age:33, club:'Liverpool', nationality:'Mısır', position:'Sağ Kanat' },
-  { id:'kdb', name:'Kevin De Bruyne', image:'https://upload.wikimedia.org/wikipedia/commons/4/40/Kevin_De_Bruyne_2018.jpg', marketValue:40, rating:89, goals:162, age:34, club:'Manchester City', nationality:'Belçika', position:'Oyun Kurucu' },
-  { id:'hakan', name:'Hakan Çalhanoğlu', image:'https://upload.wikimedia.org/wikipedia/commons/f/fe/Hakan_%C3%87alhano%C4%9Flu_2024.jpg', marketValue:40, rating:86, goals:142, age:32, club:'Inter Milan', nationality:'Türkiye', position:'Orta Saha' },
-  { id:'arda', name:'Arda Güler', image:'https://upload.wikimedia.org/wikipedia/commons/b/bc/Arda_G%C3%BCler_2023_%28cropped%29.jpg', marketValue:60, rating:81, goals:28, age:21, club:'Real Madrid', nationality:'Türkiye', position:'Ofansif Orta Saha' },
-  { id:'kenan-yildiz', name:'Kenan Yıldız', image:'https://upload.wikimedia.org/wikipedia/commons/7/7e/Kenan_Y%C4%B1ld%C4%B1z_2024.jpg', marketValue:50, rating:80, goals:22, age:21, club:'Juventus', nationality:'Türkiye', position:'Sol Kanat' },
-  { id:'ferdi-kadioglu', name:'Ferdi Kadıoğlu', image:'https://upload.wikimedia.org/wikipedia/commons/c/c4/Ferdi_Kad%C4%B1o%C4%9Flu_2024.jpg', marketValue:35, rating:80, goals:21, age:26, club:'Brighton', nationality:'Türkiye', position:'Sol Bek' },
-  { id:'baris-alper', name:'Barış Alper Yılmaz', image:'https://upload.wikimedia.org/wikipedia/commons/3/3d/Bar%C4%B1%C5%9F_Alper_Y%C4%B1lmaz_2024.jpg', marketValue:25, rating:78, goals:32, age:26, club:'Galatasaray', nationality:'Türkiye', position:'Sağ Kanat' },
-  { id:'semih-kilicsoy', name:'Semih Kılıçsoy', image:'https://upload.wikimedia.org/wikipedia/commons/8/87/Semih_K%C4%B1l%C4%B1%C3%A7soy_2024.jpg', marketValue:22, rating:75, goals:19, age:20, club:'Beşiktaş', nationality:'Türkiye', position:'Santrafor' },
-  { id:'icardi', name:'Mauro Icardi', image:'https://upload.wikimedia.org/wikipedia/commons/f/f3/Mauro_Icardi_2019_%28cropped%29.jpg', marketValue:15, rating:83, goals:268, age:33, club:'Galatasaray', nationality:'Arjantin', position:'Santrafor' },
-  { id:'dusan-tadic', name:'Dušan Tadić', image:'https://upload.wikimedia.org/wikipedia/commons/c/ce/Dusan_Tadic_2024.jpg', marketValue:3, rating:81, goals:232, age:37, club:'Fenerbahçe', nationality:'Sırbistan', position:'Sol Kanat' },
-  { id:'edin-dzeko', name:'Edin Džeko', image:'https://upload.wikimedia.org/wikipedia/commons/c/cc/Edin_D%C5%BEeko_2024.jpg', marketValue:2, rating:79, goals:418, age:40, club:'Fenerbahçe', nationality:'Bosna-Hersek', position:'Santrafor' },
-  { id:'fred', name:'Fred', image:'https://upload.wikimedia.org/wikipedia/commons/4/4b/Fred_2022.jpg', marketValue:14, rating:80, goals:44, age:33, club:'Fenerbahçe', nationality:'Brezilya', position:'Orta Saha' },
-  { id:'szymanski', name:'Sebastian Szymański', image:'https://upload.wikimedia.org/wikipedia/commons/6/60/Sebastian_Szyma%C5%84ski_2024.jpg', marketValue:22, rating:79, goals:56, age:27, club:'Fenerbahçe', nationality:'Polonya', position:'Ofansif Orta Saha' },
-  { id:'kerem-akturkoglu', name:'Kerem Aktürkoğlu', image:'https://upload.wikimedia.org/wikipedia/commons/d/da/Kerem_Akt%C3%BCrko%C4%9Flu_2024.jpg', marketValue:20, rating:79, goals:64, age:27, club:'Benfica', nationality:'Türkiye', position:'Sol Kanat' },
-  { id:'messi', name:'Lionel Messi', image:'https://upload.wikimedia.org/wikipedia/commons/b/b4/Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg', marketValue:25, rating:88, goals:854, age:38, club:'Inter Miami', nationality:'Arjantin', position:'Oyun Kurucu' },
-  { id:'cr7', name:'Cristiano Ronaldo', image:'https://upload.wikimedia.org/wikipedia/commons/d/d7/Cristiano_Ronaldo_playing_for_Al_Nassr_FC_against_Al_Fateh_FC_on_3_February_2023_%28cropped%29.jpg', marketValue:12, rating:85, goals:922, age:41, club:'Al Nassr', nationality:'Portekiz', position:'Santrafor' },
-  { id:'lewandowski', name:'Robert Lewandowski', image:'https://upload.wikimedia.org/wikipedia/commons/0/03/Robert_Lewandowski_2022_%28cropped%29.jpg', marketValue:12, rating:88, goals:682, age:37, club:'Barcelona', nationality:'Polonya', position:'Santrafor' },
-  { id:'son', name:'Heung-min Son', image:'https://upload.wikimedia.org/wikipedia/commons/c/c4/Son_Heung-min_2022.jpg', marketValue:35, rating:86, goals:238, age:33, club:'Tottenham', nationality:'G. Kore', position:'Sol Kanat' },
-  { id:'rashford', name:'Marcus Rashford', image:'https://upload.wikimedia.org/wikipedia/commons/f/f6/Marcus_Rashford_at_Old_Trafford_%28cropped%29.jpg', marketValue:55, rating:83, goals:144, age:28, club:'Manchester United', nationality:'İngiltere', position:'Sol Kanat' },
-  { id:'camavinga', name:'Eduardo Camavinga', image:'https://upload.wikimedia.org/wikipedia/commons/2/22/Eduardo_Camavinga_2021_%28cropped%29.jpg', marketValue:100, rating:84, goals:12, age:23, club:'Real Madrid', nationality:'Fransa', position:'Orta Saha' },
-  { id:'saliba', name:'William Saliba', image:'https://upload.wikimedia.org/wikipedia/commons/7/75/Arsenal_against_Aston_Villa_2024_%284%29_%28cropped%29.jpg', marketValue:90, rating:86, goals:7, age:25, club:'Arsenal', nationality:'Fransa', position:'Stoper' },
-  { id:'nico-williams', name:'Nico Williams', image:'https://upload.wikimedia.org/wikipedia/commons/8/85/Nico_Williams_2024.jpg', marketValue:80, rating:84, goals:34, age:23, club:'Athletic Bilbao', nationality:'İspanya', position:'Sol Kanat' },
-  { id:'griezmann', name:'Antoine Griezmann', image:'https://upload.wikimedia.org/wikipedia/commons/0/0e/France_vs._Canada-224_%28cropped%29.jpg', marketValue:20, rating:86, goals:282, age:35, club:'Atletico Madrid', nationality:'Fransa', position:'Gezici Forvet' },
-  { id:'rafael-varane', name:'Gavi', image:'https://upload.wikimedia.org/wikipedia/commons/a/ac/Gavi_2021_%28cropped%29.jpg', marketValue:90, rating:84, goals:11, age:21, club:'Barcelona', nationality:'İspanya', position:'Orta Saha' },
-  { id:'muslera', name:'Fernando Muslera', image:'https://upload.wikimedia.org/wikipedia/commons/4/4c/Fernando_Muslera_2024.jpg', marketValue:1, rating:80, goals:1, age:40, club:'Galatasaray', nationality:'Uruguay', position:'Kaleci' },
-  { id:'livakovic', name:'Dominik Livaković', image:'https://upload.wikimedia.org/wikipedia/commons/e/e9/Dominik_Livakovi%C4%87_2024.jpg', marketValue:11, rating:80, goals:0, age:31, club:'Fenerbahçe', nationality:'Hırvatistan', position:'Kaleci' },
-  { id:'gedson', name:'Gedson Fernandes', image:'https://upload.wikimedia.org/wikipedia/commons/3/30/Gedson_Fernandes_2023.jpg', marketValue:18, rating:79, goals:18, age:27, club:'Beşiktaş', nationality:'Portekiz', position:'Orta Saha' },
-  { id:'saint-maximin', name:'Allan Saint-Maximin', image:'https://upload.wikimedia.org/wikipedia/commons/f/ff/Allan_Saint-Maximin_2021.jpg', marketValue:16, rating:79, goals:36, age:29, club:'Fenerbahçe', nationality:'Fransa', position:'Sol Kanat' },
-  { id:'en-nesyri', name:'Youssef En-Nesyri', image:'https://upload.wikimedia.org/wikipedia/commons/2/23/Youssef_En-Nesyri_2022.jpg', marketValue:20, rating:80, goals:112, age:29, club:'Fenerbahçe', nationality:'Fas', position:'Santrafor' }
+  { id:'erling-haaland', name:'Erling Haaland', image:'https://en.wikipedia.org/wiki/Special:FilePath/Erling_Haaland_2023.jpg?width=300', marketValue:180, rating:92, goals:342, age:25, club:'Manchester City', nationality:'Norveç', position:'Santrafor' },
+
+  { id:'kylian-mbappe', name:'Kylian Mbappé', image:'https://en.wikipedia.org/wiki/Special:FilePath/Kylian_Mbapp%C3%A9_2022_%28cropped%29.jpg?width=300', marketValue:180, rating:91, goals:388, age:27, club:'Real Madrid', nationality:'Fransa', position:'Sol Kanat' },
+
+  { id:'jude-bellingham', name:'Jude Bellingham', image:'https://en.wikipedia.org/wiki/Special:FilePath/Jude_Bellingham_2024.jpg?width=300', marketValue:180, rating:90, goals:82, age:23, club:'Real Madrid', nationality:'İngiltere', position:'Orta Saha' },
+
+  { id:'vinicius-junior', name:'Vinícius Júnior', image:'https://en.wikipedia.org/wiki/Special:FilePath/Vinicius_Junior_2021.jpg?width=300', marketValue:180, rating:91, goals:132, age:25, club:'Real Madrid', nationality:'Brezilya', position:'Sol Kanat' },
+
+  { id:'phil-foden', name:'Phil Foden', image:'https://en.wikipedia.org/wiki/Special:FilePath/Phil_Foden_2024_%28cropped%29.jpg?width=300', marketValue:140, rating:89, goals:112, age:26, club:'Manchester City', nationality:'İngiltere', position:'Sağ Kanat' },
+
+  { id:'bukayo-saka', name:'Bukayo Saka', image:'https://en.wikipedia.org/wiki/Special:FilePath/Bukayo_Saka_2021_%28cropped%29.jpg?width=300', marketValue:150, rating:88, goals:94, age:24, club:'Arsenal', nationality:'İngiltere', position:'Sağ Kanat' },
+
+  { id:'florian-wirtz', name:'Florian Wirtz', image:'https://en.wikipedia.org/wiki/Special:FilePath/Florian_Wirtz_2023.jpg?width=300', marketValue:150, rating:89, goals:76, age:23, club:'Bayer Leverkusen', nationality:'Almanya', position:'Oyun Kurucu' },
+
+  { id:'lamine-yamal', name:'Lamine Yamal', image:'https://en.wikipedia.org/wiki/Special:FilePath/Spain_vs._Georgia_2024-06-30-221_%28cropped%29.jpg?width=300', marketValue:160, rating:86, goals:34, age:18, club:'Barcelona', nationality:'İspanya', position:'Sağ Kanat' },
+
+  { id:'rodri', name:'Rodri', image:'https://en.wikipedia.org/wiki/Special:FilePath/Rodri_2020_%28cropped%29.jpg?width=300', marketValue:110, rating:91, goals:36, age:29, club:'Manchester City', nationality:'İspanya', position:'Ön Libero' },
+
+  { id:'cole-palmer', name:'Cole Palmer', image:'https://en.wikipedia.org/wiki/Special:FilePath/Cole_Palmer_2024.jpg?width=300', marketValue:110, rating:87, goals:68, age:24, club:'Chelsea', nationality:'İngiltere', position:'Ofansif Orta Saha' },
+
+  { id:'declan-rice', name:'Declan Rice', image:'https://en.wikipedia.org/wiki/Special:FilePath/West_Ham_v_Arsenal%2C_11_Feb_2024_%281%29_%28cropped%29.jpg?width=300', marketValue:110, rating:86, goals:34, age:27, club:'Arsenal', nationality:'İngiltere', position:'Orta Saha' },
+
+  { id:'harry-kane', name:'Harry Kane', image:'https://en.wikipedia.org/wiki/Special:FilePath/Harry_Kane_2024.jpg?width=300', marketValue:90, rating:90, goals:468, age:32, club:'Bayern Münih', nationality:'İngiltere', position:'Santrafor' },
+
+  { id:'jamal-musiala', name:'Jamal Musiala', image:'https://en.wikipedia.org/wiki/Special:FilePath/Jamal_Musiala_2022_%28cropped%29.jpg?width=300', marketValue:130, rating:88, goals:72, age:23, club:'Bayern Münih', nationality:'Almanya', position:'Orta Saha' },
+
+  { id:'martin-odegaard', name:'Martin Ødegaard', image:'https://en.wikipedia.org/wiki/Special:FilePath/West_Ham_v_Arsenal%2C_11_Feb_2024_%2814%29_%28cropped%29.jpg?width=300', marketValue:100, rating:88, goals:69, age:27, club:'Arsenal', nationality:'Norveç', position:'Oyun Kurucu' },
+
+  { id:'victor-osimhen', name:'Victor Osimhen', image:'https://en.wikipedia.org/wiki/Special:FilePath/Victor_Osimhen_2023_%28cropped%29.jpg?width=300', marketValue:90, rating:88, goals:154, age:27, club:'Galatasaray', nationality:'Nijerya', position:'Santrafor' },
+
+  { id:'federico-valverde', name:'Federico Valverde', image:'https://en.wikipedia.org/wiki/Special:FilePath/Fede_Valverde_2022_%28cropped%29.jpg?width=300', marketValue:120, rating:89, goals:46, age:27, club:'Real Madrid', nationality:'Uruguay', position:'Orta Saha' },
+
+  { id:'rafael-leao', name:'Rafael Leão', image:'https://en.wikipedia.org/wiki/Special:FilePath/Rafael_Le%C3%A3o_2021_%28cropped%29.jpg?width=300', marketValue:85, rating:86, goals:82, age:26, club:'Milan', nationality:'Portekiz', position:'Sol Kanat' },
+
+  { id:'pedri', name:'Pedri', image:'https://en.wikipedia.org/wiki/Special:FilePath/Pedri_2021_%28cropped%29.jpg?width=300', marketValue:80, rating:86, goals:26, age:23, club:'Barcelona', nationality:'İspanya', position:'Orta Saha' },
+
+  { id:'lautaro-martinez', name:'Lautaro Martínez', image:'https://en.wikipedia.org/wiki/Special:FilePath/Lautaro_Mart%C3%ADnez_2024.jpg?width=300', marketValue:110, rating:89, goals:198, age:28, club:'Inter Milan', nationality:'Arjantin', position:'Santrafor' },
+
+  { id:'viktor-gyokeres', name:'Viktor Gyökeres', image:'https://en.wikipedia.org/wiki/Special:FilePath/Viktor_Gy%C3%B6keres_2023.jpg?width=300', marketValue:90, rating:85, goals:174, age:28, club:'Sporting CP', nationality:'İsveç', position:'Santrafor' },
+
+  { id:'rodrygo', name:'Rodrygo', image:'https://en.wikipedia.org/wiki/Special:FilePath/Rodrygo_2022.jpg?width=300', marketValue:110, rating:86, goals:78, age:25, club:'Real Madrid', nationality:'Brezilya', position:'Sağ Kanat' },
+
+  { id:'khvicha', name:'Khvicha Kvaratskhelia', image:'https://en.wikipedia.org/wiki/Special:FilePath/Khvicha_Kvaratskhelia_2022.jpg?width=300', marketValue:80, rating:86, goals:59, age:25, club:'Napoli', nationality:'Gürcistan', position:'Sol Kanat' },
+
+  { id:'ruben-dias', name:'Rúben Dias', image:'https://en.wikipedia.org/wiki/Special:FilePath/R%C3%BAben_Dias_2022.jpg?width=300', marketValue:80, rating:89, goals:16, age:29, club:'Manchester City', nationality:'Portekiz', position:'Stoper' },
+
+  { id:'bruno-fernandes', name:'Bruno Fernandes', image:'https://en.wikipedia.org/wiki/Special:FilePath/Bruno_Fernandes_2021_%28cropped%29.jpg?width=300', marketValue:65, rating:87, goals:196, age:31, club:'Manchester United', nationality:'Portekiz', position:'Ofansif Orta Saha' },
+
+  { id:'salah', name:'Mohamed Salah', image:'https://en.wikipedia.org/wiki/Special:FilePath/Mohamed_Salah_2018.jpg?width=300', marketValue:50, rating:88, goals:354, age:33, club:'Liverpool', nationality:'Mısır', position:'Sağ Kanat' },
+
+  { id:'kdb', name:'Kevin De Bruyne', image:'https://en.wikipedia.org/wiki/Special:FilePath/Kevin_De_Bruyne_2018.jpg?width=300', marketValue:40, rating:89, goals:162, age:34, club:'Manchester City', nationality:'Belçika', position:'Oyun Kurucu' },
+
+  { id:'hakan', name:'Hakan Çalhanoğlu', image:'https://en.wikipedia.org/wiki/Special:FilePath/Hakan_%C3%87alhano%C4%9Flu_2024.jpg?width=300', marketValue:40, rating:86, goals:142, age:32, club:'Inter Milan', nationality:'Türkiye', position:'Orta Saha' },
+
+  { id:'arda', name:'Arda Güler', image:'https://en.wikipedia.org/wiki/Special:FilePath/Arda_G%C3%BCler_2023_%28cropped%29.jpg?width=300', marketValue:60, rating:81, goals:28, age:21, club:'Real Madrid', nationality:'Türkiye', position:'Ofansif Orta Saha' },
+
+  { id:'kenan-yildiz', name:'Kenan Yıldız', image:'https://en.wikipedia.org/wiki/Special:FilePath/Kenan_Y%C4%B1ld%C4%B1z_2024.jpg?width=300', marketValue:50, rating:80, goals:22, age:21, club:'Juventus', nationality:'Türkiye', position:'Sol Kanat' },
+
+  { id:'ferdi-kadioglu', name:'Ferdi Kadıoğlu', image:'https://en.wikipedia.org/wiki/Special:FilePath/Ferdi_Kad%C4%B1o%C4%9Flu_2024.jpg?width=300', marketValue:35, rating:80, goals:21, age:26, club:'Brighton', nationality:'Türkiye', position:'Sol Bek' },
+
+  { id:'baris-alper', name:'Barış Alper Yılmaz', image:'https://en.wikipedia.org/wiki/Special:FilePath/Bar%C4%B1%C5%9F_Alper_Y%C4%B1lmaz_2024.jpg?width=300', marketValue:25, rating:78, goals:32, age:26, club:'Galatasaray', nationality:'Türkiye', position:'Sağ Kanat' },
+
+  { id:'semih-kilicsoy', name:'Semih Kılıçsoy', image:'https://en.wikipedia.org/wiki/Special:FilePath/Semih_K%C4%B1l%C4%B1%C3%A7soy_2024.jpg?width=300', marketValue:22, rating:75, goals:19, age:20, club:'Beşiktaş', nationality:'Türkiye', position:'Santrafor' },
+
+  { id:'icardi', name:'Mauro Icardi', image:'https://en.wikipedia.org/wiki/Special:FilePath/Mauro_Icardi_2019_%28cropped%29.jpg?width=300', marketValue:15, rating:83, goals:268, age:33, club:'Galatasaray', nationality:'Arjantin', position:'Santrafor' },
+
+  { id:'dusan-tadic', name:'Dušan Tadić', image:'https://en.wikipedia.org/wiki/Special:FilePath/Dusan_Tadic_2024.jpg?width=300', marketValue:3, rating:81, goals:232, age:37, club:'Fenerbahçe', nationality:'Sırbistan', position:'Sol Kanat' },
+
+  { id:'edin-dzeko', name:'Edin Džeko', image:'https://en.wikipedia.org/wiki/Special:FilePath/Edin_D%C5%BEeko_2024.jpg?width=300', marketValue:2, rating:79, goals:418, age:40, club:'Fenerbahçe', nationality:'Bosna-Hersek', position:'Santrafor' },
+
+  { id:'fred', name:'Fred', image:'https://en.wikipedia.org/wiki/Special:FilePath/Fred_2022.jpg?width=300', marketValue:14, rating:80, goals:44, age:33, club:'Fenerbahçe', nationality:'Brezilya', position:'Orta Saha' },
+
+  { id:'szymanski', name:'Sebastian Szymański', image:'https://en.wikipedia.org/wiki/Special:FilePath/Sebastian_Szyma%C5%84ski_2024.jpg?width=300', marketValue:22, rating:79, goals:56, age:27, club:'Fenerbahçe', nationality:'Polonya', position:'Ofansif Orta Saha' },
+
+  { id:'kerem-akturkoglu', name:'Kerem Aktürkoğlu', image:'https://en.wikipedia.org/wiki/Special:FilePath/Kerem_Akt%C3%BCrko%C4%9Flu_2024.jpg?width=300', marketValue:20, rating:79, goals:64, age:27, club:'Benfica', nationality:'Türkiye', position:'Sol Kanat' },
+
+  { id:'messi', name:'Lionel Messi', image:'https://en.wikipedia.org/wiki/Special:FilePath/Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg?width=300', marketValue:25, rating:88, goals:854, age:38, club:'Inter Miami', nationality:'Arjantin', position:'Oyun Kurucu' },
+
+  { id:'cr7', name:'Cristiano Ronaldo', image:'https://en.wikipedia.org/wiki/Special:FilePath/Cristiano_Ronaldo_playing_for_Al_Nassr_FC_against_Al_Fateh_FC_on_3_February_2023_%28cropped%29.jpg?width=300', marketValue:12, rating:85, goals:922, age:41, club:'Al Nassr', nationality:'Portekiz', position:'Santrafor' },
+
+  { id:'lewandowski', name:'Robert Lewandowski', image:'https://en.wikipedia.org/wiki/Special:FilePath/Robert_Lewandowski_2022_%28cropped%29.jpg?width=300', marketValue:12, rating:88, goals:682, age:37, club:'Barcelona', nationality:'Polonya', position:'Santrafor' },
+
+  { id:'son', name:'Heung-min Son', image:'https://en.wikipedia.org/wiki/Special:FilePath/Son_Heung-min_2022.jpg?width=300', marketValue:35, rating:86, goals:238, age:33, club:'Tottenham', nationality:'G. Kore', position:'Sol Kanat' },
+
+  { id:'rashford', name:'Marcus Rashford', image:'https://en.wikipedia.org/wiki/Special:FilePath/Marcus_Rashford_at_Old_Trafford_%28cropped%29.jpg?width=300', marketValue:55, rating:83, goals:144, age:28, club:'Manchester United', nationality:'İngiltere', position:'Sol Kanat' },
+
+  { id:'camavinga', name:'Eduardo Camavinga', image:'https://en.wikipedia.org/wiki/Special:FilePath/Eduardo_Camavinga_2021_%28cropped%29.jpg?width=300', marketValue:100, rating:84, goals:12, age:23, club:'Real Madrid', nationality:'Fransa', position:'Orta Saha' },
+
+  { id:'saliba', name:'William Saliba', image:'https://en.wikipedia.org/wiki/Special:FilePath/Arsenal_against_Aston_Villa_2024_%284%29_%28cropped%29.jpg?width=300', marketValue:90, rating:86, goals:7, age:25, club:'Arsenal', nationality:'Fransa', position:'Stoper' },
+
+  { id:'nico-williams', name:'Nico Williams', image:'https://en.wikipedia.org/wiki/Special:FilePath/Nico_Williams_2024.jpg?width=300', marketValue:80, rating:84, goals:34, age:23, club:'Athletic Bilbao', nationality:'İspanya', position:'Sol Kanat' },
+
+  { id:'griezmann', name:'Antoine Griezmann', image:'https://en.wikipedia.org/wiki/Special:FilePath/France_vs._Canada-224_%28cropped%29.jpg?width=300', marketValue:20, rating:86, goals:282, age:35, club:'Atletico Madrid', nationality:'Fransa', position:'Gezici Forvet' },
+
+  { id:'rafael-varane', name:'Gavi', image:'https://en.wikipedia.org/wiki/Special:FilePath/Gavi_2021_%28cropped%29.jpg?width=300', marketValue:90, rating:84, goals:11, age:21, club:'Barcelona', nationality:'İspanya', position:'Orta Saha' },
+
+  { id:'muslera', name:'Fernando Muslera', image:'https://en.wikipedia.org/wiki/Special:FilePath/Fernando_Muslera_2024.jpg?width=300', marketValue:1, rating:80, goals:1, age:40, club:'Galatasaray', nationality:'Uruguay', position:'Kaleci' },
+
+  { id:'livakovic', name:'Dominik Livaković', image:'https://en.wikipedia.org/wiki/Special:FilePath/Dominik_Livakovi%C4%87_2024.jpg?width=300', marketValue:11, rating:80, goals:0, age:31, club:'Fenerbahçe', nationality:'Hırvatistan', position:'Kaleci' },
+
+  { id:'gedson', name:'Gedson Fernandes', image:'https://en.wikipedia.org/wiki/Special:FilePath/Gedson_Fernandes_2023.jpg?width=300', marketValue:18, rating:79, goals:18, age:27, club:'Beşiktaş', nationality:'Portekiz', position:'Orta Saha' },
+
+  { id:'saint-maximin', name:'Allan Saint-Maximin', image:'https://en.wikipedia.org/wiki/Special:FilePath/Allan_Saint-Maximin_2021.jpg?width=300', marketValue:16, rating:79, goals:36, age:29, club:'Fenerbahçe', nationality:'Fransa', position:'Sol Kanat' },
+
+  { id:'en-nesyri', name:'Youssef En-Nesyri', image:'https://en.wikipedia.org/wiki/Special:FilePath/Youssef_En-Nesyri_2022.jpg?width=300', marketValue:20, rating:80, goals:112, age:29, club:'Fenerbahçe', nationality:'Fas', position:'Santrafor' }
 ];
 
 /* ─────────── STAT HELPERS ─────────── */
