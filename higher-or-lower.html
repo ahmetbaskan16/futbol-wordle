@@ -143,7 +143,8 @@
         }
         .player-img {
             width: 100%; height: 100%;
-            object-fit: cover; object-position: top center;
+            object-fit: cover; 
+            object-position: center 20%; /* Yüz hizalamasını düzeltmek için güncellendi */
             display: block;
             transition: opacity 0.3s ease;
         }
@@ -418,8 +419,6 @@
 
 <script>
 /* ─────────── PLAYER DATA (Oto-Resim Sistemi) ─────────── */
-// NOT: Resim linkleriyle uğraşmamak için "image" kısımları tamamen kaldırıldı.
-// Sistem Wikipedia API üzerinden resimleri canlı ve otomatik olarak bulacak.
 const PLAYERS = [
   { id:'erling-haaland', name:'Erling Haaland', marketValue:180, rating:92, goals:342, age:25, club:'Manchester City', nationality:'Norveç', position:'Santrafor' },
   { id:'kylian-mbappe', name:'Kylian Mbappé', marketValue:180, rating:91, goals:388, age:27, club:'Real Madrid', nationality:'Fransa', position:'Sol Kanat' },
@@ -487,7 +486,6 @@ function fmtStat(v, cat) {
 
 /* ─────────── OTOMATİK WIKIPEDIA GÖRSEL ÇEKİCİ (API) ─────────── */
 function fetchPlayerImage(player, imgEl) {
-    // Görseli önceden çektiysek tekrar API yormayalım
     if (player.cachedImg) {
         imgEl.src = player.cachedImg;
         return;
@@ -502,12 +500,10 @@ function fetchPlayerImage(player, imgEl) {
             const pages = data.query.pages;
             const pageId = Object.keys(pages)[0];
             
-            // Eğer İngilizce Wiki'de resim varsa uygula
             if (pageId !== "-1" && pages[pageId].thumbnail) {
                 player.cachedImg = pages[pageId].thumbnail.source;
                 imgEl.src = player.cachedImg;
             } else {
-                // Yoksa Türkçe Wiki'ye bak
                 const trUrl = `https://tr.wikipedia.org/w/api.php?action=query&titles=${encodeURIComponent(title)}&prop=pageimages&format=json&pithumbsize=600&origin=*`;
                 fetch(trUrl)
                     .then(r => r.json())
@@ -557,10 +553,8 @@ function renderCard(side, player, hideVal) {
     const valEl = document.getElementById(`val-${side}`);
     const lblEl = document.getElementById(`cat-label-${side}`);
 
-    // RESİM YÜKLENENE KADAR ŞIK VE TEMAYA UYGUN BİR AVATAR (Yükleniyor Ekranı) GÖSTER
     img.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(player.name)}&background=1a1a2e&color=ffffff&size=500&font-size=0.33&bold=true`;
     
-    // WIKIPEDIA API İLE CANLI RESİM ÇEKME İŞLEMİNİ BAŞLAT
     fetchPlayerImage(player, img);
 
     name.textContent = player.name;
