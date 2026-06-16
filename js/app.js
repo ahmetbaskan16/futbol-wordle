@@ -40,7 +40,7 @@ class FutbolWordleApp {
     saveUser() {
         localStorage.setItem(this.storageKey, JSON.stringify(this.user));
         this.updateUI();
-        this.syncToServer();
+        this._trySyncToServer();
     }
 
     init() {
@@ -114,30 +114,47 @@ class FutbolWordleApp {
         this.saveUser();
     }
 
-    async syncToServer() {
+    async _trySyncToServer() {
         try {
             const response = await fetch('/api/user.js', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ userData: this.user })
             });
+            if (!response.ok) throw new Error('Network response was not ok');
             const result = await response.json();
             console.log('Server sync result:', result);
         } catch (error) {
-            console.error('Failed to sync with server:', error);
+            console.warn('Sync failed (offline/DB error), keeping local data:', error);
         }
     }
 
-    notify(message) {
-        const toast = document.getElementById('level-up-toast');
-        const msg = document.getElementById('level-up-message');
-        if (toast && msg) {
-            msg.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        } else {
-            console.log('Notification:', message);
+    notify(message, duration = 3000) {
+        // Modern Toast Notification
+        const container = document.getElementById('toast-container');
+        if (!container) {
+            // Fallback to old behavior if container doesn't exist
+            const toast = document.getElementById('level-up-toast');
+            const msg = document.getElementById('level-up-message');
+            if (toast && msg) {
+                msg.textContent = message;
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), duration);
+            } else {
+                console.log('Notification:', message);
+            }
+            return;
         }
+
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.textContent = message;
+        container.appendChild(toast);
+
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
     }
 }
 
