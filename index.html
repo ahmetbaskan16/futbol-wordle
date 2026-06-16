@@ -2,662 +2,137 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Futbol Wordle">
-    <link rel="apple-touch-icon" href="https://upload.wikimedia.org/wikipedia/tr/8/86/Fenerbah%C3%A7e_SK.png">
-    <title>Futbol Wordle</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
-            --glass: rgba(255,255,255,0.05);
-            --glass-border: rgba(255,255,255,0.1);
-            --text: #ffffff;
-            --text-muted: rgba(255,255,255,0.7);
-            --correct: #4ade80;
-            --present: #facc15;
-            --absent: #475569;
-            --tile-border: #334155;
-            --accent: #3b82f6;
-            --fb-blue: #003399;
-            --fb-yellow: #fdd017;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-        body {
-            background: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-x: hidden;
-            padding: 16px;
-        }
-        header {
-            text-align: center;
-            margin-bottom: 16px;
-            position: relative;
-            width: 100%;
-            max-width: 500px;
-        }
-        h1 {
-            font-size: clamp(1.6rem, 6vw, 2.6rem);
-            font-weight: 800;
-            letter-spacing: -2px;
-            background: linear-gradient(135deg, #fff 0%, #aaa 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 4px;
-        }
-        .subtitle { color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; }
-        .header-actions {
-            position: absolute;
-            right: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            gap: 8px;
-        }
-        .icon-btn {
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            color: #fff;
-            width: 38px;
-            height: 38px;
-            border-radius: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-            font-size: 1.2rem;
-        }
-        .icon-btn:hover { background: rgba(255,255,255,0.15); }
-        
-        .mode-container {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            width: 100%;
-            max-width: 280px;
-            margin-bottom: 20px;
-        }
-        .mode-switcher {
-            display: flex;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            padding: 4px;
-            border-radius: 12px;
-            width: 100%;
-        }
-        .mode-btn {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            padding: 9px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.82rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .mode-btn.active { background: var(--accent); color: #fff; box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
-        .mode-btn.active-green { background: var(--correct); color: #000; box-shadow: 0 4px 12px rgba(74,222,128,0.3); }
-
-        #game-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-            width: 100%;
-            max-width: 600px;
-        }
-        #game-board { display: flex; flex-direction: column; gap: 6px; }
-        .row { display: flex; gap: 6px; justify-content: center; }
-        .tile {
-            width: clamp(32px, 9vw, 52px);
-            height: clamp(32px, 9vw, 52px);
-            border: 2px solid var(--tile-border);
-            background: var(--glass);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: clamp(1rem, 3.5vw, 1.4rem);
-            font-weight: 700;
-            text-transform: uppercase;
-            transition: border-color 0.1s;
-            user-select: none;
-            border-radius: 4px;
-        }
-        .tile.space { border: none; background: transparent; width: 10px; }
-        .tile.pop { transform: scale(1.08); border-color: #fff; }
-        .tile[data-state="correct"] { background: var(--correct); border-color: var(--correct); color: #000; animation: flip 0.5s ease forwards; }
-        .tile[data-state="present"] { background: var(--present); border-color: var(--present); color: #000; animation: flip 0.5s ease forwards; }
-        .tile[data-state="absent"]  { background: var(--absent);  border-color: var(--absent);  opacity: 0.7; animation: flip 0.5s ease forwards; }
-        @keyframes flip {
-            0%   { transform: rotateX(0); }
-            50%  { transform: rotateX(90deg); }
-            100% { transform: rotateX(0); }
-        }
-        @keyframes shake {
-            0%,100% { transform: translateX(0); }
-            20%,60% { transform: translateX(-6px); }
-            40%,80% { transform: translateX(6px); }
-        }
-        .shake { animation: shake 0.4s ease; }
-        #keyboard { display: flex; flex-direction: column; gap: 6px; width: 100%; max-width: 500px; }
-        .kb-row { display: flex; justify-content: center; gap: 4px; }
-        .key {
-            background: rgba(255,255,255,0.12);
-            border: 1px solid var(--glass-border);
-            color: #fff;
-            border-radius: 6px;
-            padding: 14px 4px;
-            font-weight: 600;
-            cursor: pointer;
-            text-transform: uppercase;
-            flex: 1;
-            transition: background 0.15s, color 0.15s;
-            font-size: 0.82rem;
-            -webkit-tap-highlight-color: transparent;
-            min-width: 0;
-        }
-        .key:active { transform: scale(0.94); }
-        .key.large { flex: 1.5; font-size: 0.68rem; }
-        .key[data-state="correct"] { background: var(--correct) !important; color: #000 !important; border-color: var(--correct) !important; }
-        .key[data-state="present"] { background: var(--present) !important; color: #000 !important; border-color: var(--present) !important; }
-        .key[data-state="absent"]  { background: #1e293b !important; color: #64748b !important; border-color: transparent !important; }
-        .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(12px);
-            display: none; flex-direction: column;
-            justify-content: center; align-items: center;
-            z-index: 1000; padding: 20px;
-        }
-        .modal {
-            background: rgba(255,255,255,0.08);
-            border: 1px solid var(--glass-border);
-            padding: 28px;
-            border-radius: 24px;
-            max-width: 460px;
-            width: 95%;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.6);
-            text-align: center;
-            position: relative;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        .close-modal { position: absolute; right: 18px; top: 18px; cursor: pointer; opacity: 0.6; font-size: 1.1rem; }
-        .modal h2 { font-size: 1.6rem; margin-bottom: 18px; font-weight: 800; }
-        .modal h3 { font-size: 0.9rem; margin: 16px 0 8px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
-        .modern-input {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--glass-border);
-            padding: 14px;
-            border-radius: 12px;
-            color: #fff;
-            width: 100%;
-            font-size: 1rem;
-            outline: none;
-            text-align: center;
-            margin: 16px 0;
-        }
-        .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 8px; margin-bottom: 16px; }
-        .stat-item .value { font-size: 1.4rem; font-weight: 800; display: block; }
-        .stat-item .label { font-size: 0.58rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-        .leaderboard-container { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left; }
-        .leaderboard-list { background: rgba(0,0,0,0.2); padding: 8px; border-radius: 14px; max-height: 160px; overflow-y: auto; }
-        .leaderboard-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid var(--glass-border);
-            padding: 7px 10px;
-            border-radius: 8px;
-            margin-bottom: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.75rem;
-        }
-        .leaderboard-item.highlight { border-color: var(--correct); background: rgba(74,222,128,0.1); }
-        .leaderboard-item .rank { font-weight: 800; color: var(--present); margin-right: 6px; }
-        .btn-restart {
-            background: #fff; color: #000; border: none;
-            padding: 13px 36px; border-radius: 12px;
-            font-weight: 700; cursor: pointer;
-            transition: opacity 0.2s; margin-top: 14px; width: 100%;
-        }
-        .btn-restart:hover { opacity: 0.85; }
-        .btn-secondary {
-            background: transparent; color: #fff;
-            border: 1px solid var(--glass-border);
-            padding: 7px 14px; border-radius: 8px;
-            font-size: 0.78rem; cursor: pointer; margin-top: 8px;
-        }
-        .win-fenerbahce { border: 4px solid var(--fb-yellow) !important; background: linear-gradient(135deg, var(--fb-blue) 0%, #001a4d 100%) !important; }
-        .toast {
-            position: fixed; top: 76px; left: 50%; transform: translateX(-50%) translateY(-20px);
-            background: #fff; color: #000;
-            padding: 10px 22px; border-radius: 50px;
-            font-weight: 700; font-size: 0.85rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            opacity: 0; transition: all 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
-            z-index: 2000; pointer-events: none; white-space: nowrap;
-        }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 10px; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Futbol Wordle - Pro Hub</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-
-<header>
-    <div class="header-actions">
-        <!-- İPUCU BUTONU BURAYA EKLENDİ (Başta Gizli) -->
-        <button class="icon-btn" id="hint-btn" onclick="useHint()" title="İpucu Al" style="display: none; border-color: var(--present);">💡</button>
-        <button class="icon-btn" onclick="window.location.href='leaderboard.html'" title="Leaderboard">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-        </button>
-        <button class="icon-btn" onclick="toggleStats()" title="İstatistikler">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6M18 9h1.5a2.5 2.5 0 0 0 0-5H18M4 12a8 8 0 0 1 16 0 8 8 0 0 1-16 0M12 9v6M9 15h6"/></svg>
-        </button>
-    </div>
-    <h1>⚽ FUTBOL WORDLE</h1>
-    <div class="subtitle" id="game-subtitle">THE ULTIMATE CLUB CHALLENGE</div>
-</header>
-
-<div class="mode-container">
-    <div class="mode-switcher">
-        <button class="mode-btn active" id="mode-club" onclick="switchMode('club')">🏟 KULÜP</button>
-        <button class="mode-btn" id="mode-player" onclick="switchMode('player')">👤 OYUNCU</button>
-    </div>
-    <div class="mode-switcher">
-        <button class="mode-btn" id="mode-daily" onclick="switchPlayType(true)">📅 GÜNÜN</button>
-        <button class="mode-btn" id="mode-endless" onclick="switchPlayType(false)">♾️ SERBEST</button>
-    </div>
-    
-    <!-- LOGO QUIZ GEÇİŞ BUTONU -->
-    <button onclick="window.location.href='logo-quiz.html'" style="margin-top: 12px; width: 100%; background: linear-gradient(135deg, #3b82f6 0%, #a5b4fc 100%); color: #000; border: none; padding: 11px 0; border-radius: 10px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: opacity 0.2s;">
-        🛡️ LOGO QUIZ OYNA ➔
-    </button>
-    <button onclick="window.location.href='higher-or-lower.html'" style="margin-top: 8px; width: 100%; background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%); color: #000; border: none; padding: 11px 0; border-radius: 10px; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: opacity 0.2s;">
-        📊 HIGHER OR LOWER OYNA ➔
-    </button>
-</div>
-
-<div id="game-container">
-    <div id="game-board"></div>
-    <div id="keyboard">
-        <div class="kb-row">
-            <button class="key" data-key="Q">Q</button><button class="key" data-key="W">W</button>
-            <button class="key" data-key="E">E</button><button class="key" data-key="R">R</button>
-            <button class="key" data-key="T">T</button><button class="key" data-key="Y">Y</button>
-            <button class="key" data-key="U">U</button><button class="key" data-key="I">I</button>
-            <button class="key" data-key="O">O</button><button class="key" data-key="P">P</button>
-        </div>
-        <div class="kb-row">
-            <button class="key" data-key="A">A</button><button class="key" data-key="S">S</button>
-            <button class="key" data-key="D">D</button><button class="key" data-key="F">F</button>
-            <button class="key" data-key="G">G</button><button class="key" data-key="H">H</button>
-            <button class="key" data-key="J">J</button><button class="key" data-key="K">K</button>
-            <button class="key" data-key="L">L</button>
-        </div>
-        <div class="kb-row">
-            <button class="key large" data-key="ENTER">ENTER</button>
-            <button class="key" data-key="Z">Z</button><button class="key" data-key="X">X</button>
-            <button class="key" data-key="C">C</button><button class="key" data-key="V">V</button>
-            <button class="key" data-key="B">B</button><button class="key" data-key="N">N</button>
-            <button class="key" data-key="M">M</button>
-            <button class="key large" data-key="BACKSPACE">⌫</button>
-        </div>
-    </div>
-</div>
-
-<!-- Login Modal -->
-<div id="login-overlay" class="overlay">
-    <div class="modal">
-        <h2>İSMİN NE? ⚽</h2>
-        <p style="color:var(--text-muted);margin-bottom:8px">Meydan okumak için ismini gir.</p>
-        <input type="text" id="username-input" class="modern-input" placeholder="Manager Adın" maxlength="15">
-        <button class="btn-restart" onclick="registerUser()">KARİYERE BAŞLA</button>
-    </div>
-</div>
-
-<!-- Stats Modal -->
-<div id="stats-overlay" class="overlay">
-    <div id="stats-modal" class="modal">
-        <div class="close-modal" onclick="toggleStats()">✕</div>
-        <h2 id="modal-title">İSTATİSTİKLER</h2>
-        <div class="stats-grid">
-            <div class="stat-item"><span class="value" id="stats-played">0</span><span class="label">Oynanan</span></div>
-            <div class="stat-item"><span class="value" id="stats-score">0</span><span class="label">Galibiyet</span></div>
-            <div class="stat-item"><span class="value" id="stats-streak">0</span><span class="label">Seri</span></div>
-            <div class="stat-item"><span class="value" id="stats-max">0</span><span class="label">En İyi Seri</span></div>
-        </div>
-        <div class="leaderboard-container">
-            <div>
-                <h3>EN İYİLERİN</h3>
-                <div class="leaderboard-list" id="leaderboard"></div>
-            </div>
-            <div>
-                <h3>LİDERLİK TABLOSU</h3>
-                <div class="leaderboard-list" id="global-leaderboard"></div>
-            </div>
-        </div>
-        <button class="btn-restart" onclick="location.reload()">TEKRAR OYNA</button>
-        <button class="btn-secondary" onclick="showNameChange()">İsmi Değiştir</button>
-    </div>
-</div>
-
-<div id="toast" class="toast"></div>
-
-<script>
-const CLUBS = [
-    'Fenerbahce','Galatasaray','Besiktas','Trabzonspor','Basaksehir',
-    'Kasimpasa','Sivasspor','Alanyaspor','Antalyaspor','Rizespor',
-    'Eyupspor','Goztepe','Gaziantep','Samsunspor','Bodrumspor',
-    'Konyaspor','Adana Demirspor','Hatayspor','Kayserispor','Karagumruk',
-    'Manchester City','Arsenal','Liverpool','Aston Villa','Tottenham',
-    'Chelsea','Newcastle','Manchester United','West Ham','Brighton',
-    'Real Madrid','Barcelona','Atletico Madrid','Athletic Bilbao','Real Sociedad',
-    'Inter Milan','AC Milan','Juventus','Atalanta','Bologna',
-    'Bayer Leverkusen','Bayern Munich','Stuttgart','RB Leipzig','Borussia Dortmund',
-    'PSG','Monaco','Lille','Brest','Nice',
-    'Ajax','PSV Eindhoven','Feyenoord',
-    'Benfica','Porto','Sporting CP',
-    'Boca Juniors','River Plate','Flamengo','Palmeiras'
-];
-
-const PLAYERS = [
-    'Cristiano Ronaldo','Lionel Messi','Kylian Mbappe','Erling Haaland','Jude Bellingham',
-    'Vinicius Junior','Harry Kane','Kevin De Bruyne','Mohamed Salah','Rodri',
-    'Robert Lewandowski','Antoine Griezmann','Luka Modric','Karim Benzema','Neymar',
-    'Zinedine Zidane','Thierry Henry','Ronaldo Nazario','Ronaldinho','Kaka',
-    'Arda Guler','Ferdi Kadioglu','Kerem Akturkoglu','Baris Alper Yilmaz','Semih Kilicsoy',
-    'Ismail Yuksek','Caglar Soyuncu','Mert Gunok','Hakan Calhanoglu','Kenan Yildiz',
-    'Mauro Icardi','Dusan Tadic','Edin Dzeko','Sebastian Szymanski','Fred',
-    'Victor Osimhen','Allan Saint-Maximin','Rafa Silva','Ciro Immobile','Gedson Fernandes',
-    'Phil Foden','Bukayo Saka','Declan Rice','Martin Odegaard','Cole Palmer',
-    'Lamine Yamal','Pedri','Gavi','Federico Valverde','Rodrygo Goes',
-    'Florian Wirtz','Jamal Musiala','Xavi Simons','Rafael Leao','Lautaro Martinez'
-];
-
-function normalize(str) {
-    return str.toUpperCase()
-        .replace(/İ/g,'I').replace(/Ğ/g,'G').replace(/Ü/g,'U')
-        .replace(/Ş/g,'S').replace(/Ö/g,'O').replace(/Ç/g,'C')
-        .normalize("NFD").replace(/[\u0300-\u036f]/g,'');
-}
-
-let currentGameMode = localStorage.getItem('futbol_wordle_mode') || 'club';
-let isDailyMode = localStorage.getItem('futbol_wordle_isdaily') !== 'false';
-let wordList = currentGameMode === 'club' ? CLUBS : PLAYERS;
-
-function getTargetWord(list, isDaily) {
-    if (!isDaily) return list[Math.floor(Math.random() * list.length)];
-    
-    const today = new Date();
-    const modeOffset = currentGameMode === 'club' ? 1 : 2; 
-    const seed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate() + modeOffset;
-    
-    const x = Math.sin(seed) * 10000;
-    const index = Math.floor((x - Math.floor(x)) * list.length);
-    return list[index];
-}
-
-let rawTarget = getTargetWord(wordList, isDailyMode);
-let targetWord = normalize(rawTarget);
-let targetLettersOnly = targetWord.replace(/[^A-Z]/g,'');
-let letterCount = targetLettersOnly.length;
-let currentRow = 0, currentLetterIndex = 0, gameOver = false;
-let startTime = Date.now();
-const attempts = 6;
-let guesses = Array.from({length: attempts}, () => []);
-let hintUsed = false;
-
-const statsKey = currentGameMode === 'club' ? 'wordleStats' : 'playerWordleStats';
-let stats = JSON.parse(localStorage.getItem(statsKey)) || {played:0, wins:0, streak:0, maxStreak:0, bestRuns:[], totalScore:0};
-let username = localStorage.getItem('futbol_wordle_username');
-
-function saveStats() { localStorage.setItem(statsKey, JSON.stringify(stats)); }
-function saveUser(name) { username = name; localStorage.setItem('futbol_wordle_username', name); }
-
-function switchMode(mode) {
-    if (currentGameMode === mode) return;
-    localStorage.setItem('futbol_wordle_mode', mode);
-    location.reload();
-}
-
-function switchPlayType(daily) {
-    if (isDailyMode === daily) return;
-    localStorage.setItem('futbol_wordle_isdaily', daily);
-    location.reload();
-}
-
-function initBoard() {
-    document.getElementById('mode-club').classList.toggle('active', currentGameMode === 'club');
-    document.getElementById('mode-player').classList.toggle('active', currentGameMode === 'player');
-    
-    document.getElementById('mode-daily').classList.toggle('active-green', isDailyMode);
-    document.getElementById('mode-endless').classList.toggle('active-green', !isDailyMode);
-
-    document.getElementById('game-subtitle').textContent = currentGameMode === 'club' ? 'THE ULTIMATE CLUB CHALLENGE' : 'GUESS THE STAR PLAYER';
-
-    const board = document.getElementById('game-board');
-    board.innerHTML = '';
-    for (let i = 0; i < attempts; i++) {
-        const row = document.createElement('div');
-        row.className = 'row'; row.id = `row-${i}`;
-        let li = 0;
-        for (let ch of targetWord) {
-            const tile = document.createElement('div');
-            if (ch === ' ' || ch === '-' || ch === '.') {
-                tile.className = 'tile space'; tile.textContent = ch;
-            } else {
-                tile.className = 'tile'; tile.id = `tile-${i}-${li}`; li++;
-            }
-            row.appendChild(tile);
-        }
-        board.appendChild(row);
-    }
-}
-
-function showToast(msg) {
-    const t = document.getElementById('toast');
-    t.textContent = msg; t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 2800);
-}
-
-function useHint() {
-    if (hintUsed || gameOver) return;
-    
-    let foundLetters = new Set();
-    for(let i=0; i<currentRow; i++) {
-        guesses[i].forEach(ch => foundLetters.add(ch));
-    }
-    
-    let missingLetters = targetLettersOnly.split('').filter(ch => !foundLetters.has(ch));
-    
-    if(missingLetters.length > 0) {
-        let randomHint = missingLetters[Math.floor(Math.random() * missingLetters.length)];
-        showToast(`💡 İPUCU: Kelimede kesinlikle "${randomHint}" harfi var!`);
-    } else {
-        showToast(`💡 İPUCU: Bütün harfleri zaten buldun, sadece yerleri yanlış!`);
-    }
-    
-    hintUsed = true;
-    document.getElementById('hint-btn').style.opacity = '0.4';
-    document.getElementById('hint-btn').style.cursor = 'not-allowed';
-}
-
-function updateBoard() {
-    const rowTiles = document.querySelectorAll(`#row-${currentRow} .tile:not(.space)`);
-    rowTiles.forEach((tile, idx) => {
-        tile.textContent = guesses[currentRow][idx] || '';
-        tile.classList.toggle('pop', !!guesses[currentRow][idx]);
-    });
-}
-
-function submitGuess() {
-    const guess = guesses[currentRow].join('');
-    if (guess.length !== letterCount) {
-        const row = document.getElementById(`row-${currentRow}`);
-        row.classList.add('shake');
-        setTimeout(() => row.classList.remove('shake'), 400);
-        showToast("YETERSİZ HARF");
-        return;
-    }
-
-    if (currentGameMode === 'club' && guess === normalize('Galatasaray')) {
-        showToast("Cidden mi? Limon sıktın keyfimize... 🍋");
-    }
-
-    const rowTiles = document.querySelectorAll(`#row-${currentRow} .tile:not(.space)`);
-    const targetArr = targetLettersOnly.split('');
-    const guessArr = guess.split('');
-    const states = new Array(letterCount).fill('absent');
-
-    guessArr.forEach((ch, i) => { if (ch === targetArr[i]) { states[i] = 'correct'; targetArr[i] = null; } });
-    guessArr.forEach((ch, i) => {
-        if (states[i] !== 'correct') {
-            const idx = targetArr.indexOf(ch);
-            if (idx !== -1) { states[i] = 'present'; targetArr[idx] = null; }
-        }
-    });
-
-    const KB_PRIORITY = { correct: 3, present: 2, absent: 1 };
-    states.forEach((state, i) => {
-        setTimeout(() => {
-            rowTiles[i].setAttribute('data-state', state);
-            const key = document.querySelector(`.key[data-key="${guessArr[i]}"]`);
-            if (key) {
-                const cur = KB_PRIORITY[key.getAttribute('data-state')] || 0;
-                if (KB_PRIORITY[state] > cur) key.setAttribute('data-state', state);
-            }
-        }, i * 120);
-    });
-
-    const isWin = guess === targetLettersOnly;
-    const delay = letterCount * 120 + 400;
-    
-    if (isWin || currentRow === attempts - 1) {
-        gameOver = true;
-        updateStats(isWin);
-        setTimeout(() => showEndGame(isWin), delay);
-    } else {
-        setTimeout(() => { 
-            currentRow++; 
-            currentLetterIndex = 0; 
+    <header class="header">
+        <div class="container header-content">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">⚽</div>
+                <span class="logo-text">FUTBOL WORDLE</span>
+            </a>
             
-            if (currentRow >= 2 && !hintUsed) {
-                document.getElementById('hint-btn').style.display = 'flex';
-            }
-        }, delay - 200);
-    }
-}
+            <div class="header-stats">
+                <div class="stat-badge level">
+                    <span class="icon">⭐</span>
+                    <span id="header-level">Seviye 1</span>
+                </div>
+                <div class="stat-badge xp">
+                    <span class="icon">⚡</span>
+                    <span id="header-xp">100 XP</span>
+                </div>
+                <div class="user-menu">
+                    <div class="user-avatar" id="user-avatar">?</div>
+                </div>
+            </div>
+        </div>
+    </header>
 
-function updateStats(win) {
-    stats.played++;
-    if (win) {
-        stats.wins++;
-        stats.streak++;
-        stats.totalScore = (stats.totalScore || 0) + 1;
-        if (stats.streak > stats.maxStreak) stats.maxStreak = stats.streak;
-        const time = Math.floor((Date.now() - startTime) / 1000);
-        stats.bestRuns.push({ guesses: currentRow + 1, time, club: rawTarget });
-        stats.bestRuns.sort((a,b) => a.guesses - b.guesses || a.time - b.time);
-        stats.bestRuns = stats.bestRuns.slice(0, 10);
-    } else { stats.streak = 0; }
-    saveStats();
-}
+    <nav class="container">
+        <div class="nav-tabs">
+            <a href="index.html" class="nav-tab active">Ana Sayfa</a>
+            <a href="missions.html" class="nav-tab">Görevler</a>
+            <a href="leaderboard.html" class="nav-tab">Sıralama</a>
+            <a href="stats.html" class="nav-tab">İstatistikler</a>
+        </div>
+    </nav>
 
-window.toggleStats = function() {
-    const overlay = document.getElementById('stats-overlay');
-    if (overlay.style.display === 'flex') { overlay.style.display = 'none'; return; }
+    <main class="container main">
+        <section class="xp-progress-section">
+            <div class="xp-info">
+                <div class="xp-current">
+                    <span class="icon">🏆</span>
+                    <span id="level-text">Seviye 1 - Çaylak</span>
+                </div>
+                <div class="xp-next" id="xp-remaining">Sonraki seviyeye 400 XP kaldı</div>
+            </div>
+            <div class="xp-bar">
+                <div class="xp-fill" id="xp-bar-fill" style="width: 25%"></div>
+            </div>
+        </section>
 
-    document.getElementById('stats-played').textContent = stats.played;
-    document.getElementById('stats-score').textContent = stats.wins || 0;
-    document.getElementById('stats-streak').textContent = stats.streak;
-    document.getElementById('stats-max').textContent = stats.maxStreak;
+        <section class="games-grid">
+            <a href="wordle.html" class="game-card club">
+                <span class="new-badge">Yeni</span>
+                <div class="game-card-icon">🏗️</div>
+                <h3 class="game-card-title">Kulüp Wordle</h3>
+                <p class="game-card-desc">Gizli futbol kulübünü ambleminden ve renklerinden tahmin et.</p>
+                <div class="game-card-meta">
+                    <span class="game-card-stat">📈 Zorluk: Orta</span>
+                    <div class="game-card-play">Oyna →</div>
+                </div>
+            </a>
 
-    const lb = document.getElementById('leaderboard');
-    lb.innerHTML = stats.bestRuns.length
-        ? stats.bestRuns.map((r,i) => `<div class="leaderboard-item"><span><span class="rank">#${i+1}</span>${r.club}</span><span style="opacity:.6">${r.guesses} deneme</span></div>`).join('')
-        : '<p style="text-align:center;opacity:.3;font-size:.7rem;">Henüz galibiyet yok</p>';
+            <a href="player-wordle.html" class="game-card player">
+                <div class="game-card-icon">👤</div>
+                <h3 class="game-card-title">Oyuncu Wordle</h3>
+                <p class="game-card-desc">Transfer geçmişi ve özelliklerine göre gizli oyuncuyu bul.</p>
+                <div class="game-card-meta">
+                    <span class="game-card-stat">📈 Zorluk: Zor</span>
+                    <div class="game-card-play">Oyna →</div>
+                </div>
+            </a>
 
-    const fakeDBPlayers = [
-        {name: username || "Sen", score: stats.wins || 0, isUser: true}
-    ];
+            <a href="higher-or-lower.html" class="game-card daily">
+                <div class="game-card-icon">📊</div>
+                <h3 class="game-card-title">Alt-Üst</h3>
+                <p class="game-card-desc">Hangi oyuncunun piyasa değeri veya gol sayısı daha fazla?</p>
+                <div class="game-card-meta">
+                    <span class="game-card-stat">📈 Zorluk: Kolay</span>
+                    <div class="game-card-play">Oyna →</div>
+                </div>
+            </a>
 
-    document.getElementById('global-leaderboard').innerHTML = fakeDBPlayers.map((l,i) =>
-        `<div class="leaderboard-item ${l.isUser?'highlight':''}"><span><span class="rank">${i+1}</span>${l.name}</span><span style="font-weight:800">${l.score}</span></div>`
-    ).join('');
+            <a href="logo-quiz.html" class="game-card infinite">
+                <div class="game-card-icon">🎨</div>
+                <h3 class="game-card-title">Logo Quiz</h3>
+                <p class="game-card-desc">Hızla değişen logoları tanı, en yüksek skoru yap.</p>
+                <div class="game-card-meta">
+                    <span class="game-card-stat">📈 Zorluk: Orta</span>
+                    <div class="game-card-play">Oyna →</div>
+                </div>
+            </a>
+        </section>
 
-    overlay.style.display = 'flex';
-};
+        <section class="missions-section">
+            <div class="section-header">
+                <h2 class="section-title">
+                    <span class="icon">🎯</span>
+                    Günlük Görevler
+                </h2>
+                <div class="timer-badge">
+                    <span class="icon">🕒</span>
+                    <span id="mission-timer">14:22:05</span>
+                </div>
+            </div>
+            <div class="missions-grid" id="daily-missions-container">
+                <!-- Missions will be loaded by JS -->
+            </div>
+        </section>
+    </main>
 
-function showEndGame(win) {
-    const modal = document.getElementById('stats-modal');
-    const title = document.getElementById('modal-title');
-    if (win) {
-        if (targetWord === normalize('Fenerbahce')) {
-            modal.classList.add('win-fenerbahce');
-            title.innerHTML = "EN BÜYÜK FENERBAHÇE! 💛💙";
-        } else if (targetWord === normalize('Galatasaray')) {
-            title.textContent = "Sarı-kırmızı bir tat... 🍋";
-        } else {
-            const msgs = ["G O O O A L ! ⚽","MÜKEMMEL! 🎯","HARIKA! 🔥","SÜPER! 💪","BRAVO! 👏"];
-            title.textContent = msgs[currentRow] || msgs[0];
-        }
-    } else {
-        title.textContent = "OYUN BİTTİ: " + rawTarget;
-    }
-    toggleStats();
-}
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-links">
+                <a href="#" class="footer-link">Hakkımızda</a>
+                <a href="#" class="footer-link">Nasıl Oynanır?</a>
+                <a href="#" class="footer-link">Destek</a>
+            </div>
+            <p>© 2024 Futbol Wordle Pro. Tüm hakları saklıdır.</p>
+        </div>
+    </footer>
 
-function handleInput(key) {
-    if (gameOver || document.getElementById('login-overlay').style.display === 'flex') return;
-    if (key === 'ENTER') submitGuess();
-    else if (key === 'BACKSPACE') {
-        if (currentLetterIndex > 0) { currentLetterIndex--; guesses[currentRow].pop(); updateBoard(); }
-    } else if (/^[A-Z]$/.test(key) && currentLetterIndex < letterCount) {
-        guesses[currentRow].push(key); currentLetterIndex++; updateBoard();
-    }
-}
+    <div class="level-up-toast" id="level-up-toast">
+        <h2>TEBRİKLER!</h2>
+        <p id="level-up-message">Seviye 2 oldunuz!</p>
+    </div>
 
-function registerUser() {
-    const val = document.getElementById('username-input').value.trim();
-    if (!val) { showToast("Bir isim gir!"); return; }
-    saveUser(val);
-    document.getElementById('login-overlay').style.display = 'none';
-    showToast(`Hoş geldin, Manager ${val}! ⚽`);
-}
-
-function showNameChange() {
-    document.getElementById('stats-overlay').style.display = 'none';
-    document.getElementById('login-overlay').style.display = 'flex';
-    document.getElementById('username-input').value = username || '';
-}
-
-window.addEventListener('load', () => {
-    if (!username) document.getElementById('login-overlay').style.display = 'flex';
-    initBoard();
-});
-
-window.addEventListener('keydown', e => {
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
-    if (e.key === 'Backspace') handleInput('BACKSPACE');
-    else if (e.key === 'Enter') handleInput('ENTER');
-    else if (/^[a-zA-Z]$/.test(e.key)) handleInput(e.key.toUpperCase());
-});
-
-document.getElementById('keyboard').addEventListener('click', e => {
-    const key = e.target.closest('.key');
-    if (key) handleInput(key.getAttribute('data-key'));
-});
-</script>
+    <script src="js/app.js"></script>
+    <script src="js/animations.js"></script>
 </body>
 </html>
