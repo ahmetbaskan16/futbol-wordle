@@ -417,6 +417,9 @@
 
 <div id="toast" class="toast"></div>
 
+<!-- Scripts -->
+<script src="js/app.js"></script>
+<script src="js/missions.js"></script>
 <script>
 /* ─────────── PLAYER DATA (Kullanıcının Verdiği Güncel Liste) ─────────── */
 const PLAYERS = [
@@ -444,7 +447,6 @@ const PLAYERS = [
   { id:'william-saliba', name:'William Saliba', marketValue:100, rating:87, goals:7, age:25, club:'Arsenal', nationality:'Fransa', position:'Stoper' },
   { id:'dominik-szoboszlai', name:'Dominik Szoboszlai', marketValue:100, rating:85, goals:0, age:25, club:'Liverpool', nationality:'Macaristan', position:'On Numara' },
   { id:'ousmane-dembele', name:'Ousmane Dembélé', marketValue:100, rating:90, goals:0, age:29, club:'Paris Saint-Germain', nationality:'Fransa', position:'Santrafor' },
-  { id:'yan-diomande', name:'Yan Diomande', marketValue:90, rating:76, goals:0, age:19, club:'RB Leipzig', nationality:'Fildişi Sahili', position:'Sol Kanat' },
   { id:'arda-guler', name:'Arda Güler', marketValue:90, rating:84, goals:28, age:21, club:'Real Madrid', nationality:'Türkiye', position:'On Numara' },
   { id:'aleksandar-pavlovic', name:'Aleksandar Pavlović', marketValue:90, rating:83, goals:0, age:22, club:'Bayern Münih', nationality:'Almanya', position:'Ön Libero' },
   { id:'enzo-fernandez', name:'Enzo Fernández', marketValue:90, rating:86, goals:0, age:25, club:'Chelsea', nationality:'Arjantin', position:'Merkez Orta Saha' },
@@ -485,18 +487,18 @@ const PLAYERS = [
   { id:'icardi', name:'Mauro Icardi', marketValue:15, rating:84, goals:268, age:33, club:'Galatasaray', nationality:'Arjantin', position:'Santrafor' },
   { id:'dusan-tadic', name:'Dušan Tadić', marketValue:3, rating:80, goals:232, age:37, club:'Fenerbahçe', nationality:'Sırbistan', position:'Sol Kanat' },
   { id:'edin-dzeko', name:'Edin Džeko', marketValue:2, rating:78, goals:418, age:40, club:'Fenerbahçe', nationality:'Bosna-Hersek', position:'Santrafor' },
-  { id:'fred', name:'Fred', wiki:'Fred (footballer, born 1993)', marketValue:14, rating:79, goals:44, age:33, club:'Fenerbahçe', nationality:'Brezilya', position:'Orta Saha' },
+  { id:'fred', name:'Fred', marketValue:14, rating:79, goals:44, age:33, club:'Fenerbahçe', nationality:'Brezilya', position:'Orta Saha' },
   { id:'szymanski', name:'Sebastian Szymański', marketValue:22, rating:79, goals:56, age:27, club:'Fenerbahçe', nationality:'Polonya', position:'Ofansif Orta Saha' },
   { id:'kerem-akturkoglu', name:'Kerem Aktürkoğlu', marketValue:22, rating:80, goals:64, age:27, club:'Benfica', nationality:'Türkiye', position:'Sol Kanat' },
   { id:'messi', name:'Lionel Messi', marketValue:25, rating:87, goals:854, age:38, club:'Inter Miami', nationality:'Arjantin', position:'Oyun Kurucu' },
   { id:'cr7', name:'Cristiano Ronaldo', marketValue:12, rating:85, goals:922, age:41, club:'Al Nassr', nationality:'Portekiz', position:'Santrafor' },
   { id:'lewandowski', name:'Robert Lewandowski', marketValue:12, rating:88, goals:682, age:37, club:'Barcelona', nationality:'Polonya', position:'Santrafor' },
-  { id:'son', name:'Heung-min Son', wiki:'Son Heung-min', marketValue:35, rating:85, goals:238, age:33, club:'Tottenham', nationality:'G. Kore', position:'Sol Kanat' },
+  { id:'son', name:'Heung-min Son', marketValue:35, rating:85, goals:238, age:33, club:'Tottenham', nationality:'G. Kore', position:'Sol Kanat' },
   { id:'rashford', name:'Marcus Rashford', marketValue:55, rating:82, goals:144, age:28, club:'Manchester United', nationality:'İngiltere', position:'Sol Kanat' },
   { id:'camavinga', name:'Eduardo Camavinga', marketValue:100, rating:84, goals:12, age:23, club:'Real Madrid', nationality:'Fransa', position:'Orta Saha' },
   { id:'nico-williams', name:'Nico Williams', marketValue:80, rating:84, goals:34, age:23, club:'Athletic Bilbao', nationality:'İspanya', position:'Sol Kanat' },
   { id:'griezmann', name:'Antoine Griezmann', marketValue:20, rating:86, goals:282, age:35, club:'Atletico Madrid', nationality:'Fransa', position:'Gezici Forvet' },
-  { id:'gavi', name:'Gavi', wiki:'Gavi (footballer)', marketValue:90, rating:84, goals:11, age:21, club:'Barcelona', nationality:'İspanya', position:'Orta Saha' },
+  { id:'gavi', name:'Gavi', marketValue:90, rating:84, goals:11, age:21, club:'Barcelona', nationality:'İspanya', position:'Orta Saha' },
   { id:'muslera', name:'Fernando Muslera', marketValue:1, rating:79, goals:1, age:40, club:'Galatasaray', nationality:'Uruguay', position:'Kaleci' },
   { id:'livakovic', name:'Dominik Livaković', marketValue:11, rating:80, goals:0, age:31, club:'Fenerbahçe', nationality:'Hırvatistan', position:'Kaleci' },
   { id:'gedson', name:'Gedson Fernandes', marketValue:18, rating:79, goals:18, age:27, club:'Beşiktaş', nationality:'Portekiz', position:'Orta Saha' },
@@ -663,6 +665,13 @@ function makeGuess(guess) {
         badge.className = 'result-badge correct';
         badge.style.display = 'block';
 
+        if (window.app) {
+            window.app.addXP(20);
+            if (streak >= 5) {
+                updateMissionProgress('streak_5_higher', streak, true);
+            }
+        }
+
         const msgs = ['Mükemmel! 🎯', 'Harika! 🔥', 'Bravo! 💪', 'Süper! ⚡'];
         if (streak % 5 === 0) showToast(`🔥 ${streak} SERİ! Muazzam gidiyorsun!`);
         else if (streak >= 3) showToast(`${msgs[Math.min(streak-3,3)]} Seri: ${streak}`);
@@ -671,6 +680,8 @@ function makeGuess(guess) {
         badge.textContent = '✗ YANLIŞ';
         badge.className = 'result-badge wrong';
         badge.style.display = 'block';
+
+        if (window.app) window.app.addLoss();
 
         setTimeout(() => showGameOver(), 1200);
         updateScoreUI();
