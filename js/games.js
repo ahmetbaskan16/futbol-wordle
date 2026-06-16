@@ -214,6 +214,20 @@ class WordleGame {
       if (window.app) {
         window.app.addWin('wordle');
         window.app.addXP(xp);
+        
+        // Save win to leaderboard (fail silently)
+        const userData = window.app.user;
+        if (userData) {
+          fetch('/api/leaderboard', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: userData.username || 'Misafir',
+              score: userData.xp,
+              level: userData.level
+            })
+          }).catch(() => {});
+        }
       }
       setTimeout(() => this.showResult(true, xp), 500);
     } else if (this.currentAttempt >= this.maxAttempts) {
