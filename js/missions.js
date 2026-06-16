@@ -9,7 +9,20 @@ const missionsData = [
     { id: 'score_20_logo', title: 'Logo Uzmanı', desc: 'Logo Quiz modunda 20 skora ulaş', goal: 20, xp: 200, icon: '🎨' }
 ];
 
+function checkDailyReset() {
+    const user = JSON.parse(localStorage.getItem('fw_user_data'));
+    if (!user) return;
+
+    const today = new Date().toDateString();
+    if (user.lastMissionReset !== today) {
+        user.missionProgress = {};
+        user.lastMissionReset = today;
+        localStorage.setItem('fw_user_data', JSON.stringify(user));
+    }
+}
+
 function initMissions() {
+    checkDailyReset();
     const container = document.getElementById('daily-missions-container');
     if (!container) return;
 
@@ -43,6 +56,7 @@ function initMissions() {
 }
 
 function updateMissionProgress(id, increment = 1, setDirectly = false) {
+    checkDailyReset();
     const user = JSON.parse(localStorage.getItem('fw_user_data'));
     if (!user) return;
     if (!user.missionProgress) user.missionProgress = {};
