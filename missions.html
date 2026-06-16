@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Görevler - Futbol Wordle</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container header-content">
+            <a href="index.html" class="logo">
+                <div class="logo-icon">⚽</div>
+                <span class="logo-text">FUTBOL WORDLE</span>
+            </a>
+            <div class="header-stats">
+                <div class="stat-badge level"><span id="header-level">Seviye 1</span></div>
+                <div class="stat-badge xp"><span id="header-xp">100 XP</span></div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="container">
+        <div class="nav-tabs">
+            <a href="index.html" class="nav-tab">Ana Sayfa</a>
+            <a href="missions.html" class="nav-tab active">Görevler</a>
+            <a href="leaderboard.html" class="nav-tab">Sıralama</a>
+            <a href="stats.html" class="nav-tab">İstatistikler</a>
+        </div>
+    </nav>
+
+    <main class="container main">
+        <div class="section-header">
+            <h2 class="section-title">Günlük Görevler</h2>
+            <div class="timer-badge">Sıfırlanıyor: 14:22:05</div>
+        </div>
+        
+        <div class="missions-grid" id="daily-missions-container">
+            <!-- Loaded by app.js -->
+        </div>
+
+        <h2 class="section-title" style="margin-top: 40px;">Haftalık Meydan Okumalar</h2>
+        <div class="missions-grid">
+            <div class="mission-card">
+                <div class="mission-icon">📅</div>
+                <div class="mission-content">
+                    <div class="mission-title">İstikrar</div>
+                    <div class="mission-desc">7 gün üst üste en az 1 oyun oyna</div>
+                    <div class="mission-progress">
+                        <div class="progress-bar"><div class="progress-fill" style="width: 42%"></div></div>
+                        <div class="mission-reward">500 XP</div>
+                    </div>
+                </div>
+            </div>
+            <div class="mission-card">
+                <div class="mission-icon">🎖️</div>
+                <div class="mission-content">
+                    <div class="mission-title">Usta Tahminci</div>
+                    <div class="mission-desc">Wordle modunda 10 galibiyet al</div>
+                    <div class="mission-progress">
+                        <div class="progress-bar"><div class="progress-fill" style="width: 20%"></div></div>
+                        <div class="mission-reward">1000 XP</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/app.js"></script>
+    <script src="js/animations.js"></script>
+</body>
+</html>
