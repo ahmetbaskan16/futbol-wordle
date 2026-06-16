@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <!-- Header -->
   <header class="header">
     <div class="container header-content">
       <a href="index.html" class="logo">
@@ -19,27 +18,21 @@
     </div>
   </header>
 
-  <!-- Game Container -->
   <main class="main container">
     <div id="game-container"></div>
   </main>
 
-  <!-- Scripts - BUNLAR ÖNEMLİ! -->
   <script src="js/app.js"></script>
-  <script src="js/animations.js"></script>
+  <script src="js/games.js"></script>
   <script>
-    // URL'den modu al (club veya player)
-    const urlParams = new URLSearchParams(window.location.search);
-    const mode = urlParams.get('mode') || 'club';
-    
-    // Oyunu başlat
-    let wordleGame;
     document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const mode = urlParams.get('mode') || 'club';
+      
       if (document.getElementById('game-container')) {
-        wordleGame = new WordleGame(mode);
+        window.wordleGame = new WordleGame(mode);
       }
     });
   </script>
-  <script src="js/games.js"></script>
 </body>
 </html>
