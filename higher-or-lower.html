@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Higher or Lower">
+    <title>⚽ Higher or Lower - Futbol</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
+            --glass: rgba(255,255,255,0.05);
+            --glass-border: rgba(255,255,255,0.1);
+            --text: #ffffff;
+            --text-muted: rgba(255,255,255,0.6);
+            --correct: #4ade80;
+            --wrong: #ef4444;
+            --accent: #3b82f6;
+            --present: #facc15;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            padding: 16px 16px 40px;
+        }
+
+        /* ── HEADER ── */
+        header {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            position: relative;
+        }
+        .back-btn {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            color: #fff;
+            width: 38px; height: 38px;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; text-decoration: none; font-size: 1.1rem;
+            transition: background 0.2s; flex-shrink: 0;
+        }
+        .back-btn:hover { background: rgba(255,255,255,0.15); }
+        .header-center { text-align: center; flex: 1; }
+        h1 {
+            font-size: clamp(1.3rem, 5vw, 2rem);
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .subtitle { color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px; margin-top: 2px; }
+
+        /* ── SCORE BAR ── */
+        .score-bar {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 16px;
+        }
+        .score-card {
+            flex: 1;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 10px 14px;
+            text-align: center;
+        }
+        .score-val { font-size: 1.5rem; font-weight: 800; display: block; }
+        .score-val.streak-active { color: var(--present); }
+        .score-label { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* ── CATEGORY SWITCHER ── */
+        .cat-switcher {
+            display: flex;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 4px;
+            gap: 4px;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 18px;
+        }
+        .cat-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 4px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            white-space: nowrap;
+        }
+        .cat-btn.active { background: var(--accent); color: #fff; box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+
+        /* ── GAME AREA ── */
+        #game-area {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0;
+        }
+
+        /* Player Card */
+        .player-card {
+            width: 100%;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            transition: border-color 0.3s;
+        }
+        .player-card.result-correct { border-color: var(--correct); box-shadow: 0 0 20px rgba(74,222,128,0.25); }
+        .player-card.result-wrong   { border-color: var(--wrong);   box-shadow: 0 0 20px rgba(239,68,68,0.25); }
+
+        .player-img-wrap {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+            background: #111;
+        }
+        .player-img {
+            width: 100%; height: 100%;
+            object-fit: cover; object-position: top center;
+            display: block;
+        }
+        .player-img-overlay {
+            position: absolute; inset: 0;
+            background: linear-gradient(to bottom, transparent 40%, rgba(10,10,20,0.95) 100%);
+        }
+        .player-name-over {
+            position: absolute;
+            bottom: 10px; left: 14px; right: 14px;
+            font-size: 1.1rem; font-weight: 800;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+        }
+        .player-meta {
+            display: flex; gap: 6px;
+            padding: 10px 14px 4px;
+            flex-wrap: wrap;
+        }
+        .badge {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 6px;
+            padding: 3px 8px;
+            font-size: 0.68rem;
+            color: var(--text-muted);
+        }
+        .stat-row {
+            padding: 10px 14px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .stat-label-txt { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); }
+        .stat-value-txt {
+            font-size: 1.6rem; font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .stat-value-txt.hidden-stat {
+            background: none;
+            -webkit-text-fill-color: rgba(255,255,255,0.2);
+            font-size: 1.1rem;
+            letter-spacing: 4px;
+        }
+
+        /* VS Divider */
+        .vs-divider {
+            width: 50px; height: 50px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 1rem;
+            box-shadow: 0 4px 16px rgba(59,130,246,0.5);
+            z-index: 2;
+            margin: -10px 0;
+            flex-shrink: 0;
+            border: 3px solid #0f0f1a;
+        }
+
+        /* Buttons */
+        .btn-row {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+            margin-top: 18px;
+        }
+        .guess-btn {
+            flex: 1;
+            border: none;
+            border-radius: 14px;
+            padding: 16px;
+            font-size: 1rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .guess-btn:active { transform: scale(0.96); }
+        .guess-btn.higher {
+            background: linear-gradient(135deg, var(--correct) 0%, #22c55e 100%);
+            color: #000;
+            box-shadow: 0 6px 20px rgba(74,222,128,0.3);
+        }
+        .guess-btn.lower {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: #fff;
+            box-shadow: 0 6px 20px rgba(239,68,68,0.3);
+        }
+        .guess-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        /* Result overlay inside second card */
+        .result-badge {
+            position: absolute;
+            top: 12px; right: 12px;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 0.85rem;
+            z-index: 5;
+        }
+        .result-badge.correct { background: var(--correct); color: #000; }
+        .result-badge.wrong   { background: var(--wrong);   color: #fff; }
+
+        /* Next button */
+        .btn-next {
+            width: 100%;
+            margin-top: 14px;
+            background: #fff; color: #000;
+            border: none; border-radius: 14px;
+            padding: 16px;
+            font-size: 1rem; font-weight: 800;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            display: none;
+        }
+        .btn-next:hover { opacity: 0.85; }
+        .btn-next.visible { display: block; }
+
+        /* Game Over */
+        .overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(12px);
+            display: none; flex-direction: column;
+            justify-content: center; align-items: center;
+            z-index: 1000; padding: 20px;
+        }
+        .overlay.show { display: flex; }
+        .modal {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--glass-border);
+            padding: 30px 24px;
+            border-radius: 24px;
+            max-width: 380px;
+            width: 95%;
+            text-align: center;
+        }
+        .modal-emoji { font-size: 3rem; margin-bottom: 10px; }
+        .modal h2 { font-size: 1.6rem; font-weight: 800; margin-bottom: 6px; }
+        .modal p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; }
+        .modal-stats {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 10px; margin-bottom: 20px;
+        }
+        .modal-stat {
+            background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px;
+        }
+        .modal-stat .val { font-size: 1.3rem; font-weight: 800; display: block; }
+        .modal-stat .lbl { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .btn-restart {
+            background: #fff; color: #000; border: none;
+            padding: 14px 36px; border-radius: 12px;
+            font-weight: 700; cursor: pointer; width: 100%;
+            transition: opacity 0.2s; font-size: 1rem;
+        }
+        .btn-restart:hover { opacity: 0.85; }
+
+        /* Toast */
+        .toast {
+            position: fixed; top: 76px; left: 50%; transform: translateX(-50%) translateY(-20px);
+            background: #fff; color: #000;
+            padding: 10px 22px; border-radius: 50px;
+            font-weight: 700; font-size: 0.85rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            opacity: 0; transition: all 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
+            z-index: 2000; pointer-events: none; white-space: nowrap;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        /* Ticker animation */
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .reveal-anim { animation: countUp 0.4s ease forwards; }
+
+        /* Streak fire */
+        .streak-fire { display: inline; }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="index.html" class="back-btn">🏠</a>
+    <div class="header-center">
+        <h1>📊 HIGHER OR LOWER</h1>
+        <div class="subtitle">HANGİ OYUNCU DAHA YÜKSEK?</div>
+    </div>
+    <div style="width:38px"></div>
+</header>
+
+<!-- Score Bar -->
+<div class="score-bar">
+    <div class="score-card">
+        <span class="score-val" id="streak-val">0</span>
+        <span class="score-label">🔥 Güncel Seri</span>
+    </div>
+    <div class="score-card">
+        <span class="score-val" id="best-val">0</span>
+        <span class="score-label">🏆 En İyi</span>
+    </div>
+    <div class="score-card">
+        <span class="score-val" id="total-val">0</span>
+        <span class="score-label">✅ Toplam</span>
+    </div>
+</div>
+
+<!-- Category Switcher -->
+<div class="cat-switcher">
+    <button class="cat-btn active" data-cat="marketValue" onclick="switchCat(this,'marketValue')">💶 Değer</button>
+    <button class="cat-btn" data-cat="goals" onclick="switchCat(this,'goals')">⚽ Gol</button>
+    <button class="cat-btn" data-cat="rating" onclick="switchCat(this,'rating')">🎮 Rating</button>
+    <button class="cat-btn" data-cat="age" onclick="switchCat(this,'age')">🎂 Yaş</button>
+</div>
+
+<!-- Game Area -->
+<div id="game-area">
+    <!-- Left card (known) -->
+    <div class="player-card" id="card-left">
+        <div class="player-img-wrap">
+            <img class="player-img" id="img-left" src="" alt="">
+            <div class="player-img-overlay"></div>
+            <div class="player-name-over" id="name-left"></div>
+        </div>
+        <div class="player-meta" id="meta-left"></div>
+        <div class="stat-row">
+            <span class="stat-label-txt" id="cat-label-left"></span>
+            <span class="stat-value-txt" id="val-left"></span>
+        </div>
+    </div>
+
+    <div class="vs-divider">VS</div>
+
+    <!-- Right card (mystery) -->
+    <div class="player-card" id="card-right">
+        <div class="player-img-wrap">
+            <img class="player-img" id="img-right" src="" alt="">
+            <div class="player-img-overlay"></div>
+            <div class="player-name-over" id="name-right"></div>
+        </div>
+        <div class="player-meta" id="meta-right"></div>
+        <div class="stat-row">
+            <span class="stat-label-txt" id="cat-label-right"></span>
+            <span class="stat-value-txt hidden-stat" id="val-right">???</span>
+        </div>
+        <!-- Result badge appears after guess -->
+        <div class="result-badge" id="result-badge" style="display:none"></div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="btn-row" id="btn-row">
+        <button class="guess-btn higher" onclick="makeGuess('higher')">▲ DAHA YÜKSEK</button>
+        <button class="guess-btn lower"  onclick="makeGuess('lower')">▼ DAHA DÜŞÜK</button>
+    </div>
+
+    <button class="btn-next" id="btn-next" onclick="nextRound()">SONRAKI ➔</button>
+</div>
+
+<!-- Game Over Modal -->
+<div class="overlay" id="gameover-overlay">
+    <div class="modal">
+        <div class="modal-emoji" id="go-emoji">💥</div>
+        <h2 id="go-title">OYUN BİTTİ!</h2>
+        <p id="go-msg">Tekrar dene!</p>
+        <div class="modal-stats">
+            <div class="modal-stat"><span class="val" id="go-streak">0</span><span class="lbl">Bu Seri</span></div>
+            <div class="modal-stat"><span class="val" id="go-best">0</span><span class="lbl">En İyi Seri</span></div>
+        </div>
+        <button class="btn-restart" onclick="restartGame()">🔄 TEKRAR OYNA</button>
+    </div>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script>
+/* ─────────── PLAYER DATA ─────────── */
+const PLAYERS = [
+  { id:'erling-haaland', name:'Erling Haaland', image:'https://upload.wikimedia.org/wikipedia/commons/0/07/Erling_Haaland_2023.jpg', marketValue:180, rating:91, goals:282, age:23, club:'Manchester City', nationality:'Norveç', position:'Santrafor' },
+  { id:'kylian-mbappe', name:'Kylian Mbappé', image:'https://upload.wikimedia.org/wikipedia/commons/b/b3/Kylian_Mbapp%C3%A9_2022_%28cropped%29.jpg', marketValue:180, rating:91, goals:334, age:25, club:'Real Madrid', nationality:'Fransa', position:'Sol Kanat' },
+  { id:'jude-bellingham', name:'Jude Bellingham', image:'https://upload.wikimedia.org/wikipedia/commons/1/14/Jude_Bellingham_2024.jpg', marketValue:180, rating:88, goals:62, age:20, club:'Real Madrid', nationality:'İngiltere', position:'Orta Saha' },
+  { id:'vinicius-junior', name:'Vinícius Júnior', image:'https://upload.wikimedia.org/wikipedia/commons/f/f3/Vinicius_Junior_2021.jpg', marketValue:180, rating:89, goals:98, age:23, club:'Real Madrid', nationality:'Brezilya', position:'Sol Kanat' },
+  { id:'phil-foden', name:'Phil Foden', image:'https://upload.wikimedia.org/wikipedia/commons/0/07/Phil_Foden_2024_%28cropped%29.jpg', marketValue:150, rating:88, goals:87, age:24, club:'Manchester City', nationality:'İngiltere', position:'Sağ Kanat' },
+  { id:'bukayo-saka', name:'Bukayo Saka', image:'https://upload.wikimedia.org/wikipedia/commons/3/3a/Bukayo_Saka_2021_%28cropped%29.jpg', marketValue:140, rating:86, goals:68, age:22, club:'Arsenal', nationality:'İngiltere', position:'Sağ Kanat' },
+  { id:'florian-wirtz', name:'Florian Wirtz', image:'https://upload.wikimedia.org/wikipedia/commons/a/af/Florian_Wirtz_2023.jpg', marketValue:130, rating:87, goals:47, age:21, club:'Bayer Leverkusen', nationality:'Almanya', position:'Asistçi' },
+  { id:'lamine-yamal', name:'Lamine Yamal', image:'https://upload.wikimedia.org/wikipedia/commons/d/da/Spain_vs._Georgia_2024-06-30-221_%28cropped%29.jpg', marketValue:120, rating:81, goals:14, age:16, club:'Barcelona', nationality:'İspanya', position:'Sağ Kanat' },
+  { id:'rodri', name:'Rodri', image:'https://upload.wikimedia.org/wikipedia/commons/f/ff/Rodri_2020_%28cropped%29.jpg', marketValue:120, rating:89, goals:31, age:27, club:'Manchester City', nationality:'İspanya', position:'Ön Libero' },
+  { id:'declan-rice', name:'Declan Rice', image:'https://upload.wikimedia.org/wikipedia/commons/e/ea/West_Ham_v_Arsenal%2C_11_Feb_2024_%281%29_%28cropped%29.jpg', marketValue:120, rating:85, goals:28, age:25, club:'Arsenal', nationality:'İngiltere', position:'Orta Saha' },
+  { id:'harry-kane', name:'Harry Kane', image:'https://upload.wikimedia.org/wikipedia/commons/1/1b/Harry_Kane_2024.jpg', marketValue:110, rating:90, goals:420, age:30, club:'Bayern Münih', nationality:'İngiltere', position:'Santrafor' },
+  { id:'jamal-musiala', name:'Jamal Musiala', image:'https://upload.wikimedia.org/wikipedia/commons/e/e3/Jamal_Musiala_2022_%28cropped%29.jpg', marketValue:110, rating:86, goals:51, age:21, club:'Bayern Münih', nationality:'Almanya', position:'Orta Saha' },
+  { id:'martin-odegaard', name:'Martin Ødegaard', image:'https://upload.wikimedia.org/wikipedia/commons/e/ec/West_Ham_v_Arsenal%2C_11_Feb_2024_%2814%29_%28cropped%29.jpg', marketValue:110, rating:87, goals:58, age:25, club:'Arsenal', nationality:'Norveç', position:'Oyun Kurucu' },
+  { id:'victor-osimhen', name:'Victor Osimhen', image:'https://upload.wikimedia.org/wikipedia/commons/f/fa/Victor_Osimhen_2023_%28cropped%29.jpg', marketValue:100, rating:88, goals:125, age:25, club:'Galatasaray', nationality:'Nijerya', position:'Santrafor' },
+  { id:'federico-valverde', name:'Federico Valverde', image:'https://upload.wikimedia.org/wikipedia/commons/b/ba/Fede_Valverde_2022_%28cropped%29.jpg', marketValue:120, rating:88, goals:38, age:25, club:'Real Madrid', nationality:'Uruguay', position:'Orta Saha' },
+  { id:'rafael-leao', name:'Rafael Leão', image:'https://upload.wikimedia.org/wikipedia/commons/c/c5/Rafael_Le%C3%A3o_2021_%28cropped%29.jpg', marketValue:90, rating:86, goals:64, age:24, club:'Milan', nationality:'Portekiz', position:'Sol Kanat' },
+  { id:'gavi', name:'Gavi', image:'https://upload.wikimedia.org/wikipedia/commons/a/ac/Gavi_2021_%28cropped%29.jpg', marketValue:90, rating:83, goals:9, age:19, club:'Barcelona', nationality:'İspanya', position:'Orta Saha' },
+  { id:'pedri', name:'Pedri', image:'https://upload.wikimedia.org/wikipedia/commons/0/07/Pedri_2021_%28cropped%29.jpg', marketValue:80, rating:86, goals:18, age:21, club:'Barcelona', nationality:'İspanya', position:'Orta Saha' },
+  { id:'khvicha', name:'Khvicha Kvaratskhelia', image:'https://upload.wikimedia.org/wikipedia/commons/1/10/Khvicha_Kvaratskhelia_2022.jpg', marketValue:80, rating:86, goals:42, age:23, club:'Napoli', nationality:'Gürcistan', position:'Sol Kanat' },
+  { id:'ruben-dias', name:'Rúben Dias', image:'https://upload.wikimedia.org/wikipedia/commons/3/36/R%C3%BAben_Dias_2022.jpg', marketValue:80, rating:89, goals:14, age:27, club:'Manchester City', nationality:'Portekiz', position:'Stoper' },
+  { id:'bruno-fernandes', name:'Bruno Fernandes', image:'https://upload.wikimedia.org/wikipedia/commons/c/c5/Bruno_Fernandes_2021_%28cropped%29.jpg', marketValue:70, rating:88, goals:172, age:29, club:'Manchester United', nationality:'Portekiz', position:'Ofansif Orta Saha' },
+  { id:'bernardo-silva', name:'Bernardo Silva', image:'https://upload.wikimedia.org/wikipedia/commons/d/de/Bernardo_Silva_2021_%28cropped%29.jpg', marketValue:70, rating:88, goals:98, age:29, club:'Manchester City', nationality:'Portekiz', position:'Orta Saha' },
+  { id:'salah', name:'Mohamed Salah', image:'https://upload.wikimedia.org/wikipedia/commons/c/c1/Mohamed_Salah_2018.jpg', marketValue:65, rating:89, goals:312, age:32, club:'Liverpool', nationality:'Mısır', position:'Sağ Kanat' },
+  { id:'kdb', name:'Kevin De Bruyne', image:'https://upload.wikimedia.org/wikipedia/commons/4/40/Kevin_De_Bruyne_2018.jpg', marketValue:60, rating:91, goals:148, age:32, club:'Manchester City', nationality:'Belçika', position:'Oyun Kurucu' },
+  { id:'rashford', name:'Marcus Rashford', image:'https://upload.wikimedia.org/wikipedia/commons/f/f6/Marcus_Rashford_at_Old_Trafford_%28cropped%29.jpg', marketValue:60, rating:85, goals:135, age:26, club:'Manchester United', nationality:'İngiltere', position:'Sol Kanat' },
+  { id:'son', name:'Heung-min Son', image:'https://upload.wikimedia.org/wikipedia/commons/c/c4/Son_Heung-min_2022.jpg', marketValue:45, rating:87, goals:218, age:31, club:'Tottenham', nationality:'G. Kore', position:'Sol Kanat' },
+  { id:'neymar', name:'Neymar Jr', image:'https://upload.wikimedia.org/wikipedia/commons/a/a6/Neymar_Jr_Al_Hilal_crop.jpg', marketValue:45, rating:89, goals:436, age:32, club:'Al Hilal', nationality:'Brezilya', position:'Oyun Kurucu' },
+  { id:'hakan', name:'Hakan Çalhanoğlu', image:'https://upload.wikimedia.org/wikipedia/commons/f/fe/Hakan_%C3%87alhano%C4%9Flu_2024.jpg', marketValue:45, rating:85, goals:122, age:30, club:'Inter Milan', nationality:'Türkiye', position:'Orta Saha' },
+  { id:'arda', name:'Arda Güler', image:'https://upload.wikimedia.org/wikipedia/commons/b/bc/Arda_G%C3%BCler_2023_%28cropped%29.jpg', marketValue:45, rating:77, goals:18, age:19, club:'Real Madrid', nationality:'Türkiye', position:'Ofansif Orta Saha' },
+  { id:'messi', name:'Lionel Messi', image:'https://upload.wikimedia.org/wikipedia/commons/b/b4/Lionel-Messi-Argentina-2022-FIFA-World-Cup_%28cropped%29.jpg', marketValue:30, rating:90, goals:838, age:36, club:'Inter Miami', nationality:'Arjantin', position:'Oyun Kurucu' },
+  { id:'griezmann', name:'Antoine Griezmann', image:'https://upload.wikimedia.org/wikipedia/commons/0/0e/France_vs._Canada-224_%28cropped%29.jpg', marketValue:25, rating:88, goals:268, age:33, club:'Atletico Madrid', nationality:'Fransa', position:'Gezici Forvet' },
+  { id:'cr7', name:'Cristiano Ronaldo', image:'https://upload.wikimedia.org/wikipedia/commons/d/d7/Cristiano_Ronaldo_playing_for_Al_Nassr_FC_against_Al_Fateh_FC_on_3_February_2023_%28cropped%29.jpg', marketValue:15, rating:86, goals:895, age:39, club:'Al Nassr', nationality:'Portekiz', position:'Santrafor' },
+  { id:'lewandowski', name:'Robert Lewandowski', image:'https://upload.wikimedia.org/wikipedia/commons/0/03/Robert_Lewandowski_2022_%28cropped%29.jpg', marketValue:15, rating:90, goals:654, age:35, club:'Barcelona', nationality:'Polonya', position:'Santrafor' },
+  { id:'icardi', name:'Mauro Icardi', image:'https://upload.wikimedia.org/wikipedia/commons/f/f3/Mauro_Icardi_2019_%28cropped%29.jpg', marketValue:18, rating:83, goals:240, age:31, club:'Galatasaray', nationality:'Arjantin', position:'Santrafor' },
+  { id:'camavinga', name:'Eduardo Camavinga', image:'https://upload.wikimedia.org/wikipedia/commons/2/22/Eduardo_Camavinga_2021_%28cropped%29.jpg', marketValue:100, rating:82, goals:9, age:21, club:'Real Madrid', nationality:'Fransa', position:'Orta Saha' },
+  { id:'saliba', name:'William Saliba', image:'https://upload.wikimedia.org/wikipedia/commons/7/75/Arsenal_against_Aston_Villa_2024_%284%29_%28cropped%29.jpg', marketValue:80, rating:83, goals:5, age:23, club:'Arsenal', nationality:'Fransa', position:'Stoper' }
+];
+
+/* ─────────── STAT HELPERS ─────────── */
+const CAT_LABELS = { marketValue:'PİYASA DEĞERİ', goals:'TOPLAM GOL', rating:'EA FC REYTİNG', age:'YAŞ' };
+function getStat(p, cat) {
+    switch(cat) { case 'marketValue': return p.marketValue; case 'goals': return p.goals; case 'rating': return p.rating; case 'age': return p.age; }
+}
+function fmtStat(v, cat) {
+    switch(cat) { case 'marketValue': return `€${v}M`; case 'goals': return `${v} Gol`; case 'rating': return `${v}`; case 'age': return `${v} Yaş`; }
+}
+function proxyImg(url) {
+    if (url.includes('wikimedia.org')) return `https://images.weserv.nl/?url=${encodeURIComponent(url)}&w=450&h=450&fit=cover&a=top`;
+    return url;
+}
+
+/* ─────────── STATE ─────────── */
+let category = 'marketValue';
+let streak = 0;
+let totalCorrect = 0;
+let bestStreak = parseInt(localStorage.getItem('hl_best') || '0');
+let leftPlayer = null, rightPlayer = null;
+let answered = false;
+let usedIds = new Set();
+
+/* ─────────── INIT ─────────── */
+function getTwo() {
+    // Reset pool if too full
+    if (usedIds.size > PLAYERS.length - 4) usedIds.clear();
+
+    let pool = PLAYERS.filter(p => !usedIds.has(p.id));
+    // shuffle
+    for (let i = pool.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i+1));
+        [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    // Pick two with different stat values
+    const left = pool[0];
+    const rest = pool.slice(1).filter(p => getStat(p, category) !== getStat(left, category));
+    const right = (rest.length > 0 ? rest : pool.slice(1))[0];
+    usedIds.add(left.id);
+    usedIds.add(right.id);
+    return { left, right };
+}
+
+function renderCard(side, player, hideVal) {
+    const img = document.getElementById(`img-${side}`);
+    const name = document.getElementById(`name-${side}`);
+    const meta = document.getElementById(`meta-${side}`);
+    const valEl = document.getElementById(`val-${side}`);
+    const lblEl = document.getElementById(`cat-label-${side}`);
+
+    img.src = proxyImg(player.image);
+    img.alt = player.name;
+    name.textContent = player.name;
+    meta.innerHTML = `<span class="badge">🏟 ${player.club}</span><span class="badge">🌍 ${player.nationality}</span><span class="badge">📍 ${player.position}</span>`;
+    lblEl.textContent = CAT_LABELS[category];
+
+    if (hideVal) {
+        valEl.textContent = '???';
+        valEl.className = 'stat-value-txt hidden-stat';
+    } else {
+        valEl.textContent = fmtStat(getStat(player, category), category);
+        valEl.className = 'stat-value-txt';
+    }
+}
+
+function loadRound() {
+    answered = false;
+    const pair = getTwo();
+    leftPlayer = pair.left;
+    rightPlayer = pair.right;
+
+    // Reset card states
+    document.getElementById('card-left').className = 'player-card';
+    document.getElementById('card-right').className = 'player-card';
+    document.getElementById('result-badge').style.display = 'none';
+
+    renderCard('left', leftPlayer, false);
+    renderCard('right', rightPlayer, true);
+
+    // Enable buttons
+    document.querySelectorAll('.guess-btn').forEach(b => b.disabled = false);
+    document.getElementById('btn-next').classList.remove('visible');
+}
+
+function updateScoreUI() {
+    const sv = document.getElementById('streak-val');
+    sv.textContent = streak;
+    sv.className = 'score-val' + (streak > 0 ? ' streak-active' : '');
+    document.getElementById('best-val').textContent = bestStreak;
+    document.getElementById('total-val').textContent = totalCorrect;
+}
+
+/* ─────────── GUESS LOGIC ─────────── */
+function makeGuess(guess) {
+    if (answered) return;
+    answered = true;
+    document.querySelectorAll('.guess-btn').forEach(b => b.disabled = true);
+
+    const leftVal = getStat(leftPlayer, category);
+    const rightVal = getStat(rightPlayer, category);
+
+    let correct;
+    if (rightVal === leftVal) {
+        correct = true; // draw = correct (rare)
+    } else if (guess === 'higher') {
+        correct = rightVal > leftVal;
+    } else {
+        correct = rightVal < leftVal;
+    }
+
+    // Reveal right value
+    const valEl = document.getElementById('val-right');
+    valEl.className = 'stat-value-txt reveal-anim';
+    valEl.textContent = fmtStat(rightVal, category);
+
+    const badge = document.getElementById('result-badge');
+    const cardRight = document.getElementById('card-right');
+
+    if (correct) {
+        streak++;
+        totalCorrect++;
+        if (streak > bestStreak) {
+            bestStreak = streak;
+            localStorage.setItem('hl_best', bestStreak);
+        }
+        cardRight.className = 'player-card result-correct';
+        badge.textContent = '✓ DOĞRU';
+        badge.className = 'result-badge correct';
+        badge.style.display = 'block';
+
+        const msgs = ['Mükemmel! 🎯', 'Harika! 🔥', 'Bravo! 💪', 'Süper! ⚡'];
+        if (streak % 5 === 0) showToast(`🔥 ${streak} SERİ! İnanılmaz!`);
+        else if (streak >= 3) showToast(`${msgs[Math.min(streak-3,3)]} Seri: ${streak}`);
+    } else {
+        cardRight.className = 'player-card result-wrong';
+        badge.textContent = '✗ YANLIŞ';
+        badge.className = 'result-badge wrong';
+        badge.style.display = 'block';
+
+        // Short delay then game over
+        setTimeout(() => showGameOver(), 1200);
+        updateScoreUI();
+        return;
+    }
+
+    updateScoreUI();
+    document.getElementById('btn-next').classList.add('visible');
+}
+
+function nextRound() {
+    loadRound();
+}
+
+/* ─────────── GAME OVER ─────────── */
+function showGameOver() {
+    document.getElementById('go-streak').textContent = streak;
+    document.getElementById('go-best').textContent = bestStreak;
+    document.getElementById('go-emoji').textContent = streak >= 10 ? '🏆' : streak >= 5 ? '🔥' : '💥';
+    document.getElementById('go-title').textContent = streak >= 10 ? 'EFSANE PERFORMANS!' : streak >= 5 ? 'HARIKA BİR SERİ!' : 'OYUN BİTTİ!';
+    document.getElementById('go-msg').textContent = `${streak} doğru cevapla seriyi tamamladın.`;
+    document.getElementById('gameover-overlay').classList.add('show');
+}
+
+function restartGame() {
+    streak = 0;
+    totalCorrect = 0;
+    usedIds.clear();
+    document.getElementById('gameover-overlay').classList.remove('show');
+    updateScoreUI();
+    loadRound();
+}
+
+/* ─────────── CATEGORY SWITCH ─────────── */
+function switchCat(btn, cat) {
+    if (category === cat) return;
+    category = cat;
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    usedIds.clear();
+    loadRound();
+}
+
+/* ─────────── TOAST ─────────── */
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+/* ─────────── START ─────────── */
+window.onload = () => {
+    updateScoreUI();
+    loadRound();
+};
+</script>
+</body>
+</html>
