@@ -482,8 +482,7 @@ function fmtStat(v, cat) {
     switch(cat) { case 'marketValue': return `€${v}M`; case 'goals': return `${v} Gol`; case 'rating': return `${v}`; case 'age': return `${v} Yaş`; }
 }
 function proxyImg(url) {
-    if (url.includes('wikimedia.org')) return `https://images.weserv.nl/?url=${encodeURIComponent(url)}&w=450&h=450&fit=cover&a=top`;
-    return url;
+    return url; // Doğrudan orijinal bağlantıyı kullanıyoruz (Proxy iptal)
 }
 
 /* ─────────── STATE ─────────── */
@@ -518,6 +517,11 @@ function renderCard(side, player, hideVal) {
     const meta = document.getElementById(`meta-${side}`);
     const valEl = document.getElementById(`val-${side}`);
     const lblEl = document.getElementById(`cat-label-${side}`);
+
+    // Görsel yüklenmezse placeholder göster
+    img.onerror = function() {
+        this.src = `https://placehold.co/450x450/111111/ffffff?text=${encodeURIComponent(player.name)}`;
+    };
 
     img.src = proxyImg(player.image);
     img.alt = player.name;
