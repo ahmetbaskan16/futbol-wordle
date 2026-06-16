@@ -1,7 +1,7 @@
 {
   "name": "futbol-wordle",
   "version": "1.0.0",
-  "description": "Elite Football Wordle Game",
-  "main": "index.html",
-  "dependencies": {}
+  "dependencies": {
+    "@upstash/redis": "^1.34.0"
+  }
 }
