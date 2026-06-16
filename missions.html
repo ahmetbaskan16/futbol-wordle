@@ -33,7 +33,7 @@
     <main class="container main">
         <div class="section-header">
             <h2 class="section-title">Günlük Görevler</h2>
-            <div class="timer-badge">Sıfırlanıyor: 14:22:05</div>
+            <div class="timer-badge" id="mission-timer">Sıfırlanıyor: --:--:--</div>
         </div>
         
         <div class="missions-grid" id="daily-missions-container">
@@ -70,5 +70,25 @@
     <script src="js/app.js"></script>
     <script src="js/missions.js"></script>
     <script src="js/animations.js"></script>
+    <script>
+        // Mission Timer Implementation
+        function updateCountdown() {
+            const now = new Date();
+            const tomorrow = new Date();
+            tomorrow.setHours(24, 0, 0, 0);
+            
+            const diff = tomorrow - now;
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            const timerElement = document.getElementById('mission-timer');
+            if (timerElement) {
+                timerElement.textContent = `Sıfırlanıyor: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            }
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+    </script>
 </body>
 </html>
