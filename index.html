@@ -13,7 +13,7 @@
     <header class="header">
         <div class="container header-content">
             <a href="index.html" class="logo">
-                <div class="logo-icon">⚽</div>
+                <div class="logo-icon" id="logo-icon">⚽</div>
                 <span class="logo-text">FUTBOL WORDLE</span>
             </a>
             
@@ -43,8 +43,10 @@
         </div>
     </nav>
 
-    <!-- Mobile Menu -->
+    <!-- Mobile Menu Overlay -->
     <div class="mobile-menu-overlay" id="mobile-menu-overlay"></div>
+    
+    <!-- Mobile Side Menu -->
     <div class="mobile-menu" id="mobile-menu">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
             <h3 style="margin: 0;">Menü</h3>
@@ -61,28 +63,8 @@
         </div>
     </div>
 
-    <!-- Bottom Navigation -->
-    <nav class="bottom-nav">
-        <a href="index.html" class="bottom-nav-item active">
-            <span class="icon">🏠</span>
-            <span>Ana Sayfa</span>
-        </a>
-        <a href="missions.html" class="bottom-nav-item">
-            <span class="icon">🎯</span>
-            <span>Görevler</span>
-        </a>
-        <a href="leaderboard.html" class="bottom-nav-item">
-            <span class="icon">🏆</span>
-            <span>Sıralama</span>
-        </a>
-        <a href="stats.html" class="bottom-nav-item">
-            <span class="icon">📊</span>
-            <span>Profil</span>
-        </a>
-    </nav>
-
     <main class="container main">
-        <section class="xp-progress-section">
+        <section class="xp-progress-section reveal">
             <div class="xp-info">
                 <div class="xp-current">
                     <span class="icon">🏆</span>
@@ -96,7 +78,7 @@
         </section>
 
         <section class="games-grid">
-            <a href="wordle.html?mode=club" class="game-card club glass-card">
+            <a href="wordle.html?mode=club" class="game-card club glass-card reveal">
                 <span class="new-badge">Yeni</span>
                 <div class="game-card-icon">🏗️</div>
                 <h3 class="game-card-title">Kulüp Wordle</h3>
@@ -107,7 +89,7 @@
                 </div>
             </a>
 
-            <a href="wordle.html?mode=player" class="game-card player glass-card">
+            <a href="wordle.html?mode=player" class="game-card player glass-card reveal">
                 <div class="game-card-icon">👤</div>
                 <h3 class="game-card-title">Oyuncu Wordle</h3>
                 <p class="game-card-desc">Transfer geçmişi ve özelliklerine göre gizli oyuncuyu bul.</p>
@@ -117,7 +99,7 @@
                 </div>
             </a>
 
-            <a href="higher-or-lower.html" class="game-card daily glass-card">
+            <a href="higher-or-lower.html" class="game-card daily glass-card reveal">
                 <div class="game-card-icon">📊</div>
                 <h3 class="game-card-title">Alt-Üst</h3>
                 <p class="game-card-desc">Hangi oyuncunun piyasa değeri veya gol sayısı daha fazla?</p>
@@ -127,7 +109,7 @@
                 </div>
             </a>
 
-            <a href="logo-quiz.html" class="game-card infinite glass-card">
+            <a href="logo-quiz.html" class="game-card infinite glass-card reveal">
                 <div class="game-card-icon">🎨</div>
                 <h3 class="game-card-title">Logo Quiz</h3>
                 <p class="game-card-desc">Hızla değişen logoları tanı, en yüksek skoru yap.</p>
@@ -138,7 +120,7 @@
             </a>
         </section>
 
-        <section class="missions-section">
+        <section class="missions-section reveal">
             <div class="section-header">
                 <h2 class="section-title">
                     <span class="icon">🎯</span>
@@ -165,6 +147,29 @@
             <p>© 2024 Futbol Wordle Pro. Tüm hakları saklıdır.</p>
         </div>
     </footer>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="index.html" class="bottom-nav-item active">
+            <span class="icon">🏠</span>
+            <span>Ana Sayfa</span>
+        </a>
+        <a href="missions.html" class="bottom-nav-item">
+            <span class="icon">🎯</span>
+            <span>Görevler</span>
+        </a>
+        <a href="leaderboard.html" class="bottom-nav-item">
+            <span class="icon">🏆</span>
+            <span>Sıralama</span>
+        </a>
+        <a href="stats.html" class="bottom-nav-item">
+            <span class="icon">📊</span>
+            <span>Profil</span>
+        </a>
+    </nav>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
 
     <div class="level-up-toast" id="level-up-toast">
         <h2>TEBRİKLER!</h2>
