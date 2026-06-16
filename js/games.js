@@ -4,14 +4,15 @@
 
 class WordleGame {
   constructor(mode = 'club') {
+    this.mode = mode;
     // Mod bazlı kelime listesi
     if (mode === 'club') {
       this.words = [
         'FENERBAHCE', 'GALATASARAY', 'BESIKTAS', 'TRABZONSPOR', 
-        'BURSASPOR', 'BESIKTAS', 'ANTALYASPOR', 'SIVASSPOR',
-        'REALMADRID', 'BARCELONA', 'MANCHESTER', 'LIVERPOOL',
-        'CHELSEA', 'ARSENAL', 'BAYERN', 'JUVENTUS',
-        'PSG', 'MILAN', 'INTER', 'ATLETICO'
+        'BURSASPOR', 'ANTALYASPOR', 'SIVASSPOR', 'REALMADRID', 
+        'BARCELONA', 'MANCHESTER', 'LIVERPOOL', 'CHELSEA', 
+        'ARSENAL', 'BAYERN', 'JUVENTUS', 'PSG', 'MILAN', 
+        'INTER', 'ATLETICO'
       ];
     } else {
       // Oyuncu modu
@@ -23,7 +24,6 @@ class WordleGame {
       ];
     }
     
-    this.mode = mode;
     this.targetWord = this.words[Math.floor(Math.random() * this.words.length)].toUpperCase();
     this.maxAttempts = 6;
     this.currentAttempt = 0;
@@ -96,7 +96,6 @@ class WordleGame {
       keyboard.appendChild(rowEl);
     });
     
-    // Bottom row
     const bottomRow = document.createElement('div');
     bottomRow.style.cssText = 'display:flex;gap:6px';
     
@@ -109,12 +108,13 @@ class WordleGame {
     bottomRow.appendChild(backKey);
     keyboard.appendChild(bottomRow);
     
-    document.addEventListener('keydown', (e) => {
+    this._keydownHandler = (e) => {
       if (this.gameOver) return;
       if (e.key === 'Enter') this.handleEnter();
       else if (e.key === 'Backspace') this.handleBackspace();
       else if (/^[a-zA-Z]$/.test(e.key)) this.handleInput(e.key.toUpperCase());
-    });
+    };
+    document.addEventListener('keydown', this._keydownHandler);
   }
 
   createKey(label, className = '') {
@@ -145,19 +145,22 @@ class WordleGame {
   updateTiles() {
     for (let j = 0; j < this.targetWord.length; j++) {
       const tile = document.getElementById(`tile-${this.currentAttempt}-${j}`);
-      tile.textContent = this.currentGuess[j] || '';
-      tile.style.background = this.currentGuess[j] ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)';
+      if (tile) {
+        tile.textContent = this.currentGuess[j] || '';
+        tile.style.background = this.currentGuess[j] ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.05)';
+      }
     }
   }
 
   handleEnter() {
     if (this.gameOver) return;
     if (this.currentGuess.length !== this.targetWord.length) {
-      // Shake animation
       for (let j = 0; j < this.targetWord.length; j++) {
         const tile = document.getElementById(`tile-${this.currentAttempt}-${j}`);
-        tile.style.animation = 'shake 0.5s';
-        setTimeout(() => tile.style.animation = '', 500);
+        if (tile) {
+          tile.style.animation = 'shake 0.5s';
+          setTimeout(() => tile.style.animation = '', 500);
+        }
       }
       return;
     }
@@ -178,7 +181,6 @@ class WordleGame {
       targetLetterCount[char] = (targetLetterCount[char] || 0) + 1;
     }
     
-    // First pass: Green
     guess.split('').forEach((char, i) => {
       if (char === target[i]) {
         rowTiles[i].classList.add('correct');
@@ -188,7 +190,6 @@ class WordleGame {
       }
     });
     
-    // Second pass: Yellow/Gray
     guess.split('').forEach((char, i) => {
       if (char !== target[i]) {
         if (targetLetterCount[char] > 0) {
@@ -210,15 +211,14 @@ class WordleGame {
     if (guess === target) {
       this.gameOver = true;
       const xp = (this.maxAttempts - this.currentAttempt + 1) * 50;
-      if (typeof fwApp !== 'undefined') {
-        fwApp.updateStats(true);
-        fwApp.addXP(xp);
-        fwApp.updateMissionProgress('wordle_win');
+      if (window.app) {
+        window.app.addWin('wordle');
+        window.app.addXP(xp);
       }
       setTimeout(() => this.showResult(true, xp), 500);
     } else if (this.currentAttempt >= this.maxAttempts) {
       this.gameOver = true;
-      if (typeof fwApp !== 'undefined') fwApp.updateStats(false);
+      if (window.app) window.app.addLoss();
       setTimeout(() => this.showResult(false, 0), 500);
     }
   }
@@ -231,7 +231,7 @@ class WordleGame {
       justify-content:center;z-index:1000;
     `;
     overlay.innerHTML = `
-      <div style="background:#1f2937;padding:40px;border-radius:24px;text-align:center;max-width:400px">
+      <div style="background:#1f2937;padding:40px;border-radius:24px;text-align:center;max-width:400px;color:white">
         <div style="font-size:4rem;margin-bottom:16px">${won ? '🎉' : '😔'}</div>
         <h2 style="margin-bottom:16px">${won ? 'Tebrikler!' : 'Oyun Bitti'}</h2>
         ${won ? `<p style="color:#fbbf24;font-size:1.5rem;margin-bottom:16px">⚡ +${xp} XP</p>` : `<p>Doğru kelime: <strong>${this.targetWord}</strong></p>`}
@@ -244,15 +244,3 @@ class WordleGame {
     document.body.appendChild(overlay);
   }
 }
-
-// Global instance
-let wordleGame;
-
-document.addEventListener('DOMContentLoaded', () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const mode = urlParams.get('mode') || 'club';
-  
-  if (document.getElementById('game-container')) {
-    wordleGame = new WordleGame(mode);
-  }
-});
