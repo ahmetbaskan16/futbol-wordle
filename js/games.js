@@ -29,6 +29,8 @@ class WordleGame {
     this.currentAttempt = 0;
     this.currentGuess = '';
     this.gameOver = false;
+    this.keyElements = {};
+    this.keyStatus = {}; // harf bazlı en iyi durum: 'correct' > 'present' > 'absent'
     
     this.container = document.getElementById('game-container');
     this.init();
@@ -127,6 +129,9 @@ class WordleGame {
       cursor:pointer;transition:all 0.15s;
     `;
     if (className === 'wide') key.style.minWidth = '70px';
+    if (label.length === 1) {
+      this.keyElements[label] = key;
+    }
     return key;
   }
 
@@ -167,6 +172,60 @@ class WordleGame {
     this.checkGuess();
   }
 
+  updateKeyboardColors(guess, target) {
+    const priority = { absent: 0, present: 1, correct: 2 };
+    const letterCount = {};
+    for (const char of target) {
+      letterCount[char] = (letterCount[char] || 0) + 1;
+    }
+
+    // Önce 'correct' durumları belirle (renk önceliği en yüksek)
+    const statusForIndex = new Array(guess.length).fill(null);
+    guess.split('').forEach((char, i) => {
+      if (char === target[i]) {
+        statusForIndex[i] = 'correct';
+        letterCount[char]--;
+      }
+    });
+    guess.split('').forEach((char, i) => {
+      if (statusForIndex[i]) return;
+      if (letterCount[char] > 0) {
+        statusForIndex[i] = 'present';
+        letterCount[char]--;
+      } else {
+        statusForIndex[i] = 'absent';
+      }
+    });
+
+    statusForIndex.forEach((status, i) => {
+      const char = guess[i];
+      const current = this.keyStatus[char];
+      if (!current || priority[status] > priority[current]) {
+        this.keyStatus[char] = status;
+      }
+    });
+
+    Object.keys(this.keyStatus).forEach(char => {
+      const keyEl = this.keyElements[char];
+      if (!keyEl) return;
+      const status = this.keyStatus[char];
+      keyEl.classList.remove('correct', 'present', 'absent');
+      keyEl.classList.add(status);
+      if (status === 'correct') {
+        keyEl.style.background = '#10b981';
+        keyEl.style.borderColor = '#10b981';
+        keyEl.style.color = '#ffffff';
+      } else if (status === 'present') {
+        keyEl.style.background = '#f59e0b';
+        keyEl.style.borderColor = '#f59e0b';
+        keyEl.style.color = '#ffffff';
+      } else {
+        keyEl.style.background = 'rgba(255,255,255,0.05)';
+        keyEl.style.color = '#6b7280';
+      }
+    });
+  }
+
   checkGuess() {
     const guess = this.currentGuess;
     const target = this.targetWord;
@@ -204,7 +263,9 @@ class WordleGame {
         }
       }
     });
-    
+
+    this.updateKeyboardColors(guess, target);
+
     this.currentAttempt++;
     this.currentGuess = '';
     
